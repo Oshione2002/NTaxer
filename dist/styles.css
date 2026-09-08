@@ -261,10 +261,3 @@ h2,h3{font-weight:750}
 @media(max-width:650px){.law-filter-control{gap:5px;padding:8px}.law-filter-control select{width:90px;font-size:14px}}
 @media print{.law-search-controls{display:none}}
 
-/* Leave a clear gap between the edge toggle and the first sidebar item. */
-@media screen{
- .sidebar{padding-top:80px}
-}
-@media screen and (max-width:650px){
- .sidebar{padding-top:72px}
-}
