@@ -108,3 +108,18 @@
  .scroll-to-top{right:16px;bottom:max(16px,env(safe-area-inset-bottom))}
 }
 @media print{.scroll-to-top{display:none}.law-toolbar{display:block}.law-toolbar .search{display:none}}
+
+/* Sticky controls and bounded category headings share the sidebar scroll area. */
+.calculator-menu{--calculator-heading-height:45px;--calculator-search-height:70px}
+.calculator-menu-content{padding-top:0;margin-top:0}
+.calculator-search-bar{padding:12px 0;background:#fbfcfb}
+.calculator-search-bar .search{margin:0}
+.calculator-nav-group{padding-bottom:12px}
+.calculator-menu .nav-group{margin:0;padding:10px 8px;background:#fbfcfb;line-height:1.5}
+@media screen{
+ .calculator-menu>summary{position:sticky;top:0;z-index:4;background:#fbfcfb}
+ .calculator-menu>summary.active{background:#e4eee7}
+ .calculator-search-bar{position:sticky;top:var(--calculator-heading-height);z-index:3}
+ .calculator-menu .nav-group{position:sticky;top:calc(var(--calculator-heading-height) + var(--calculator-search-height));z-index:2;border-bottom:1px solid var(--line)}
+ .calculator-menu .calc-link{scroll-margin-top:calc(var(--calculator-heading-height) + var(--calculator-search-height) + 64px)}
+}
