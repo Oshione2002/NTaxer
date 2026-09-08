@@ -150,7 +150,7 @@ updateScrollTopButton();
 
 // Keep the pinned category headings below the actual menu and search heights.
 const calculatorMenu=$('.calculator-menu');
-const calculatorSummary=calculatorMenu.querySelector('summary');
+const calculatorSummary=calculatorMenu.querySelector('.calculator-menu-toggle');
 const calculatorSearchBar=$('.calculator-search-bar');
 const syncCalculatorStickyHeights=()=>{
  for(const [element,property] of [[calculatorSummary,'--calculator-heading-height'],[calculatorSearchBar,'--calculator-search-height']]){
@@ -161,5 +161,12 @@ const syncCalculatorStickyHeights=()=>{
 const calculatorStickyObserver=new ResizeObserver(syncCalculatorStickyHeights);
 calculatorStickyObserver.observe(calculatorSummary);
 calculatorStickyObserver.observe(calculatorSearchBar);
-calculatorMenu.addEventListener('toggle',syncCalculatorStickyHeights);
+calculatorSummary.addEventListener('click',()=>{
+ const expanded=calculatorSummary.getAttribute('aria-expanded')!=='true';
+ calculatorSummary.setAttribute('aria-expanded',String(expanded));
+ calculatorMenu.classList.toggle('is-open',expanded);
+ $('.sidebar-primary').classList.toggle('calculators-expanded',expanded);
+ $('#calculator-menu-options').hidden=!expanded;
+ syncCalculatorStickyHeights();
+});
 syncCalculatorStickyHeights();

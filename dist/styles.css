@@ -60,18 +60,18 @@
 
 /* All tax calculators are grouped beneath one keyboard-accessible disclosure. */
 .calculator-menu{min-width:0}
-.calculator-menu>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;list-style:none;cursor:pointer;padding:10px 12px;border-radius:8px;font-size:16px;color:var(--muted)}
-.calculator-menu>summary::-webkit-details-marker{display:none}
-.calculator-menu>summary:hover{background:#ecf1ee}
-.calculator-menu>summary.active{background:#e4eee7;color:var(--green);font-weight:700}
-.calculator-menu>summary svg{flex-shrink:0}
-.calculator-menu[open]>summary svg{transform:rotate(180deg)}
+.calculator-menu>.calculator-menu-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;list-style:none;cursor:pointer;padding:10px 12px;border-radius:8px;font-size:16px;color:var(--muted)}
+.calculator-menu>.calculator-menu-toggle::-webkit-details-marker{display:none}
+.calculator-menu>.calculator-menu-toggle:hover{background:#ecf1ee}
+.calculator-menu>.calculator-menu-toggle.active{background:#e4eee7;color:var(--green);font-weight:700}
+.calculator-menu>.calculator-menu-toggle svg{flex-shrink:0}
+.calculator-menu.is-open>.calculator-menu-toggle svg{transform:rotate(180deg)}
 .calculator-menu-content{padding:12px 5px 6px;margin:4px 0 8px;max-height:none;overflow:visible}
 .calculator-menu #calculator-nav{display:block;max-height:none;overflow:visible;padding:0}
 .calculator-menu .nav-group{display:block;margin:20px 8px 8px}
 .calculator-menu .calc-link{white-space:normal;border:0}
 @media(max-width:650px){
- .calculator-menu>summary{font-size:15px}
+ .calculator-menu>.calculator-menu-toggle{font-size:15px}
  .calculator-menu .calc-link{margin:3px 0}
 }
 
@@ -117,9 +117,23 @@
 .calculator-nav-group{padding-bottom:12px}
 .calculator-menu .nav-group{margin:0;padding:10px 8px;background:#fbfcfb;line-height:1.5}
 @media screen{
- .calculator-menu>summary{position:sticky;top:0;z-index:4;background:#fbfcfb}
- .calculator-menu>summary.active{background:#e4eee7}
+ .calculator-menu>.calculator-menu-toggle{position:sticky;top:0;z-index:4;background:#fbfcfb}
+ .calculator-menu>.calculator-menu-toggle.active{background:#e4eee7}
  .calculator-search-bar{position:sticky;top:var(--calculator-heading-height);z-index:3}
  .calculator-menu .nav-group{position:sticky;top:calc(var(--calculator-heading-height) + var(--calculator-search-height));z-index:2;border-bottom:1px solid var(--line)}
  .calculator-menu .calc-link{scroll-margin-top:calc(var(--calculator-heading-height) + var(--calculator-search-height) + 64px)}
+}
+
+/* Expanding calculators reserves a scrolling middle area above the two page links. */
+.calculator-menu-toggle{width:100%;border:0;background:transparent;font-family:inherit;text-align:left;font-weight:400;flex-shrink:0}
+.calculator-menu-content[hidden]{display:none!important}
+@media screen{
+ .sidebar-primary.calculators-expanded{height:100%;min-height:0;margin:0;padding:0;border:0}
+ .sidebar-primary>a{display:block;flex-shrink:0}
+ .calculator-menu.is-open{display:flex;flex-direction:column;flex:1 1 0;min-height:0}
+ .calculator-menu.is-open>.calculator-menu-toggle{position:relative;top:auto}
+ .calculator-menu.is-open .calculator-menu-content{flex:1 1 0;min-height:0;margin:0;overflow-y:auto;overscroll-behavior-y:auto;scrollbar-width:thin}
+ .calculator-menu.is-open .calculator-search-bar{top:0;flex-shrink:0}
+ .calculator-menu.is-open .nav-group{top:var(--calculator-search-height)}
+ .calculator-menu.is-open .calc-link{scroll-margin-top:calc(var(--calculator-search-height) + 64px)}
 }
