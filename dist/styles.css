@@ -89,3 +89,22 @@
  .sidebar-toggle{left:calc(var(--sidebar-width) - 16px);border-radius:8px}
  .sidebar-toggle[aria-expanded="false"]{left:0;border-radius:0 8px 8px 0}
 }
+
+/* Keep law search beside its heading and available throughout the reference page. */
+.law-toolbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,360px);align-items:center;gap:20px;background:#f3f6f5;padding:14px 0 18px;margin-bottom:18px;border-bottom:1px solid var(--line)}
+.law-toolbar h1{margin-bottom:0}
+.law-toolbar .wide-search{margin:0;width:100%;max-width:none}
+.law-toolbar .wide-search input{min-width:0}
+@media screen{
+ .law-toolbar{position:sticky;top:var(--header-height);z-index:6}
+ .law-item,.law-count{scroll-margin-top:calc(var(--law-toolbar-height,120px) + 12px)}
+}
+.scroll-to-top{position:fixed;right:24px;bottom:max(24px,env(safe-area-inset-bottom));z-index:8;display:grid;place-items:center;width:48px;height:48px;border:1px solid #386758;border-radius:50%;background:var(--green);color:white;box-shadow:0 4px 14px #073e3226}
+.scroll-to-top:hover{background:#125441}
+.scroll-to-top[hidden]{display:none}
+@media(max-width:1150px){.law-toolbar{grid-template-columns:minmax(0,1fr);gap:12px}}
+@media(max-width:650px){
+ .law-toolbar{padding:10px 0 14px}
+ .scroll-to-top{right:16px;bottom:max(16px,env(safe-area-inset-bottom))}
+}
+@media print{.scroll-to-top{display:none}.law-toolbar{display:block}.law-toolbar .search{display:none}}
