@@ -409,3 +409,54 @@ body{font-size:16px}
  .home-group{order:initial}
  .home-reference-links{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+
+/* Small-screen breathing room. */
+@media screen and (max-width:650px){
+ .topbar{padding-left:20px;padding-right:20px}
+ main,.shell:not(.sidebar-collapsed)>main,.shell.sidebar-collapsed>main{padding-left:20px;padding-right:20px}
+ footer{padding-left:20px;padding-right:20px}
+}
+
+/* Keep native dropdown menus legible in both themes. */
+select option{background-color:var(--surface);color:var(--tone-172e28)}
+:root[data-theme="dark"] select{color-scheme:dark}
+:root[data-theme="dark"] select option{background-color:#14221d;color:#f7fbf8}
+
+/* Keep the footer at the viewport bottom on short responsive pages. */
+@media screen and (max-width:940px){
+ .shell{display:flex;flex-direction:column;min-height:calc(100dvh - var(--header-height))}
+ .shell>main{flex:1 0 auto}
+ .shell>footer{flex:0 0 auto;margin-top:auto}
+}
+
+/* Tax Coverage search and filter controls. */
+.coverage-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;gap:10px;margin:22px 0 12px}
+.coverage-toolbar .wide-search{width:100%;max-width:none;margin:0}
+.coverage-filter-control{displaydisplay:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--green)}
+.coverage-filter-control svg{flex-shrink:0}
+.coverage-filter-control select{min-width:130px;padding:6px 0;border:0;background:transparent;color:inherit;font:inherit;font-size:14px;cursor:pointer}
+.coverage-filter-control:focus-within{outline:2px solid var(--tone-219d72);outline-offset:2px}
+.coverage-empty{grid-column:1/-1}
+@media(max-width:480px){
+ .coverage-toolbar{grid-template-columns:minmax(0,1fr)}
+ .coverage-filter-control{width:100%}
+ .coverage-filter-control select{width:100%}
+}
+
+/* Slide the sidebar and animate the matching header icon. */
+@media screen{
+ .sidebar{transform:translateX(0);visibility:visible;transition:transform .26s ease,visibility 0s}
+ .sidebar[hidden]{display:flex!important;transform:translateX(calc(-100% - 10px));visibility:hidden;pointer-events:none;transition:transform .26s ease,visibility 0s .26s}
+ .topbar .sidebar-toggle{overflow:hidden}
+ .sidebar-toggle .sidebar-open-icon,.sidebar-toggle .sidebar-close-icon{display:block;grid-area:1/1;transition:opacity .18s ease,transform .26s ease}
+ .sidebar-toggle[aria-expanded="true"] .sidebar-open-icon{opacity:0;transform:translateX(-12px) rotate(-90deg)}
+ .sidebar-toggle[aria-expanded="true"] .sidebar-close-icon{opacity:1;transform:translateX(0) rotate(0)}
+ .sidebar-toggle[aria-expanded="false"] .sidebar-open-icon{opacity:1;transform:translateX(0) rotate(0)}
+ .sidebar-toggle[aria-expanded="false"] .sidebar-close-icon{opacity:0;transform:translateX(12px) rotate(90deg)}
+ .sidebar-toggle:active{transform:scale(.94)}
+}
+@media(prefers-reduced-motion:reduce){
+ .sidebar,.sidebar[hidden],.sidebar-toggle .sidebar-open-icon,.sidebar-toggle .sidebar-close-icon{transition:none}
+}
+@media print{.sidebar,.sidebar[hidden]{display:none!important}}
