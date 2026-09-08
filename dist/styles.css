@@ -304,3 +304,60 @@ h2,h3{font-weight:750}
 @media screen{
  .sidebar-toggle[aria-expanded="true"]{left:calc(var(--sidebar-width) - 24px)}
 }
+
+
+/* Restore the original compact typography scale. */
+body{font-size:16px}
+.sidebar-heading,.nav-group,.eyebrow,.badge,.step,.field .hint,.checkfield small,.field-divider,.form-actions,.result-metrics small,.bar-labels,.info-note,th,.inline-ref,footer,.mini-label,.sidebar-theme-controls>span,.sticky-estimate span{font-size:12px}
+.side-note,.source-shortcut,.error,.text-button,.result-heading,.result-sub,.button,.result-row,table,.coverage-card ul,.filter-chips button,.law-item a,.law-count,.toast{font-size:13px}
+.topbar nav a,.edition,.search input,.calc-link,.side-note strong,.field>span:first-child,.checkfield,.notice,.tabbar button,.detail-card,.coverage-card p,.coverage-card a,.source-entry p,.sidebar-primary>a,.calculator-menu>.calculator-menu-toggle,.law-body,.law-filter-control select,.home-calculator small,.home-reference-links span{font-size:14px}
+.law-item summary{font-size:15px}
+.section-no{font-size:13px}
+.wide-search input{font-size:16px}
+@media(max-width:940px){.calc-link{font-size:13px}}
+@media(max-width:650px){
+ .topbar nav a,.tabbar button,.calculator-menu>.calculator-menu-toggle{font-size:13px}
+ .lead,.law-item summary{font-size:14px}
+ .law-filter-control select{font-size:12px}
+}
+
+/* Increase text contrast in both colour themes. */
+:root{
+ --tone-172e28:#0b1411;
+ --tone-233e31:#0b1411;
+ --tone-60716b:#405049;
+ --tone-53665b:#33463d;
+ --tone-53675d:#33463d;
+ --tone-547264:#345244;
+ --tone-426152:#334d42;
+ --tone-809087:#4b5e55;
+ --tone-819187:#4b5e55;
+}
+:root[data-theme="dark"]{
+ --tone-172e28:#f7fbf8;
+ --tone-233e31:#ffffff;
+ --tone-60716b:#cfddd5;
+ --tone-53665b:#dce7e1;
+ --tone-53675d:#dce7e1;
+ --tone-547264:#d6e5dd;
+ --tone-426152:#d4e2da;
+ --tone-809087:#c8d6ce;
+ --tone-819187:#c8d6ce;
+ --tone-496d53:#d6e5dd;
+}
+
+/* Additional homepage guidance. */
+.home-how{margin-top:24px;padding:28px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.home-section-heading{margin-bottom:22px}
+.home-section-heading .eyebrow{margin-bottom:7px}
+.home-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:0;padding:0;list-style:none}
+.home-steps li{display:flex;align-items:flex-start;gap:13px;min-width:0}
+.home-step-number{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border-radius:50%;background:var(--tone-eaf1eb);color:var(--green);font-weight:800}
+.home-steps strong{display:block;margin-bottom:5px;color:var(--tone-172e28)}
+.home-steps p{margin:0;color:var(--muted);font-size:14px}
+.home-planning-note{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,1.2fr);align-items:center;gap:32px;margin-top:24px;padding:26px 28px;border-radius:var(--radius);background:var(--strong-surface);color:#fff}
+.home-planning-note .eyebrow{color:#dcefe5}
+.home-planning-note h2{color:#fff}
+.home-planning-note p{margin:0;color:#e1eee7}
+@media(max-width:940px){.home-steps{grid-template-columns:1fr}.home-planning-note{grid-template-columns:1fr;gap:14px}}
+@media(max-width:650px){.home-how,.home-planning-note{padding:22px}}
