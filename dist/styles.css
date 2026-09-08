@@ -276,3 +276,25 @@ h2,h3{font-weight:750}
 @media screen{
  .shell.sidebar-collapsed>main{padding-left:64px}
 }
+
+
+/* Give the outboard sidebar control a permanent gutter beside navigation. */
+@media screen and (min-width:1151px){
+ :root{--sidebar-width:280px}
+ .shell{grid-template-columns:var(--sidebar-width) minmax(0,1fr)}
+ .sidebar-primary,.sidebar-primary.calculators-expanded{padding-right:28px}
+}
+@media screen and (min-width:941px) and (max-width:1150px){
+ :root{--sidebar-width:244px}
+ .shell{grid-template-columns:var(--sidebar-width) minmax(0,1fr)}
+ .sidebar-primary,.sidebar-primary.calculators-expanded{padding-right:28px}
+}
+@media screen and (min-width:651px) and (max-width:940px){
+ :root{--sidebar-width:214px}
+ .shell{grid-template-columns:var(--sidebar-width) minmax(0,1fr)}
+ .sidebar-primary,.sidebar-primary.calculators-expanded{padding-right:28px}
+}
+@media screen and (max-width:650px){
+ :root{--sidebar-width:min(320px,calc(100vw - 40px))}
+ .sidebar-primary,.sidebar-primary.calculators-expanded{padding-right:24px}
+}
