@@ -12,10 +12,11 @@ if(header){
  new ResizeObserver(syncHeaderHeight).observe(header);
 }
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const titleCase=s=>String(s).replace(/\b[a-z]/g,c=>c.toUpperCase());
 const format=(n,currency='NGN')=>typeof n==='number'?new Intl.NumberFormat('en-NG',{style:'currency',currency,minimumFractionDigits:2,maximumFractionDigits:2}).format(n/100):escape(n);
 const statusLabel=s=>({calculated:'Formula calculator',assisted:'Assisted estimate',scenario:'Planning scenario'}[s]);
 const link=(href,label)=>`<a href="${escape(href)}" target="_blank" rel="noopener noreferrer">${escape(label)} ↗</a>`;
-const state={inputs:structuredClone(DEFAULTS),current:'paye',tab:'calculation',result:null,error:null,law:null,coverage:'All',lawQuery:'',lawChapter:'All'};
+const state={inputs:structuredClone(DEFAULTS),current:'paye',tab:'calculation',result:null,error:null,law:null,coverage:'All',coverageQuery:'',lawQuery:'',lawChapter:'All'};
 const lawPromise=fetch('law.json').then(r=>{if(!r.ok)throw new Error('Law reference unavailable');return r.json();}).then(data=>state.law=data).catch(()=>null);
 
 function homeView(){
@@ -55,7 +56,7 @@ function nav(){
   if(!groups.has(c.group))groups.set(c.group,[]);
   groups.get(c.group).push(c);
  }
- $('#calculator-nav').innerHTML=[...groups].map(([group,calculators])=>`<section class="calculator-nav-group" aria-label="${escape(group)}"><div class="nav-group">${escape(group)}</div>${calculators.map(c=>`<a href="#calculator/${c.id}" class="calc-link ${state.current===c.id&&location.hash.startsWith('#calculator')?'active':''}" ${state.current===c.id&&location.hash.startsWith('#calculator')?'aria-current="page"':''}><span class="nav-symbol" aria-hidden="true">${c.symbol}</span>${escape(c.short)}</a>`).join('')}</section>`).join('')||'<p class="empty">No matching calculators.</p>';
+ $('#calculator-nav').innerHTML=[...groups].map(([group,calculators])=>`<section class="calculator-nav-group" aria-label="${escape(titleCase(group))}"><div class="nav-group">${escape(titleCase(group))}</div>${calculators.map(c=>`<a href="#calculator/${c.id}" class="calc-link ${state.current===c.id&&location.hash.startsWith('#calculator')?'active':''}" ${state.current===c.id&&location.hash.startsWith('#calculator')?'aria-current="page"':''}><span class="nav-symbol" aria-hidden="true">${c.symbol}</span>${escape(c.short)}</a>`).join('')}</section>`).join('')||'<p class="empty">No matching calculators.</p>';
 }
 function inputHtml(f,values){
  if(f.type==='divider')return `<div class="field-divider">${escape(f.label)}</div>`;
@@ -107,8 +108,22 @@ function rowsTable(r,currency){return `<div class="table-wrap"><table><thead><tr
 function download(c,r){const data={application:'NTaxer',calculator:c.name,ruleset:RULESET,reviewed:REVIEWED,generatedAt:new Date().toISOString(),currency:r.currency||'NGN',moneyUnit:'minor units (100 kobo/cents = 1 currency unit)',status:statusLabel(c.status),inputs:state.inputs[c.id],result:r,legalSections:c.refs,source:SOURCE_LINKS.nta.url,additionalSource:c.extraSource?SOURCE_LINKS[c.extraSource].url:null};const blob=new Blob([JSON.stringify(data,(_,v)=>v===Infinity?'unbounded':v,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`NTaxer-${c.id}-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 
 function coverageView(){
- $('#main').innerHTML=`<div class="intro page-header"><p class="eyebrow">Scope, before calculation</p><h1>Every chapter. Clear boundaries.</h1><p class="lead">Explore the taxes and taxpayer segments in the Act. A formula, an assisted assessment and a legal exemption are different kinds of coverage.</p></div><div class="notice neutral">${CALCULATORS.length} calculator workspaces · ${SECTORS.length} sector and subject guides · 202 sections · 14 schedules. This does not mean every tax liability is automatically determined.</div><div class="filter-chips" aria-label="Coverage filters"><button class="active" data-filter="All">All subjects</button><button data-filter="calculator">Calculator workspaces</button><button data-filter="sector">Sector guides</button></div><div class="grid-cards" id="coverage-cards"></div>`;
- const render=filter=>{$('#coverage-cards').innerHTML=(filter==='sector'?'':CALCULATORS.map(c=>`<article class="coverage-card"><span class="badge ${c.status}">${statusLabel(c.status)}</span><h2>${escape(c.name)}</h2><p>${escape(c.description)}</p><p class="mini-label">${refsHtml(c.refs)}</p><a href="#calculator/${c.id}">Open calculator →</a></article>`).join(''))+(filter==='calculator'?'':SECTORS.map(s=>`<article class="coverage-card"><span class="badge assisted">${escape(s.status)}</span><h2>${escape(s.name)}</h2><p>${escape(s.text)}</p><p class="mini-label">${refsHtml(s.refs)}</p>${s.source?`<p>${link(SOURCE_LINKS[s.source].url,'Additional source')}</p>`:''}<a href="#calculator/${s.calc}">Related calculator →</a></article>`).join(''));};render('All');document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));render(b.dataset.filter);}));
+ $('#main').innerHTML=`<div class="intro page-header"><p class="eyebrow">Scope, before calculation</p><h1>Every chapter. Clear boundaries.</h1><p class="lead">Explore the taxes and taxpayer segments in the Act. A formula, an assisted assessment and a legal exemption are different kinds of coverage.</p></div><div class="notice neutral">${CALCULATORS.length} calculator workspaces · ${SECTORS.length} sector and subject guides · 202 sections · 14 schedules. This does not mean every tax liability is automatically determined.</div><div class="coverage-toolbar"><label class="search wide-search"><span aria-hidden="true">⌕</span><input id="coverage-search" type="search" aria-label="Search tax coverage" placeholder="Search calculators or sector guides…" value="${escape(state.coverageQuery)}"></label><label class="coverage-filter-control"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 4h18l-7 8v7l-4 2v-9Z"/></svg><select id="coverage-filter" aria-label="Filter tax coverage"><option value="All" ${state.coverage==='All'?'selected':''}>All coverage</option><option value="calculator" ${state.coverage==='calculator'?'selected':''}>Calculators</option><option value="sector" ${state.coverage==='sector'?'selected':''}>Sector guides</option></select></label></div><p class="law-count" id="coverage-count" aria-live="polite"></p><div class="grid-cards" id="coverage-cards"></div>`;
+ const matches=(item,query)=>!query||`${item.name||''} ${item.group||''} ${item.description||''} ${item.text||''} ${item.status||''}`.toLowerCase().includes(query);
+ const render=()=>{
+  const query=state.coverageQuery.toLowerCase().trim();
+  const calculators=state.coverage==='sector'?[]:CALCULATORS.filter(item=>matches(item,query));
+  const sectors=state.coverage==='calculator'?[]:SECTORS.filter(item=>matches(item,query));
+  const cards=calculators.map(c=>`<article class="coverage-card"><span class="badge ${c.status}">${statusLabel(c.status)}</span><h2>${escape(c.name)}</h2><p>${escape(c.description)}</p><p class="mini-label">${refsHtml(c.refs)}</p><a href="#calculator/${c.id}">Open calculator →</a></article>`).join('')+sectors.map(s=>`<article class="coverage-card"><span class="badge assisted">${escape(s.status)}</span><h2>${escape(s.name)}</h2><p>${escape(s.text)}</p><p class="mini-label">${refsHtml(s.refs)}</p>${s.source?`<p>${link(SOURCE_LINKS[s.source].url,'Additional source')}</p>`:''}<a href="#calculator/${s.calc}">Related calculator →</a></article>`).join('');
+  const count=calculators.length+sectors.length;
+  $('#coverage-count').textContent=`${count} ${count===1?'result':'results'}`;
+  $('#coverage-cards').innerHTML=cards||'<p class="empty coverage-empty">No matching coverage found.</p>';
+ };
+ const search=$('#coverage-search');
+ const filter=$('#coverage-filter');
+ search.addEventListener('input',()=>{state.coverageQuery=search.value;render();});
+ filter.addEventListener('change',()=>{state.coverage=filter.value;render();});
+ render();
 }
 let lawToolbarObserver;
 async function lawView(target){
@@ -176,6 +191,8 @@ const smallSidebar=window.matchMedia('(max-width:940px)');
 function setSidebarExpanded(expanded){
  const sidebar=$('#tax-sidebar');
  sidebar.hidden=!expanded;
+ sidebar.inert=!expanded;
+ sidebar.setAttribute('aria-hidden',String(!expanded));
  $('.shell').classList.toggle('sidebar-collapsed',!expanded);
  sidebarToggle.setAttribute('aria-expanded',String(expanded));
  const label=expanded?'Collapse sidebar':'Open sidebar';
