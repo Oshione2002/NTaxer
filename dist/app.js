@@ -102,11 +102,26 @@ async function lawView(target){
  if(target){state.lawQuery='';$('#law-search').value='';state.lawChapter=target.startsWith('schedule-')?'schedules':'All';}renderLaw();
  if(target){const el=document.getElementById('law-'+target);if(el){el.open=true;el.scrollIntoView({block:'start',behavior:'instant'});}}
 }
+function lawTextHtml(value){
+ // Rejoin PDF line wraps, keeping clause markers and structural headings separate.
+ const paragraphs=[];
+ let current='';
+ for(const rawLine of String(value??'').replace(/\r\n?/g,'\n').split('\n')){
+  const line=rawLine.trim();
+  const startsParagraph=/^(?:\([a-z0-9]+\)|\d+\.\s|CHAPTER\b|PART\s+[IVX\d]+\b)/i.test(line);
+  if(!line||startsParagraph){
+   if(current)paragraphs.push(current);
+   current=line;
+  }else current+=(current?' ':'')+line;
+ }
+ if(current)paragraphs.push(current);
+ return paragraphs.map(p=>`<p>${escape(p)}</p>`).join('');
+}
 function renderLaw(){const q=state.lawQuery.toLowerCase().trim(),data=state.law;document.querySelectorAll('[data-chapter]').forEach(b=>b.classList.toggle('active',b.dataset.chapter===state.lawChapter));let list=[];
  if(state.lawChapter==='schedules'){list=data.schedules.map((s,i)=>{const last=data.schedules[i+1]?.page||214;return {id:'schedule-'+s.number,title:s.title,number:'S'+s.number,page:s.page,text:data.pages.filter(p=>p.page>=s.page&&p.page<last).map(p=>p.text).join('\n\n')};});}
  else{list=data.sections.filter(s=>{if(state.lawChapter==='All')return true;const c=CHAPTERS[Number(state.lawChapter)];return c&&s.number>=c.from&&s.number<=c.to;}).map(s=>({...s,id:String(s.number)}));}
  list=list.filter(s=>!q||String(s.number)===q||s.title.toLowerCase().includes(q)||s.text.toLowerCase().includes(q));$('#law-count').textContent=`${list.length} ${state.lawChapter==='schedules'?'schedules':'sections'} found`;
- $('#law-results').innerHTML=list.map(s=>`<details class="law-item" id="law-${s.id}"><summary><span class="section-no">${s.number}</span>${escape(s.title)}</summary><p>${link(`assets/nigeria-tax-act-2025-nass.pdf#page=${s.page}`,`Verify in the PDF · page ${s.page}`)}</p><pre>${escape(s.text)}</pre></details>`).join('')||'<div class="empty">No match. Try a shorter phrase or another chapter.</div>';
+ $('#law-results').innerHTML=list.map(s=>`<details class="law-item" id="law-${s.id}"><summary><span class="section-no">${s.number}</span>${escape(s.title)}</summary><p>${link(`assets/nigeria-tax-act-2025-nass.pdf#page=${s.page}`,`Verify in the PDF · page ${s.page}`)}</p>${state.lawChapter==='schedules'?`<pre>${escape(s.text)}</pre>`:`<div class="law-body">${lawTextHtml(s.text)}</div>`}</details>`).join('')||'<div class="empty">No match. Try a shorter phrase or another chapter.</div>';
 }
 function sourcesView(){
  $('#main').innerHTML=`<div class="intro page-header"><p class="eyebrow">Understanding your estimate</p><h1>Sources & methodology</h1><p class="lead">See which sources inform NTaxer, how your estimate is calculated and what to check before using it.</p></div>
