@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en-NG">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>NTaxer · Nigeria tax calculator</title>
+  <meta name="description" content="Calculate Nigerian personal, business and transaction taxes. Explore the Nigeria Tax Act 2025, see calculation breakdowns and check legal sources.">
+  <meta name="theme-color" content="#073e32">
+  <link rel="icon" href="assets/icon.png" type="image/png"><link rel="apple-touch-icon" href="assets/icon.png">
+  <link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to calculator</a>
+  <header class="topbar">
+    <a class="brand" href="#calculator/paye"><img src="assets/icon.png" width="40" height="40" alt=""><span>NTaxer<span class="brand-period">.</span></span></a>
+    <nav aria-label="Main navigation"><a href="#calculator/paye" data-nav="calculator">Calculators</a><a href="#coverage" data-nav="coverage">Tax coverage</a><a href="#law" data-nav="law">The tax law</a></nav>
+    <span class="edition">2026 <span>tax rules</span></span>
+  </header>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Tax calculators">
+      <div class="sidebar-heading">YOUR TAX WORKSPACE</div>
+      <label class="search"><span aria-hidden="true">⌕</span><input id="calculator-search" type="search" placeholder="Find a tax…" aria-label="Find a calculator"></label>
+      <nav id="calculator-nav" aria-label="Choose calculator"></nav>
+      <div class="side-note"><span class="shield" aria-hidden="true">✓</span><strong>Your numbers stay here.</strong><p>Calculations run in your browser. No account or financial data upload.</p></div>
+      <a class="source-shortcut" href="#sources">Sources &amp; methodology ↗</a>
+    </aside>
+    <main id="main" tabindex="-1"></main>
+  </div>
+  <footer><span>NTaxer · Independent tax planning tool</span><span>Estimates, not a tax assessment. Check the scope and sources for your case.</span></footer>
+  <noscript><p class="notice">Enable JavaScript to use the calculators. <a href="https://nass.gov.ng/documents/download/11249">Read the Nigeria Tax Act 2025.</a></p></noscript>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

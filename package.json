@@ -1,0 +1,6 @@
+{
+  "name": "ntaxer", "version": "1.0.0", "private": true, "type": "module",
+  "description": "Source-linked Nigeria Tax Act 2025 calculators",
+  "scripts": {"test": "node --test tests/*.test.mjs", "build": "node scripts/validate.mjs", "check": "npm test && npm run build"},
+  "engines": {"node": ">=22"}
+}
