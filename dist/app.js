@@ -4,6 +4,13 @@ import {VAT_CATEGORIES} from './schedules.js';
 import {RULESET,REVIEWED,money} from './engine.js';
 
 const $=s=>document.querySelector(s);
+// Track the actual header height when navigation wraps or text size changes.
+const header=$('.topbar');
+if(header){
+ const syncHeaderHeight=()=>document.documentElement.style.setProperty('--header-height',header.getBoundingClientRect().height+'px');
+ syncHeaderHeight();
+ new ResizeObserver(syncHeaderHeight).observe(header);
+}
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const format=(n,currency='NGN')=>typeof n==='number'?new Intl.NumberFormat('en-NG',{style:'currency',currency,minimumFractionDigits:2,maximumFractionDigits:2}).format(n/100):escape(n);
 const statusLabel=s=>({calculated:'Formula calculator',assisted:'Assisted estimate',scenario:'Planning scenario'}[s]);
