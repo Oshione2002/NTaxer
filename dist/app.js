@@ -78,12 +78,18 @@ function coverageView(){
  $('#main').innerHTML=`<div class="intro"><p class="eyebrow">Scope, before calculation</p><h1>Every chapter. Clear boundaries.</h1><p class="lead">Explore the taxes and taxpayer segments in the Act. A formula, an assisted assessment and a legal exemption are different kinds of coverage.</p></div><div class="notice neutral">${CALCULATORS.length} calculator workspaces · ${SECTORS.length} sector and subject guides · 202 sections · 14 schedules. This does not mean every tax liability is automatically determined.</div><div class="filter-chips" aria-label="Coverage filters"><button class="active" data-filter="All">All subjects</button><button data-filter="calculator">Calculator workspaces</button><button data-filter="sector">Sector guides</button></div><div class="grid-cards" id="coverage-cards"></div>`;
  const render=filter=>{$('#coverage-cards').innerHTML=(filter==='sector'?'':CALCULATORS.map(c=>`<article class="coverage-card"><span class="badge ${c.status}">${statusLabel(c.status)}</span><h2>${escape(c.name)}</h2><p>${escape(c.description)}</p><p class="mini-label">${refsHtml(c.refs)}</p><a href="#calculator/${c.id}">Open calculator →</a></article>`).join(''))+(filter==='calculator'?'':SECTORS.map(s=>`<article class="coverage-card"><span class="badge assisted">${escape(s.status)}</span><h2>${escape(s.name)}</h2><p>${escape(s.text)}</p><p class="mini-label">${refsHtml(s.refs)}</p>${s.source?`<p>${link(SOURCE_LINKS[s.source].url,'Additional source')}</p>`:''}<a href="#calculator/${s.calc}">Related calculator →</a></article>`).join(''));};render('All');document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));render(b.dataset.filter);}));
 }
+let lawToolbarObserver;
 async function lawView(target){
  $('#main').innerHTML='<p class="eyebrow">Legal reference</p><h1>The Nigeria Tax Act, 2025</h1><p class="lead">Loading the indexed law…</p>';
  const data=await lawPromise;if(!location.hash.startsWith('#law'))return;
  if(!data){$('#main').innerHTML=`<h1>The tax law</h1><p>The searchable reference could not load. ${link('assets/nigeria-tax-act-2025-nass.pdf','Read the PDF')} or reload the page.</p>`;return;}
- $('#main').innerHTML=`<div class="intro"><p class="eyebrow">National Assembly release · January 2026</p><h1>The Nigeria Tax Act, 2025</h1><p class="lead">Search all 202 sections and the 14 schedules. Extracted text is a reading aid; use the linked PDF to verify wording and layout.</p></div><p>${link('assets/nigeria-tax-act-2025-nass.pdf','Open the complete Act')} · <a href="#sources">Sources & methodology</a></p><label class="search wide-search"><span aria-hidden="true">⌕</span><input id="law-search" type="search" aria-label="Search the tax law" placeholder="Search a section, tax, sector or phrase…" value="${escape(state.lawQuery)}"></label><div class="filter-chips" id="law-filters"><button data-chapter="All" class="active">All chapters</button>${CHAPTERS.map((c,i)=>`<button data-chapter="${i}">${escape(c.name)}</button>`).join('')}<button data-chapter="schedules">Schedules</button></div><p class="law-count" id="law-count" aria-live="polite"></p><div id="law-results"></div>`;
- $('#law-search').addEventListener('input',()=>{state.lawQuery=$('#law-search').value;renderLaw();});document.querySelectorAll('[data-chapter]').forEach(b=>b.addEventListener('click',()=>{state.lawChapter=b.dataset.chapter;renderLaw();}));
+ $('#main').innerHTML=`<div class="law-toolbar"><div><p class="eyebrow">National Assembly release · January 2026</p><h1>The Nigeria Tax Act, 2025</h1></div><label class="search wide-search"><span aria-hidden="true">⌕</span><input id="law-search" type="search" aria-label="Search the tax law" placeholder="Search a section, tax, sector or phrase…" value="${escape(state.lawQuery)}"></label></div><div class="intro"><p class="lead">Search all 202 sections and the 14 schedules. Extracted text is a reading aid; use the linked PDF to verify wording and layout.</p></div><p>${link('assets/nigeria-tax-act-2025-nass.pdf','Open the complete Act')} · <a href="#sources">Sources & methodology</a></p><div class="filter-chips" id="law-filters"><button data-chapter="All" class="active">All chapters</button>${CHAPTERS.map((c,i)=>`<button data-chapter="${i}">${escape(c.name)}</button>`).join('')}<button data-chapter="schedules">Schedules</button></div><p class="law-count" id="law-count" aria-live="polite"></p><div id="law-results"></div>`;
+ const toolbar=$('.law-toolbar');
+ const syncLawToolbar=()=>$('#main').style.setProperty('--law-toolbar-height',toolbar.getBoundingClientRect().height+'px');
+ syncLawToolbar();
+ lawToolbarObserver=new ResizeObserver(syncLawToolbar);
+ lawToolbarObserver.observe(toolbar);
+ $('#law-search').addEventListener('input',()=>{state.lawQuery=$('#law-search').value;renderLaw();$('#law-count').scrollIntoView({block:'start',behavior:'instant'});});document.querySelectorAll('[data-chapter]').forEach(b=>b.addEventListener('click',()=>{state.lawChapter=b.dataset.chapter;renderLaw();}));
  if(target){state.lawQuery='';$('#law-search').value='';state.lawChapter=target.startsWith('schedule-')?'schedules':'All';}renderLaw();
  if(target){const el=document.getElementById('law-'+target);if(el){el.open=true;el.scrollIntoView({block:'start',behavior:'instant'});}}
 }
@@ -101,7 +107,7 @@ function sourcesView(){
  <section class="detail-card detail-area"><h2>Using your estimate</h2><p>Calculators work independently. Some results overlap, and withholding tax may be a credit against another liability. Do not add every calculator result together as your total tax bill.</p><p>Eligibility, exemptions, reliefs and sector-specific treatment depend on your circumstances. Where confirmation is required, follow the instructions in that calculator. Complex payroll, insurance, trusts, free zones, petroleum operations, treaties, customs and state or local charges may need further assessment.</p><p>NTaxer provides planning estimates. It does not submit returns, make tax payments or issue an official assessment.</p></section>
  <section class="detail-card detail-area"><h2>Your information and records</h2><p>Calculations run in your browser. Entered figures stay in page memory and reset when you reload. No account or financial-data upload is required.</p><p>Use <strong>Print / save PDF</strong> to keep a readable estimate, or <strong>Export record</strong> to download the inputs, result and calculation references. Check your figures and assumptions before sharing a record.</p><p>${link('https://github.com/Oshione2002/NTaxer','View the calculation code')}</p></section>`;
 }
-function route(){const hash=location.hash||'#calculator/paye';const [page,target]=hash.slice(1).split('/');document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('active',a.dataset.nav===page));if(page==='coverage')coverageView();else if(page==='law')lawView(target);else if(page==='sources')sourcesView();else calcView(target||'paye');nav();if(page!=='law')window.scrollTo({top:0,behavior:'instant'});}
+function route(){lawToolbarObserver?.disconnect();const hash=location.hash||'#calculator/paye';const [page,target]=hash.slice(1).split('/');document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('active',a.dataset.nav===page));if(page==='coverage')coverageView();else if(page==='law')lawView(target);else if(page==='sources')sourcesView();else calcView(target||'paye');nav();if(page!=='law')window.scrollTo({top:0,behavior:'instant'});}
 const sidebarToggle=$('#sidebar-toggle');
 const smallSidebar=window.matchMedia('(max-width:650px)');
 function setSidebarExpanded(expanded){
@@ -123,3 +129,12 @@ $('#tax-sidebar').addEventListener('click',event=>{
  }
 });
 $('#calculator-search').addEventListener('input',nav);window.addEventListener('hashchange',route);if(!location.hash)history.replaceState(null,'','#calculator/paye');route();
+
+const scrollTopButton=$('#scroll-to-top');
+const updateScrollTopButton=()=>{scrollTopButton.hidden=window.scrollY<300;};
+window.addEventListener('scroll',updateScrollTopButton,{passive:true});
+scrollTopButton.addEventListener('click',()=>{
+ $('#main').focus({preventScroll:true});
+ window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+});
+updateScrollTopButton();
