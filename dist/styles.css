@@ -298,3 +298,9 @@ h2,h3{font-weight:750}
  :root{--sidebar-width:min(320px,calc(100vw - 40px))}
  .sidebar-primary,.sidebar-primary.calculators-expanded{padding-right:24px}
 }
+
+
+/* Centre the open close control on the sidebar boundary. */
+@media screen{
+ .sidebar-toggle[aria-expanded="true"]{left:calc(var(--sidebar-width) - 24px)}
+}
