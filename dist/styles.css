@@ -270,3 +270,9 @@ h2,h3{font-weight:750}
 @media screen and (max-width:650px){
  .shell:not(.sidebar-collapsed)::after{content:"";position:fixed;inset:var(--header-height) 0 0 var(--sidebar-width);z-index:9;background:#0006}
 }
+
+
+/* Keep the collapsed hamburger clear button clear of all page content. */
+@media screen{
+ .shell.sidebar-collapsed>main{padding-left:64px}
+}
