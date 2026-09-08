@@ -261,3 +261,12 @@ h2,h3{font-weight:750}
 @media(max-width:650px){.law-filter-control{gap:5px;padding:8px}.law-filter-control select{width:90px;font-size:14px}}
 @media print{.law-search-controls{display:none}}
 
+
+
+/* Keep the outboard sidebar control clear of page headings at every width. */
+@media screen and (min-width:651px) and (max-width:1150px){
+ .shell:not(.sidebar-collapsed)>main{padding-left:48px}
+}
+@media screen and (max-width:650px){
+ .shell:not(.sidebar-collapsed)::after{content:"";position:fixed;inset:var(--header-height) 0 0 var(--sidebar-width);z-index:9;background:#0006}
+}
