@@ -183,8 +183,8 @@ function setSidebarExpanded(expanded){
  sidebarToggle.title=label;
 }
 sidebarToggle.addEventListener('click',()=>setSidebarExpanded(sidebarToggle.getAttribute('aria-expanded')!=='true'));
-setSidebarExpanded(!smallSidebar.matches);
-smallSidebar.addEventListener('change',event=>setSidebarExpanded(!event.matches));
+setSidebarExpanded(false);
+smallSidebar.addEventListener('change',()=>setSidebarExpanded(false));
 $('#tax-sidebar').addEventListener('click',event=>{
  if(smallSidebar.matches&&event.target.closest('a[href]')){
   setSidebarExpanded(false);
