@@ -66,11 +66,26 @@
 .calculator-menu>summary.active{background:#e4eee7;color:var(--green);font-weight:700}
 .calculator-menu>summary svg{flex-shrink:0}
 .calculator-menu[open]>summary svg{transform:rotate(180deg)}
-.calculator-menu-content{padding:12px 5px 6px;margin:4px 0 8px;max-height:60dvh;overflow-y:auto;scrollbar-width:thin}
+.calculator-menu-content{padding:12px 5px 6px;margin:4px 0 8px;max-height:none;overflow:visible}
 .calculator-menu #calculator-nav{display:block;max-height:none;overflow:visible;padding:0}
 .calculator-menu .nav-group{display:block;margin:20px 8px 8px}
 .calculator-menu .calc-link{white-space:normal;border:0}
 @media(max-width:650px){
  .calculator-menu>summary{font-size:15px}
  .calculator-menu .calc-link{margin:3px 0}
+}
+
+/* The sidebar owns its scroll area; scrolling can continue to the page at its edge. */
+@media screen{
+ .sidebar{position:fixed;top:var(--header-height);left:0;bottom:0;width:var(--sidebar-width);height:calc(100dvh - var(--header-height));overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:auto;scrollbar-width:thin;z-index:10}
+ .shell{min-height:calc(100dvh - var(--header-height))}
+ .shell>main{grid-column:2}
+ .shell.sidebar-collapsed>main{grid-column:1}
+}
+@media screen and (max-width:650px){
+ :root{--sidebar-width:min(300px,calc(100vw - 40px))}
+ .sidebar{border-right:1px solid var(--line);border-bottom:0;box-shadow:6px 0 18px #073e3214}
+ .sidebar-primary{padding-right:0}
+ .sidebar-toggle{left:calc(var(--sidebar-width) - 16px);border-radius:8px}
+ .sidebar-toggle[aria-expanded="false"]{left:0;border-radius:0 8px 8px 0}
 }
