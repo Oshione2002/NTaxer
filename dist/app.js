@@ -25,7 +25,7 @@ function homeView(){
   groups.get(c.group).push(c);
  }
  $('#main').innerHTML=`<div class="intro page-header"><p class="eyebrow">Welcome to NTaxer</p><h1>What would you like to calculate?</h1><p class="lead">Choose a tax calculator to estimate an amount, review the breakdown and check the rules that apply.</p></div>
- <div class="home-calculators">${[...groups].map(([group,calculators])=>`<section class="home-group"><h2>${escape(group)}</h2><div class="home-group-links">${calculators.map(c=>`<a class="home-calculator" href="#calculator/${c.id}"><span><strong>${escape(c.name)}</strong><small>${escape(c.description)}</small></span><span class="home-link-arrow" aria-hidden="true">→</span></a>`).join('')}</div></section>`).join('')}</div>
+ <div class="home-calculators">${[...groups].map(([group,calculators])=>`<details class="home-group" open><summary><h2>${escape(group)}</h2><svg class="home-category-chevron" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="home-group-links">${calculators.map(c=>`<a class="home-calculator" href="#calculator/${c.id}"><span><strong>${escape(c.name)}</strong><small>${escape(c.description)}</small></span><span class="home-link-arrow" aria-hidden="true">→</span></a>`).join('')}</div></details>`).join('')}</div>
  <div class="home-reference-links"><a href="#coverage"><strong>Explore tax coverage</strong><span>See the taxes and taxpayer categories covered by NTaxer.</span></a><a href="#law"><strong>Read the tax law</strong><span>Search the Act by section, subject or phrase.</span></a></div>`;
 }
 function refsHtml(refs){return refs.map(n=>`<a href="#law/${n}">s. ${n}</a>`).join(' · ');}

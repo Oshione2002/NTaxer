@@ -240,3 +240,13 @@ h2,h3{font-weight:750}
  .shell:not(.sidebar-collapsed)>footer{left:var(--sidebar-width)}
  .shell.sidebar-collapsed>footer{left:0}
 }
+
+/* Home categories can be collapsed independently. */
+.home-group>summary{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 24px;list-style:none;cursor:pointer;background:var(--tone-eaf1eb);color:var(--green)}
+.home-group>summary::-webkit-details-marker{display:none}
+.home-group>summary h2{padding:0;margin:0;border:0;background:transparent}
+.home-group>summary:hover{background:var(--tone-e4eee7)}
+.home-group[open]>summary{border-bottom:1px solid var(--line)}
+.home-category-chevron{flex-shrink:0}
+.home-group[open] .home-category-chevron{transform:rotate(180deg)}
+@media(prefers-reduced-motion:no-preference){.home-category-chevron{transition:transform .18s ease}}
