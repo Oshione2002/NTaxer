@@ -163,18 +163,3 @@ calculatorStickyObserver.observe(calculatorSummary);
 calculatorStickyObserver.observe(calculatorSearchBar);
 calculatorMenu.addEventListener('toggle',syncCalculatorStickyHeights);
 syncCalculatorStickyHeights();
-
-// Reserve space for the two navigation links beneath the expanded calculator list.
-const sidebarFooter=$('.sidebar-footer-links');
-const sidebarPanel=$('#tax-sidebar');
-function syncCalculatorListHeight(){
- if(!calculatorMenu.open||sidebarPanel.hidden)return;
- const panelStyle=getComputedStyle(sidebarPanel);
- const menuStyle=getComputedStyle($('.sidebar-primary'));
- const available=sidebarPanel.clientHeight-parseFloat(panelStyle.paddingTop)-parseFloat(panelStyle.paddingBottom)-sidebarFooter.getBoundingClientRect().height-calculatorSummary.getBoundingClientRect().height-(parseFloat(menuStyle.rowGap)||0);
- calculatorMenu.style.setProperty('--calculator-list-height',Math.max(0,available)+'px');
-}
-const sidebarLayoutObserver=new ResizeObserver(syncCalculatorListHeight);
-for(const element of [sidebarPanel,sidebarFooter,calculatorSummary])sidebarLayoutObserver.observe(element);
-calculatorMenu.addEventListener('toggle',syncCalculatorListHeight);
-syncCalculatorListHeight();
