@@ -18,6 +18,16 @@ const link=(href,label)=>`<a href="${escape(href)}" target="_blank" rel="noopene
 const state={inputs:structuredClone(DEFAULTS),current:'paye',tab:'calculation',result:null,error:null,law:null,coverage:'All',lawQuery:'',lawChapter:'All'};
 const lawPromise=fetch('law.json').then(r=>{if(!r.ok)throw new Error('Law reference unavailable');return r.json();}).then(data=>state.law=data).catch(()=>null);
 
+function homeView(){
+ const groups=new Map();
+ for(const c of CALCULATORS){
+  if(!groups.has(c.group))groups.set(c.group,[]);
+  groups.get(c.group).push(c);
+ }
+ $('#main').innerHTML=`<div class="intro page-header"><p class="eyebrow">Welcome to NTaxer</p><h1>What would you like to calculate?</h1><p class="lead">Choose a tax calculator to estimate an amount, review the breakdown and check the rules that apply.</p></div>
+ <div class="home-calculators">${[...groups].map(([group,calculators])=>`<section class="home-group"><h2>${escape(group)}</h2><div class="home-group-links">${calculators.map(c=>`<a class="home-calculator" href="#calculator/${c.id}"><span><strong>${escape(c.name)}</strong><small>${escape(c.description)}</small></span><span class="home-link-arrow" aria-hidden="true">→</span></a>`).join('')}</div></section>`).join('')}</div>
+ <div class="home-reference-links"><a href="#coverage"><strong>Explore tax coverage</strong><span>See the taxes and taxpayer categories covered by NTaxer.</span></a><a href="#law"><strong>Read the tax law</strong><span>Search the Act by section, subject or phrase.</span></a></div>`;
+}
 function refsHtml(refs){return refs.map(n=>`<a href="#law/${n}">s. ${n}</a>`).join(' · ');}
 function sourceHtml(config){
  const page=state.law?.sections.find(s=>s.number===config.refs[0])?.page;
@@ -131,7 +141,23 @@ function sourcesView(){
  <section class="detail-card detail-area"><h2>Using your estimate</h2><p>Calculators work independently. Some results overlap, and withholding tax may be a credit against another liability. Do not add every calculator result together as your total tax bill.</p><p>Eligibility, exemptions, reliefs and sector-specific treatment depend on your circumstances. Where confirmation is required, follow the instructions in that calculator. Complex payroll, insurance, trusts, free zones, petroleum operations, treaties, customs and state or local charges may need further assessment.</p><p>NTaxer provides planning estimates. It does not submit returns, make tax payments or issue an official assessment.</p></section>
  <section class="detail-card detail-area"><h2>Your information and records</h2><p>Calculations run in your browser. Entered figures stay in page memory and reset when you reload. No account or financial-data upload is required.</p><p>Use <strong>Print / save PDF</strong> to keep a readable estimate, or <strong>Export record</strong> to download the inputs, result and calculation references. Check your figures and assumptions before sharing a record.</p><p>${link('https://github.com/Oshione2002/NTaxer','View the calculation code')}</p></section>`;
 }
-function route(){lawToolbarObserver?.disconnect();const hash=location.hash||'#calculator/paye';const [page,target]=hash.slice(1).split('/');document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('active',a.dataset.nav===page));if(page==='coverage')coverageView();else if(page==='law')lawView(target);else if(page==='sources')sourcesView();else calcView(target||'paye');nav();if(page!=='law')window.scrollTo({top:0,behavior:'instant'});}
+function route(){
+ lawToolbarObserver?.disconnect();
+ const hash=location.hash||'#home';
+ const [page,target]=hash.slice(1).split('/');
+ document.querySelectorAll('[data-nav]').forEach(a=>{
+  const active=a.dataset.nav===page;
+  a.classList.toggle('active',active);
+  if(a.tagName==='A'){if(active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');}
+ });
+ if(page==='coverage')coverageView();
+ else if(page==='law')lawView(target);
+ else if(page==='sources')sourcesView();
+ else if(page==='calculator')calcView(target||'paye');
+ else homeView();
+ nav();
+ if(page!=='law')window.scrollTo({top:0,behavior:'instant'});
+}
 const sidebarToggle=$('#sidebar-toggle');
 const smallSidebar=window.matchMedia('(max-width:650px)');
 function setSidebarExpanded(expanded){
@@ -152,7 +178,7 @@ $('#tax-sidebar').addEventListener('click',event=>{
   $('#main').focus({preventScroll:true});
  }
 });
-$('#calculator-search').addEventListener('input',nav);window.addEventListener('hashchange',route);if(!location.hash)history.replaceState(null,'','#calculator/paye');route();
+$('#calculator-search').addEventListener('input',nav);window.addEventListener('hashchange',route);if(!location.hash)history.replaceState(null,'','#home');route();
 
 const scrollTopButton=$('#scroll-to-top');
 const updateScrollTopButton=()=>{scrollTopButton.hidden=window.scrollY<300;};

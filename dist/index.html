@@ -9,14 +9,15 @@
   <link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <a class="skip" href="#main">Skip to calculator</a>
+  <a class="skip" href="#main">Skip to main content</a>
   <header class="topbar">
-    <a class="brand" href="#calculator/paye"><img src="assets/icon.png" width="40" height="40" alt=""><span>NTaxer<span class="brand-period">.</span></span></a>
+    <a class="brand" href="#home" aria-label="NTaxer home"><img src="assets/icon.png" width="40" height="40" alt=""><span>NTaxer<span class="brand-period">.</span></span></a>
   </header>
   <div class="shell">
     <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-controls="tax-sidebar" aria-expanded="true" aria-label="Collapse sidebar" title="Collapse sidebar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg></button>
     <aside id="tax-sidebar" class="sidebar" aria-label="Tax calculators">
       <nav class="sidebar-primary" aria-label="Main navigation">
+        <a href="#home" data-nav="home">Home</a>
         <div class="calculator-menu">
           <button type="button" class="calculator-menu-toggle" data-nav="calculator" aria-expanded="false" aria-controls="calculator-menu-options">Calculators<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div id="calculator-menu-options" class="calculator-menu-content" hidden>
