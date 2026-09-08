@@ -28,18 +28,32 @@
  .field input,.field select,.checkfield input{scroll-margin-top:110px}
 }
 
-/* Sidebar controls remain available when the workspace navigation is hidden. */
-.brand-controls{display:flex;align-items:center;gap:12px;min-width:0}
-.sidebar-toggle{display:grid;place-items:center;flex-shrink:0;width:42px;height:42px;padding:0;border:1px solid var(--line);border-radius:8px;background:white;color:var(--green)}
+/* Primary navigation lives in the sidebar; the brand stays centred. */
+:root{--sidebar-width:256px}
+.topbar{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);height:88px;min-height:88px;padding:0 24px;gap:12px}
+.topbar .brand{grid-column:2;justify-self:center}
+.topbar .edition{grid-column:3;justify-self:end;margin:0}
+.sidebar-primary{display:flex;flex-direction:column;gap:6px;padding-bottom:20px;margin-bottom:24px;border-bottom:1px solid var(--line)}
+.sidebar-primary a{padding:10px 12px;border-radius:8px;text-decoration:none;font-size:16px;color:var(--muted)}
+.sidebar-primary a:hover{background:#ecf1ee}
+.sidebar-primary a.active{background:#e4eee7;color:var(--green);font-weight:700}
+.sidebar-toggle{position:fixed;top:calc(var(--header-height) + 16px);left:calc(var(--sidebar-width) - 16px);z-index:15;display:grid;place-items:center;width:32px;height:44px;padding:0;border:1px solid var(--line);border-radius:8px;background:white;color:var(--green);box-shadow:0 2px 8px #073e3214}
 .sidebar-toggle:hover{background:#e4eee7}
+.sidebar-toggle[aria-expanded="false"]{left:0;border-radius:0 8px 8px 0}
+.sidebar-toggle[aria-expanded="false"] svg{transform:rotate(180deg)}
 .sidebar[hidden]{display:none!important}
 .shell.sidebar-collapsed{grid-template-columns:minmax(0,1fr)}
-@media screen and (min-width:651px){.topbar{padding-left:18px}}
-@media(max-width:650px){.brand-controls{gap:8px}}
-@media print{.sidebar-toggle{display:none}}
-@media screen and (min-width:651px) and (max-width:1050px){
- .topbar{height:auto;min-height:88px;padding-top:12px;padding-bottom:12px;flex-wrap:wrap;gap:12px 20px}
- .topbar nav{order:3;width:100%;height:auto;justify-content:center}
- .topbar nav a{padding:8px 0}
- .edition{margin-left:auto}
+@media(max-width:1150px){:root{--sidebar-width:220px}}
+@media(max-width:940px){:root{--sidebar-width:190px}}
+@media(max-width:650px){
+ :root{--sidebar-width:100%;--header-height:74px}
+ .topbar{height:74px;min-height:74px;padding:0 18px;gap:8px}
+ .topbar .edition{font-size:14px;padding:5px 8px}
+ .sidebar-primary{margin-bottom:14px;padding-right:28px;padding-bottom:14px}
+ .sidebar-primary a{font-size:15px}
+ .sidebar-toggle{left:calc(100% - 32px);border-radius:8px 0 0 8px}
+}
+@media print{
+ .sidebar-toggle{display:none}
+ .topbar{height:65px;min-height:0;padding:15px 0}
 }
