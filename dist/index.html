@@ -16,10 +16,17 @@
   <div class="shell">
     <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-controls="tax-sidebar" aria-expanded="true" aria-label="Collapse sidebar" title="Collapse sidebar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg></button>
     <aside id="tax-sidebar" class="sidebar" aria-label="Tax calculators">
-      <nav class="sidebar-primary" aria-label="Main navigation"><a href="#calculator/paye" data-nav="calculator">Calculators</a><a href="#coverage" data-nav="coverage">Tax coverage</a><a href="#law" data-nav="law">The tax law</a></nav>
-      <div class="sidebar-heading">YOUR TAX WORKSPACE</div>
-      <label class="search"><span aria-hidden="true">⌕</span><input id="calculator-search" type="search" placeholder="Find a tax…" aria-label="Find a calculator"></label>
-      <nav id="calculator-nav" aria-label="Choose calculator"></nav>
+      <nav class="sidebar-primary" aria-label="Main navigation">
+        <details class="calculator-menu">
+          <summary data-nav="calculator">Calculators<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="calculator-menu-content">
+            <label class="search"><span aria-hidden="true">⌕</span><input id="calculator-search" type="search" placeholder="Find a tax…" aria-label="Find a calculator"></label>
+            <div id="calculator-nav"></div>
+          </div>
+        </details>
+        <a href="#coverage" data-nav="coverage">Tax coverage</a>
+        <a href="#law" data-nav="law">The tax law</a>
+      </nav>
       <div class="side-note"><span class="shield" aria-hidden="true">✓</span><strong>Your numbers stay here.</strong><p>Calculations run in your browser. No account or financial data upload.</p></div>
       <a class="source-shortcut" href="#sources">Sources &amp; methodology ↗</a>
     </aside>
