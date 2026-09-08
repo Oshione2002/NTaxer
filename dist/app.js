@@ -240,10 +240,3 @@ function observePageHeader(){
 const pageContentObserver=new MutationObserver(observePageHeader);
 pageContentObserver.observe($('#main'),{childList:true});
 observePageHeader();
-
-// Reserve the full footer height after wrapping, resizing or changing sidebar width.
-const pageFooter=$('.shell > footer');
-const syncFooterHeight=()=>document.documentElement.style.setProperty('--footer-height',pageFooter.getBoundingClientRect().height+'px');
-const footerObserver=new ResizeObserver(syncFooterHeight);
-footerObserver.observe(pageFooter);
-syncFooterHeight();

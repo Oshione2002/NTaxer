@@ -208,7 +208,7 @@ h1{font-weight:800}
 h2,h3{font-weight:750}
 .brand{font-weight:900}
 .sidebar-primary>a,.calculator-menu>.calculator-menu-toggle{font-weight:700}
-.theme-toggle{grid-column:3;justify-self:end;display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid var(--line);border-radius:50%;background:var(--surface);color:var(--green)}
+.theme-toggle{display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid var(--line);border-radius:50%;background:var(--surface);color:var(--green)}
 .theme-toggle:hover{background:var(--tone-eaf1eb)}
 .theme-toggle .sun-icon{display:none}
 :root[data-theme="dark"] .theme-toggle .moon-icon{display:none}
@@ -228,19 +228,6 @@ h2,h3{font-weight:750}
  .shell.sidebar-collapsed>footer{grid-column:1}
 }
 
-/* Keep the footer visible while reserving its measured height in the page. */
-:root{--footer-height:64px}
-@media screen{
- .shell{padding-bottom:var(--footer-height)}
- .shell>footer{position:fixed;left:0;right:0;bottom:0;z-index:9;width:auto;margin:0;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
- html{scroll-padding-bottom:calc(var(--footer-height) + 16px)}
- .scroll-to-top{bottom:calc(var(--footer-height) + 16px)}
-}
-@media screen and (min-width:651px){
- .shell:not(.sidebar-collapsed)>footer{left:var(--sidebar-width)}
- .shell.sidebar-collapsed>footer{left:0}
-}
-
 /* Home categories can be collapsed independently. */
 .home-group>summary{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 24px;list-style:none;cursor:pointer;background:var(--tone-eaf1eb);color:var(--green)}
 .home-group>summary::-webkit-details-marker{display:none}
@@ -250,3 +237,12 @@ h2,h3{font-weight:750}
 .home-category-chevron{flex-shrink:0}
 .home-group[open] .home-category-chevron{transform:rotate(180deg)}
 @media(prefers-reduced-motion:no-preference){.home-category-chevron{transition:transform .18s ease}}
+
+/* Keep appearance controls at the sidebar bottom, below the navigation. */
+@media screen{
+ .sidebar{display:flex;flex-direction:column}
+ .sidebar .sidebar-primary{flex:0 0 auto}
+ .sidebar .sidebar-primary.calculators-expanded{flex:1 1 0;min-height:0;height:auto}
+}
+.sidebar-theme-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;margin-top:auto;padding-top:16px}
+.sidebar-theme-controls>span{font-size:14px;font-weight:600;color:var(--muted)}
