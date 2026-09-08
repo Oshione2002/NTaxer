@@ -172,7 +172,7 @@ function route(){
  if(page!=='law')window.scrollTo({top:0,behavior:'instant'});
 }
 const sidebarToggle=$('#sidebar-toggle');
-const smallSidebar=window.matchMedia('(max-width:650px)');
+const smallSidebar=window.matchMedia('(max-width:940px)');
 function setSidebarExpanded(expanded){
  const sidebar=$('#tax-sidebar');
  sidebar.hidden=!expanded;
