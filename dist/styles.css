@@ -36,10 +36,12 @@
 .sidebar-primary>a{padding:10px 12px;border-radius:8px;text-decoration:none;font-size:16px;color:var(--muted)}
 .sidebar-primary>a:hover{background:var(--tone-ecf1ee)}
 .sidebar-primary>a.active{background:var(--tone-e4eee7);color:var(--green);font-weight:700}
-.sidebar-toggle{position:fixed;top:calc(var(--header-height) + 16px);left:calc(var(--sidebar-width) - 16px);z-index:15;display:grid;place-items:center;width:32px;height:44px;padding:0;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--green);box-shadow:0 2px 8px var(--tone-073e3214)}
+.sidebar-toggle{position:fixed;top:calc(var(--header-height) + 16px);left:calc(var(--sidebar-width) - 24px);z-index:15;display:grid;place-items:center;width:48px;height:48px;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--green);box-shadow:0 2px 8px var(--tone-073e3214)}
 .sidebar-toggle:hover{background:var(--tone-e4eee7)}
-.sidebar-toggle[aria-expanded="false"]{left:0;border-radius:0 8px 8px 0}
-.sidebar-toggle[aria-expanded="false"] svg{transform:rotate(180deg)}
+.sidebar-toggle[aria-expanded="false"]{left:0;border-radius:0 12px 12px 0}
+.sidebar-open-icon{display:none}
+.sidebar-toggle[aria-expanded="false"] .sidebar-close-icon{display:none}
+.sidebar-toggle[aria-expanded="false"] .sidebar-open-icon{display:block}
 .sidebar[hidden]{display:none!important}
 .shell.sidebar-collapsed{grid-template-columns:minmax(0,1fr)}
 @media(max-width:1150px){:root{--sidebar-width:220px}}
@@ -50,7 +52,7 @@
  .topbar .edition{font-size:14px;padding:5px 8px}
  .sidebar-primary{margin-bottom:14px;padding-right:28px;padding-bottom:14px}
  .sidebar-primary>a{font-size:15px}
- .sidebar-toggle{left:calc(100% - 32px);border-radius:8px 0 0 8px}
+ .sidebar-toggle{left:calc(100% - 48px);border-radius:12px 0 0 12px}
 }
 @media print{
  .sidebar-toggle{display:none}
@@ -85,8 +87,8 @@
  :root{--sidebar-width:min(300px,calc(100vw - 40px))}
  .sidebar{border-right:1px solid var(--line);border-bottom:0;box-shadow:6px 0 18px var(--tone-073e3214)}
  .sidebar-primary{padding-right:0}
- .sidebar-toggle{left:calc(var(--sidebar-width) - 16px);border-radius:8px}
- .sidebar-toggle[aria-expanded="false"]{left:0;border-radius:0 8px 8px 0}
+ .sidebar-toggle{left:calc(var(--sidebar-width) - 24px);border-radius:12px}
+ .sidebar-toggle[aria-expanded="false"]{left:0;border-radius:0 12px 12px 0}
 }
 
 /* Keep law search beside its heading and available throughout the reference page. */
@@ -246,3 +248,15 @@ h2,h3{font-weight:750}
 }
 .sidebar-theme-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;margin-top:auto;padding-top:16px}
 .sidebar-theme-controls>span{font-size:14px;font-weight:600;color:var(--muted)}
+
+/* Chapter filtering stays beside the search input in the sticky law toolbar. */
+.law-toolbar{grid-template-columns:minmax(0,1fr) minmax(420px,1fr)}
+.law-search-controls{display:flex;align-items:stretch;gap:10px;min-width:0}
+.law-search-controls .wide-search{flex:1;min-width:0}
+.law-filter-control{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--green);flex-shrink:0}
+.law-filter-control svg{flex-shrink:0}
+.law-filter-control select{width:clamp(100px,14vw,180px);min-width:0;padding:6px 0;border:0;background:transparent;color:inherit;font:inherit;font-size:16px;cursor:pointer;text-overflow:ellipsis}
+.law-filter-control:focus-within{outline:2px solid var(--tone-219d72);outline-offset:2px}
+@media(max-width:1150px){.law-toolbar{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:650px){.law-filter-control{gap:5px;padding:8px}.law-filter-control select{width:90px;font-size:14px}}
+@media print{.law-search-controls{display:none}}
