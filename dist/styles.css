@@ -170,3 +170,13 @@ main{--page-header-height:0px}
 .law-item>summary:hover .law-chevron{background:#d6e6dc}
 .law-item[open]>summary .law-chevron svg{transform:rotate(180deg)}
 @media(prefers-reduced-motion:no-preference){.law-chevron svg{transition:transform .18s ease}}
+
+/* Keep the footer aligned with the page beside an expanded desktop sidebar. */
+footer{flex-wrap:wrap}
+footer span{min-width:0;overflow-wrap:anywhere}
+@media screen and (min-width:651px){
+ .shell:not(.sidebar-collapsed)~footer{margin-left:var(--sidebar-width)}
+ .shell.sidebar-collapsed~footer{margin-left:0}
+}
+@media screen and (min-width:651px) and (max-width:1150px){footer{padding-left:24px;padding-right:24px}}
+@media screen and (min-width:1450px){footer{padding-left:56px;padding-right:56px}}
