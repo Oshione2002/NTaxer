@@ -178,6 +178,20 @@ $('#tax-sidebar').addEventListener('click',event=>{
   $('#main').focus({preventScroll:true});
  }
 });
+document.addEventListener('pointerdown',event=>{
+ const sidebar=$('#tax-sidebar');
+ if(smallSidebar.matches&&!sidebar.hidden&&!sidebar.contains(event.target)&&!sidebarToggle.contains(event.target)){
+  const focusWasInside=sidebar.contains(document.activeElement);
+  setSidebarExpanded(false);
+  if(focusWasInside)sidebarToggle.focus({preventScroll:true});
+ }
+});
+document.addEventListener('keydown',event=>{
+ if(event.key==='Escape'&&smallSidebar.matches&&!$('#tax-sidebar').hidden){
+  setSidebarExpanded(false);
+  sidebarToggle.focus({preventScroll:true});
+ }
+});
 $('#calculator-search').addEventListener('input',nav);window.addEventListener('hashchange',route);if(!location.hash)history.replaceState(null,'','#home');route();
 
 const scrollTopButton=$('#scroll-to-top');
