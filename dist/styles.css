@@ -388,3 +388,15 @@ body{font-size:16px}
  .home-calculator-column{display:contents}
  .home-group{order:var(--home-order)}
 }
+
+
+/* Keep homepage categories full-width and use a drawer before content becomes cramped. */
+@media screen and (max-width:940px){
+ :root{--sidebar-width:min(320px,calc(100vw - 40px))}
+ .shell{display:block}
+ .shell>main,.shell.sidebar-collapsed>main{width:100%}
+ .sidebar{border-right:1px solid var(--line);border-bottom:0;box-shadow:6px 0 18px var(--tone-073e3214)}
+ .shell:not(.sidebar-collapsed)::after{content:"";position:fixed;inset:var(--header-height) 0 0 var(--sidebar-width);z-index:9;background:#0006}
+ .home-calculators{align-items:stretch}
+ .home-group{width:100%}
+}
