@@ -137,3 +137,16 @@
  .calculator-menu.is-open .nav-group{top:var(--calculator-search-height)}
  .calculator-menu.is-open .calc-link{scroll-margin-top:calc(var(--calculator-search-height) + 64px)}
 }
+
+/* Pin page headings below the site header and stack results beneath them. */
+main{--page-header-height:0px}
+@media screen{
+ .page-header{position:sticky;top:var(--header-height);z-index:6;background:#f3f6f5;padding:14px 0 18px;border-bottom:1px solid var(--line)}
+ .field input,.field select,.checkfield input{scroll-margin-top:calc(var(--page-header-height) + 110px)}
+}
+@media screen and (min-width:941px){
+ .result-column{top:calc(var(--header-height) + var(--page-header-height) + 20px);max-height:calc(100dvh - var(--header-height) - var(--page-header-height) - 40px)}
+}
+@media screen and (max-width:940px){
+ .sticky-estimate{top:calc(var(--header-height) + var(--page-header-height) + 8px)}
+}
