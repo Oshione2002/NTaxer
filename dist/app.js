@@ -25,8 +25,20 @@ function homeView(){
   groups.get(c.group).push(c);
  }
  $('#main').innerHTML=`<div class="intro page-header"><p class="eyebrow">Welcome to NTaxer</p><h1>What would you like to calculate?</h1><p class="lead">Choose a tax calculator to estimate an amount, review the breakdown and check the rules that apply.</p></div>
- <div class="home-calculators">${[...groups].map(([group,calculators])=>`<details class="home-group" open><summary><h2>${escape(group)}</h2><svg class="home-category-chevron" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="home-group-links">${calculators.map(c=>`<a class="home-calculator" href="#calculator/${c.id}"><span><strong>${escape(c.name)}</strong><small>${escape(c.description)}</small></span><span class="home-link-arrow" aria-hidden="true">→</span></a>`).join('')}</div></details>`).join('')}</div>
- <div class="home-reference-links"><a href="#coverage"><strong>Explore tax coverage</strong><span>See the taxes and taxpayer categories covered by NTaxer.</span></a><a href="#law"><strong>Read the tax law</strong><span>Search the Act by section, subject or phrase.</span></a></div>`;
+ <div class="home-calculators">${[...groups].map(([group,calculators])=>`<details class="home-group"><summary><h2>${escape(group)}</h2><svg class="home-category-chevron" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="home-group-links">${calculators.map(c=>`<a class="home-calculator" href="#calculator/${c.id}"><span><strong>${escape(c.name)}</strong><small>${escape(c.description)}</small></span><span class="home-link-arrow" aria-hidden="true">→</span></a>`).join('')}</div></details>`).join('')}</div>
+ <div class="home-reference-links"><a href="#coverage"><strong>Explore tax coverage</strong><span>See the taxes and taxpayer categories covered by NTaxer.</span></a><a href="#law"><strong>Read the tax law</strong><span>Search the Act by section, subject or phrase.</span></a></div>
+ <section class="home-how" aria-labelledby="home-how-title">
+  <div class="home-section-heading"><p class="eyebrow">How it works</p><h2 id="home-how-title">A clearer estimate in three steps</h2></div>
+  <ol class="home-steps">
+   <li><span class="home-step-number">1</span><div><strong>Choose the right calculator</strong><p>Select the tax, transaction or taxpayer category that matches what you want to estimate.</p></div></li>
+   <li><span class="home-step-number">2</span><div><strong>Enter the relevant figures</strong><p>Complete the fields and adjust the available assumptions to reflect your situation.</p></div></li>
+   <li><span class="home-step-number">3</span><div><strong>Review the complete result</strong><p>Check the breakdown, assumptions, scope and legal references shown with the estimate.</p></div></li>
+  </ol>
+ </section>
+ <section class="home-planning-note" aria-labelledby="home-planning-title">
+  <div><p class="eyebrow">Important to know</p><h2 id="home-planning-title">Use each result as a planning estimate</h2></div>
+  <p>Tax treatment can depend on facts that a calculator cannot capture. Review the stated assumptions, scope and legal references before making a filing or financial decision.</p>
+ </section>`;
 }
 function refsHtml(refs){return refs.map(n=>`<a href="#law/${n}">s. ${n}</a>`).join(' · ');}
 function sourceHtml(config){
