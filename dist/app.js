@@ -99,4 +99,15 @@ function sourcesView(){
  <div class="detail-card detail-area"><h2>Calculation method</h2><ul><li>Ruleset: ${RULESET}. Review date: ${REVIEWED}. The application has no live legal-update feed and is limited to the displayed 2026 rules.</li><li>Money is represented as integer kobo. Percentage calculations use integer-ratio arithmetic and round half up to the nearest kobo at each result line. Petroleum field modelling uses decimal quantities and rounds each royalty component to the nearest US cent.</li><li>Personal income tax applies the six annual bands after eligible deductions. Monthly PAYE is the annual estimate divided by 12.</li><li>Invalid, negative, malformed and out-of-range inputs block results. Monetary inputs are capped at ₦1 trillion per field. A review-needed result is not a zero liability.</li><li>Each calculator is independent. Some amounts overlap: for example withholding credits, company income tax, development levy and presumptive tax. Do not sum all calculator outputs as a single tax bill.</li><li>Figures are examples until replaced. Current input values are kept only in page memory; reloading resets them. Exported records contain the values and assumptions you choose to download.</li></ul><h3>Where specialist work remains necessary</h3><p>Complex payroll reconciliation, insurance reserves, free-zone apportionment, trust allocations, asset-ledger valuations, petroleum profit schedules, treaty eligibility, customs tariffs, state/local levies, returns and penalties are not fully automated. Their legal references and related calculation routes appear in Tax coverage. NTaxer does not make payments or submit returns.</p><p>${link('https://github.com/Oshione2002/NTaxer','Inspect the source code')}</p></div>`;
 }
 function route(){const hash=location.hash||'#calculator/paye';const [page,target]=hash.slice(1).split('/');document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('active',a.dataset.nav===page));if(page==='coverage')coverageView();else if(page==='law')lawView(target);else if(page==='sources')sourcesView();else calcView(target||'paye');nav();if(page!=='law')window.scrollTo({top:0,behavior:'instant'});}
+const sidebarToggle=$('#sidebar-toggle');
+sidebarToggle.addEventListener('click',()=>{
+ const sidebar=$('#tax-sidebar');
+ const expanded=sidebarToggle.getAttribute('aria-expanded')!=='true';
+ sidebar.hidden=!expanded;
+ $('.shell').classList.toggle('sidebar-collapsed',!expanded);
+ sidebarToggle.setAttribute('aria-expanded',String(expanded));
+ const label=expanded?'Collapse sidebar':'Open sidebar';
+ sidebarToggle.setAttribute('aria-label',label);
+ sidebarToggle.title=label;
+});
 $('#calculator-search').addEventListener('input',nav);window.addEventListener('hashchange',route);if(!location.hash)history.replaceState(null,'','#calculator/paye');route();
