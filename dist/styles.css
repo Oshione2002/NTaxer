@@ -433,7 +433,7 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 /* Tax Coverage search and filter controls. */
 .coverage-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;gap:10px;margin:22px 0 12px}
 .coverage-toolbar .wide-search{width:100%;max-width:none;margin:0}
-.coverage-filter-control{displaydisplay:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--green)}
+.coverage-filter-control{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--green)}
 .coverage-filter-control svg{flex-shrink:0}
 .coverage-filter-control select{min-width:130px;padding:6px 0;border:0;background:transparent;color:inherit;font:inherit;font-size:14px;cursor:pointer}
 .coverage-filter-control:focus-within{outline:2px solid var(--tone-219d72);outline-offset:2px}
