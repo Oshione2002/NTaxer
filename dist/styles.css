@@ -18,7 +18,7 @@
  :root{--header-height:140px}
 }
 @media screen and (min-width:941px){
- .result-column{position:sticky;top:calc(var(--header-height) + 20px);max-height:calc(100dvh - var(--header-height) - 40px);overflow-y:auto;min-width:0;scrollbar-width:thin}
+ .result-column{position:sticky;top:calc(var(--header-height) + 20px);max-height:none;overflow:visible;min-width:0}
 }
 @media screen and (max-width:940px){
  .sticky-estimate{display:flex;position:sticky;top:calc(var(--header-height) + 8px);z-index:5;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 16px;padding:12px 16px;margin-bottom:18px;border-radius:12px;background:var(--strong-surface);color:white;box-shadow:0 4px 14px var(--tone-073e3226)}
@@ -144,7 +144,7 @@ main{--page-header-height:0px}
  .field input,.field select,.checkfield input{scroll-margin-top:calc(var(--page-header-height) + 110px)}
 }
 @media screen and (min-width:941px){
- .result-column{top:calc(var(--header-height) + var(--page-header-height) + 20px);max-height:calc(100dvh - var(--header-height) - var(--page-header-height) - 40px)}
+ .result-column{top:calc(var(--header-height) + var(--page-header-height) + 20px);max-height:none}
 }
 @media screen and (max-width:940px){
  .sticky-estimate{top:calc(var(--header-height) + var(--page-header-height) + 8px)}
