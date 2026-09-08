@@ -161,3 +161,12 @@ main{--page-header-height:0px}
 @media(prefers-reduced-motion:no-preference){
  .law-item,.section-no{transition:background-color .16s ease,border-color .16s ease,color .16s ease}
 }
+
+/* The disclosure chevron follows each section's native open/closed state. */
+.law-item>summary{list-style:none}
+.law-item>summary::-webkit-details-marker{display:none}
+.law-section-title{flex:1;min-width:0;overflow-wrap:anywhere}
+.law-chevron{display:grid;place-items:center;flex:0 0 32px;width:32px;height:32px;border-radius:50%;color:var(--green)}
+.law-item>summary:hover .law-chevron{background:#d6e6dc}
+.law-item[open]>summary .law-chevron svg{transform:rotate(180deg)}
+@media(prefers-reduced-motion:no-preference){.law-chevron svg{transition:transform .18s ease}}
