@@ -400,3 +400,11 @@ body{font-size:16px}
  .home-calculators{align-items:stretch}
  .home-group{width:100%}
 }
+
+
+/* Tablets retain the two-column homepage; only smartphones use one column. */
+@media screen and (min-width:651px) and (max-width:940px){
+ .home-calculators{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
+ .home-calculator-column{display:flex}
+ .home-group{order:initial}
+}
