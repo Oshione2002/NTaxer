@@ -103,14 +103,23 @@ function sourcesView(){
 }
 function route(){const hash=location.hash||'#calculator/paye';const [page,target]=hash.slice(1).split('/');document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('active',a.dataset.nav===page));if(page==='coverage')coverageView();else if(page==='law')lawView(target);else if(page==='sources')sourcesView();else calcView(target||'paye');nav();if(page!=='law')window.scrollTo({top:0,behavior:'instant'});}
 const sidebarToggle=$('#sidebar-toggle');
-sidebarToggle.addEventListener('click',()=>{
+const smallSidebar=window.matchMedia('(max-width:650px)');
+function setSidebarExpanded(expanded){
  const sidebar=$('#tax-sidebar');
- const expanded=sidebarToggle.getAttribute('aria-expanded')!=='true';
  sidebar.hidden=!expanded;
  $('.shell').classList.toggle('sidebar-collapsed',!expanded);
  sidebarToggle.setAttribute('aria-expanded',String(expanded));
  const label=expanded?'Collapse sidebar':'Open sidebar';
  sidebarToggle.setAttribute('aria-label',label);
  sidebarToggle.title=label;
+}
+sidebarToggle.addEventListener('click',()=>setSidebarExpanded(sidebarToggle.getAttribute('aria-expanded')!=='true'));
+setSidebarExpanded(!smallSidebar.matches);
+smallSidebar.addEventListener('change',event=>setSidebarExpanded(!event.matches));
+$('#tax-sidebar').addEventListener('click',event=>{
+ if(smallSidebar.matches&&event.target.closest('a[href]')){
+  setSidebarExpanded(false);
+  $('#main').focus({preventScroll:true});
+ }
 });
 $('#calculator-search').addEventListener('input',nav);window.addEventListener('hashchange',route);if(!location.hash)history.replaceState(null,'','#calculator/paye');route();
