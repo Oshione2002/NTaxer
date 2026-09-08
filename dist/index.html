@@ -11,12 +11,13 @@
 <body>
   <a class="skip" href="#main">Skip to calculator</a>
   <header class="topbar">
-    <a class="brand" href="#calculator/paye"><img src="assets/icon.png" width="40" height="40" alt=""><span>NTaxer<span class="brand-period">.</span></span></a>
+    <div class="brand-controls"><button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-controls="tax-sidebar" aria-expanded="true" aria-label="Collapse sidebar" title="Collapse sidebar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <a class="brand" href="#calculator/paye"><img src="assets/icon.png" width="40" height="40" alt=""><span>NTaxer<span class="brand-period">.</span></span></a></div>
     <nav aria-label="Main navigation"><a href="#calculator/paye" data-nav="calculator">Calculators</a><a href="#coverage" data-nav="coverage">Tax coverage</a><a href="#law" data-nav="law">The tax law</a></nav>
     <span class="edition">2026 <span>tax rules</span></span>
   </header>
   <div class="shell">
-    <aside class="sidebar" aria-label="Tax calculators">
+    <aside id="tax-sidebar" class="sidebar" aria-label="Tax calculators">
       <div class="sidebar-heading">YOUR TAX WORKSPACE</div>
       <label class="search"><span aria-hidden="true">⌕</span><input id="calculator-search" type="search" placeholder="Find a tax…" aria-label="Find a calculator"></label>
       <nav id="calculator-nav" aria-label="Choose calculator"></nav>
