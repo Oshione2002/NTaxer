@@ -227,3 +227,16 @@ h2,h3{font-weight:750}
  .shell>footer{position:static;grid-column:2;grid-row:2;min-width:0;width:auto;margin:0}
  .shell.sidebar-collapsed>footer{grid-column:1}
 }
+
+/* Keep the footer visible while reserving its measured height in the page. */
+:root{--footer-height:64px}
+@media screen{
+ .shell{padding-bottom:var(--footer-height)}
+ .shell>footer{position:fixed;left:0;right:0;bottom:0;z-index:9;width:auto;margin:0;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+ html{scroll-padding-bottom:calc(var(--footer-height) + 16px)}
+ .scroll-to-top{bottom:calc(var(--footer-height) + 16px)}
+}
+@media screen and (min-width:651px){
+ .shell:not(.sidebar-collapsed)>footer{left:var(--sidebar-width)}
+ .shell.sidebar-collapsed>footer{left:0}
+}
