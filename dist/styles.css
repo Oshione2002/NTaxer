@@ -173,10 +173,6 @@ main{--page-header-height:0px}
 /* Keep the footer aligned with the page beside an expanded desktop sidebar. */
 footer{flex-wrap:wrap}
 footer span{min-width:0;overflow-wrap:anywhere}
-@media screen and (min-width:651px){
- .shell:not(.sidebar-collapsed)~footer{margin-left:var(--sidebar-width)}
- .shell.sidebar-collapsed~footer{margin-left:0}
-}
 @media screen and (min-width:651px) and (max-width:1150px){footer{padding-left:24px;padding-right:24px}}
 @media screen and (min-width:1450px){footer{padding-left:56px;padding-right:56px}}
 
@@ -223,3 +219,11 @@ h2,h3{font-weight:750}
 }
 
 .eyebrow,.nav-group,.result-heading{font-weight:750}
+
+/* Footer and main content share the same grid column and document flow. */
+@media screen{
+ .shell{grid-template-rows:1fr auto}
+ .shell>main{grid-row:1}
+ .shell>footer{position:static;grid-column:2;grid-row:2;min-width:0;width:auto;margin:0}
+ .shell.sidebar-collapsed>footer{grid-column:1}
+}
