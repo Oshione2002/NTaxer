@@ -24,7 +24,16 @@ function sourceHtml(config){
  const sources=[SOURCE_LINKS.nta,...(config.extraSource?[SOURCE_LINKS[config.extraSource]]:[]),...(config.id==='gains'?[SOURCE_LINKS.virtual]:[])];
  return `<h3>Legal basis</h3><p>Nigeria Tax Act 2025, National Assembly release. ${refsHtml(config.refs)}</p>${config.schedules?`<p>Schedules: ${config.schedules.map(n=>`<a href="#law/schedule-${n}">${n}</a>`).join(', ')}</p>`:''}${sources.map(s=>`<div class="source-entry"><strong>${link(s.url,s.title)}</strong><p>${escape(s.detail)}</p></div>`).join('')}<p>${link(`assets/nigeria-tax-act-2025-nass.pdf${page?'#page='+page:''}`,'Open the source PDF')} · <a href="#sources">Sources & methodology</a></p><p class="mini-label">Ruleset ${RULESET} · Reviewed ${REVIEWED}. Dates identify this fixed review, not a live tax-law feed.</p>`;
 }
-function nav(){const query=$('#calculator-search').value.toLowerCase().trim();let group='';$('#calculator-nav').innerHTML=CALCULATORS.filter(c=>`${c.name} ${c.group} ${c.description}`.toLowerCase().includes(query)).map(c=>{let heading=c.group!==group?`<div class="nav-group">${c.group}</div>`:'';group=c.group;return heading+`<a href="#calculator/${c.id}" class="calc-link ${state.current===c.id&&location.hash.startsWith('#calculator')?'active':''}" ${state.current===c.id?'aria-current="page"':''}><span class="nav-symbol" aria-hidden="true">${c.symbol}</span>${escape(c.short)}</a>`;}).join('')||'<p class="empty">No matching calculators.</p>';}
+function nav(){
+ const query=$('#calculator-search').value.toLowerCase().trim();
+ const groups=new Map();
+ for(const c of CALCULATORS){
+  if(!`${c.name} ${c.group} ${c.description}`.toLowerCase().includes(query))continue;
+  if(!groups.has(c.group))groups.set(c.group,[]);
+  groups.get(c.group).push(c);
+ }
+ $('#calculator-nav').innerHTML=[...groups].map(([group,calculators])=>`<section class="calculator-nav-group" aria-label="${escape(group)}"><div class="nav-group">${escape(group)}</div>${calculators.map(c=>`<a href="#calculator/${c.id}" class="calc-link ${state.current===c.id&&location.hash.startsWith('#calculator')?'active':''}" ${state.current===c.id&&location.hash.startsWith('#calculator')?'aria-current="page"':''}><span class="nav-symbol" aria-hidden="true">${c.symbol}</span>${escape(c.short)}</a>`).join('')}</section>`).join('')||'<p class="empty">No matching calculators.</p>';
+}
 function inputHtml(f,values){
  if(f.type==='divider')return `<div class="field-divider">${escape(f.label)}</div>`;
  const id='field-'+f.key,value=values[f.key];
@@ -138,3 +147,19 @@ scrollTopButton.addEventListener('click',()=>{
  window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
 });
 updateScrollTopButton();
+
+// Keep the pinned category headings below the actual menu and search heights.
+const calculatorMenu=$('.calculator-menu');
+const calculatorSummary=calculatorMenu.querySelector('summary');
+const calculatorSearchBar=$('.calculator-search-bar');
+const syncCalculatorStickyHeights=()=>{
+ for(const [element,property] of [[calculatorSummary,'--calculator-heading-height'],[calculatorSearchBar,'--calculator-search-height']]){
+  const height=element.getBoundingClientRect().height;
+  if(height>0)calculatorMenu.style.setProperty(property,height+'px');
+ }
+};
+const calculatorStickyObserver=new ResizeObserver(syncCalculatorStickyHeights);
+calculatorStickyObserver.observe(calculatorSummary);
+calculatorStickyObserver.observe(calculatorSearchBar);
+calculatorMenu.addEventListener('toggle',syncCalculatorStickyHeights);
+syncCalculatorStickyHeights();
