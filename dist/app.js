@@ -2,7 +2,7 @@ import {CALCULATORS,DEFAULTS,SOURCE_LINKS} from './calculators.js';
 import {CHAPTERS,SECTORS} from './coverage.js';
 import {VAT_CATEGORIES} from './schedules.js';
 import {RULESET,REVIEWED,money} from './engine.js';
-import {buildInputRows,downloadPdf,downloadExcel} from './export.js';
+import {buildInputRows,chunkExportText,downloadPdf,downloadExcel} from './export.js';
 
 const $=s=>document.querySelector(s);
 // Track the actual header height when navigation wraps or text size changes.
@@ -58,14 +58,33 @@ function exportInputValue(field,value){
 }
 function buildExportReport(c,r){
  const generatedAt=new Date(),currency=r.currency||'NGN';
+ const siteRoot=new URL('.',location.href).href;
+ const lawUrl=target=>`${siteRoot}#law/${target}`;
  const metric1=r.secondary||['Calculation base',r.base],metric2=r.tertiary||['Ruleset year','2026'];
  const sources=[SOURCE_LINKS.nta,...(c.extraSource?[SOURCE_LINKS[c.extraSource]]:[]),...(c.id==='gains'?[SOURCE_LINKS.virtual]:[])];
  const uniqueSources=[...new Map(sources.map(source=>[source.url,source])).values()];
  const calculationTables=[{title:'Full calculation',headers:['Calculation item','Amount / treatment'],rows:r.rows.map(([label,value])=>[label,exportValue(value,currency)])}];
  if(r.bands)calculationTables.unshift({title:'Progressive tax bands',headers:['Annual band','Rate','Income in band','Tax'],rows:r.bands.map(band=>[band.upper===Infinity?`Above ${format(band.lower,currency)}`:`${format(band.lower,currency)} - ${format(band.upper,currency)}`,`${band.rate/100}%`,format(band.used,currency),format(band.tax,currency)])});
  if(c.id==='vat')calculationTables.push({title:'Supply classification reference',headers:['Supply','Treatment','Section'],rows:VAT_CATEGORIES.map(([,name,treatment,reference])=>[name,treatment,reference])});
- const legalRows=[['Act sections',c.refs.map(section=>`Section ${section}`).join(', ')]];
- if(c.schedules?.length)legalRows.push(['Schedules',c.schedules.map(schedule=>`Schedule ${schedule}`).join(', ')]);
+ const legalRows=c.refs.flatMap(sectionNumber=>{
+  const section=state.law?.sections.find(item=>item.number===sectionNumber);
+  const url=lawUrl(sectionNumber),wording=section?`${section.title}\n${section.text}`:`Section ${sectionNumber}`;
+  return chunkExportText(wording).map((text,index)=>[
+   {text:index?`Section ${sectionNumber} (continued)`:`Section ${sectionNumber}`,url},
+   {text,url}
+  ]);
+ });
+ if(c.schedules?.length)legalRows.push(...c.schedules.map(scheduleNumber=>{
+  const scheduleIndex=state.law?.schedules.findIndex(item=>item.number===scheduleNumber)??-1;
+  const schedule=state.law?.schedules[scheduleIndex];
+  const nextPage=state.law?.schedules[scheduleIndex+1]?.page||214;
+  const wording=schedule?state.law.pages.filter(page=>page.page>=schedule.page&&page.page<nextPage).map(page=>page.text).join('\n\n'):'';
+  const url=lawUrl(`schedule-${scheduleNumber}`),text=schedule?`${schedule.title}\n${wording}`:`Schedule ${scheduleNumber}`;
+  return chunkExportText(text).map((chunk,index)=>[
+   {text:index?`Schedule ${scheduleNumber} (continued)`:`Schedule ${scheduleNumber}`,url},
+   {text:chunk,url}
+  ]);
+ }).flat());
  legalRows.push(['Ruleset',RULESET],['Review date',REVIEWED],['Scope note','Dates identify this fixed review, not a live tax-law feed.']);
  return {
   title:`${c.name} - tax estimate`,subtitle:c.description,amountLabel:r.title||'Estimated amount',amount:format(r.amount,currency),
@@ -75,7 +94,7 @@ function buildExportReport(c,r){
    {title:'Inputs',tables:[{title:'Information entered',headers:['Input','Entered value','Guidance / scope'],rows:buildInputRows(c.fields,state.inputs[c.id],exportInputValue)}]},
    {title:'Calculation breakdown',tables:calculationTables},
    {title:'Assumptions & scope',tables:[{title:'Conditions used for this estimate',headers:['No.','Assumption / scope'],rows:(r.notes?.length?r.notes:['No calculator-specific assumptions were returned.']).map((note,index)=>[String(index+1),note])}]},
-   {title:'Legal references',tables:[{title:'Legal basis',headers:['Reference','Details'],rows:legalRows},{title:'Source documents',headers:['Source','URL and description'],rows:uniqueSources.map(source=>[source.title,`${source.url}\n${source.detail}`])}]}
+   {title:'Legal references',tables:[{title:'Legal basis',headers:['Reference','Details'],rows:legalRows},{title:'Source documents',headers:['Source','URL and description'],rows:uniqueSources.map(source=>[{text:source.title,url:source.url},{text:`${source.url}\n${source.detail}`,url:source.url}])}]}
   ]
  };
 }
@@ -122,9 +141,10 @@ function updateResult(c){
  $('#result').innerHTML=`<div class="result-card"><div class="result-heading">${escape(r.title||'Estimated amount')}</div><div class="${available?'result-total':'status-placeholder'}">${available?format(r.amount,currency):'Review needed'}</div><div class="result-sub">${available?(r.currency==='USD'?'All results below are in US dollars':'Nigerian naira · rounded to the nearest kobo'):'Read the conditions below to continue.'}</div>${available?`<div class="result-metrics"><div><small>${escape(metric1[0])}</small><strong>${format(metric1[1],currency)}</strong></div><div><small>${escape(metric2[0])}</small><strong>${format(metric2[1],currency)}</strong></div></div>`:''}${r.bands&&available?`<div class="result-bar" role="img" aria-label="Income tax ${r.base?(r.amount/r.base*100).toFixed(2):0}% of total income"><progress class="tax-progress" value="${Math.min(1,r.base?r.amount/r.base:0)}" max="1"></progress></div><div class="bar-labels"><span>Income tax</span><span>Income before other deductions</span></div>`:''}<div class="result-actions"><button class="button primary" id="download-pdf" ${!available?'disabled':''}>Download PDF</button><button class="button" id="download-excel" ${!available?'disabled':''}>Download Excel</button></div></div>`;
  const runExport=(button,download)=>{
   const originalLabel=button.textContent;
-  button.addEventListener('click',()=>{
+  button.addEventListener('click',async()=>{
    try{
     button.disabled=true;button.textContent='Preparing…';
+    await lawPromise;
     download(buildExportReport(c,r),`NTaxer-${c.id}-${new Date().toISOString().slice(0,10)}`);
     button.textContent='Downloaded';
    }catch(error){
