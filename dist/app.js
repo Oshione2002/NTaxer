@@ -56,7 +56,7 @@ function nav(){
   if(!groups.has(c.group))groups.set(c.group,[]);
   groups.get(c.group).push(c);
  }
- $('#calculator-nav').innerHTML=[...groups].map(([group,calculators])=>`<section class="calculator-nav-group" aria-label="${escape(titleCase(group))}"><div class="nav-group">${escape(titleCase(group))}</div>${calculators.map(c=>`<a href="#calculator/${c.id}" class="calc-link ${state.current===c.id&&location.hash.startsWith('#calculator')?'active':''}" ${state.current===c.id&&location.hash.startsWith('#calculator')?'aria-current="page"':''}><span class="nav-symbol" aria-hidden="true">${c.symbol}</span>${escape(c.short)}</a>`).join('')}</section>`).join('')||'<p class="empty">No matching calculators.</p>';
+ $('#calculator-nav').innerHTML=[...groups].map(([group,calculators])=>`<details class="calculator-nav-group" ${query?'open':''}><summary class="nav-group"><span>${escape(titleCase(group))}</span><svg class="nav-group-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="calculator-nav-links">${calculators.map(c=>`<a href="#calculator/${c.id}" class="calc-link ${state.current===c.id&&location.hash.startsWith('#calculator')?'active':''}" ${state.current===c.id&&location.hash.startsWith('#calculator')?'aria-current="page"':''}><span class="nav-symbol" aria-hidden="true">${c.symbol}</span>${escape(c.short)}</a>`).join('')}</div></details>`).join('')||'<p class="empty">No matching calculators.</p>';
 }
 function inputHtml(f,values){
  if(f.type==='divider')return `<div class="field-divider">${escape(f.label)}</div>`;
