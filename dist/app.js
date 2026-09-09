@@ -2,7 +2,7 @@ import {CALCULATORS,DEFAULTS,SOURCE_LINKS} from './calculators.js';
 import {CHAPTERS,SECTORS} from './coverage.js';
 import {VAT_CATEGORIES} from './schedules.js';
 import {RULESET,REVIEWED,money} from './engine.js';
-import {downloadPdf,downloadExcel} from './export.js';
+import {buildInputRows,downloadPdf,downloadExcel} from './export.js';
 
 const $=s=>document.querySelector(s);
 // Track the actual header height when navigation wraps or text size changes.
@@ -72,7 +72,7 @@ function buildExportReport(c,r){
   generatedAt:generatedAt.toISOString(),generatedDisplay:new Intl.DateTimeFormat('en-NG',{dateStyle:'medium',timeStyle:'short'}).format(generatedAt),ruleset:RULESET,reviewed:REVIEWED,
   sections:[
    {title:'Overview',tables:[{title:'Result summary',headers:['Item','Value'],rows:[['Calculator',c.name],['Tax year','2026'],['Estimate status',statusLabel(c.status)],['Result',r.title||'Estimated amount'],['Estimated amount',format(r.amount,currency)],['Currency',currency],[metric1[0],exportValue(metric1[1],currency)],[metric2[0],exportValue(metric2[1],currency)],['Generated',new Intl.DateTimeFormat('en-NG',{dateStyle:'full',timeStyle:'long'}).format(generatedAt)],['Important','This is a planning estimate, not a tax assessment. Check the assumptions, scope and legal references before filing or making a financial decision.']]}]},
-   {title:'Inputs',tables:[{title:'Information entered',headers:['Input','Entered value','Guidance / scope'],rows:c.fields.filter(field=>field.key).map(field=>[field.label,exportInputValue(field,state.inputs[c.id]),field.hint||''])}]},
+   {title:'Inputs',tables:[{title:'Information entered',headers:['Input','Entered value','Guidance / scope'],rows:buildInputRows(c.fields,state.inputs[c.id],exportInputValue)}]},
    {title:'Calculation breakdown',tables:calculationTables},
    {title:'Assumptions & scope',tables:[{title:'Conditions used for this estimate',headers:['No.','Assumption / scope'],rows:(r.notes?.length?r.notes:['No calculator-specific assumptions were returned.']).map((note,index)=>[String(index+1),note])}]},
    {title:'Legal references',tables:[{title:'Legal basis',headers:['Reference','Details'],rows:legalRows},{title:'Source documents',headers:['Source','URL and description'],rows:uniqueSources.map(source=>[source.title,`${source.url}\n${source.detail}`])}]}
@@ -120,8 +120,24 @@ function updateResult(c){
  $('#sticky-estimate').innerHTML=`<span>${escape(r.title||'Estimated amount')}</span><strong>${available?format(r.amount,currency):'Review needed'}</strong>`;
  const metric1=r.secondary||['Calculation base',r.base],metric2=r.tertiary||['Ruleset year','2026'];
  $('#result').innerHTML=`<div class="result-card"><div class="result-heading">${escape(r.title||'Estimated amount')}</div><div class="${available?'result-total':'status-placeholder'}">${available?format(r.amount,currency):'Review needed'}</div><div class="result-sub">${available?(r.currency==='USD'?'All results below are in US dollars':'Nigerian naira · rounded to the nearest kobo'):'Read the conditions below to continue.'}</div>${available?`<div class="result-metrics"><div><small>${escape(metric1[0])}</small><strong>${format(metric1[1],currency)}</strong></div><div><small>${escape(metric2[0])}</small><strong>${format(metric2[1],currency)}</strong></div></div>`:''}${r.bands&&available?`<div class="result-bar" role="img" aria-label="Income tax ${r.base?(r.amount/r.base*100).toFixed(2):0}% of total income"><progress class="tax-progress" value="${Math.min(1,r.base?r.amount/r.base:0)}" max="1"></progress></div><div class="bar-labels"><span>Income tax</span><span>Income before other deductions</span></div>`:''}<div class="result-actions"><button class="button primary" id="download-pdf" ${!available?'disabled':''}>Download PDF</button><button class="button" id="download-excel" ${!available?'disabled':''}>Download Excel</button></div></div>`;
- $('#download-pdf').addEventListener('click',()=>downloadPdf(buildExportReport(c,r),`NTaxer-${c.id}-${new Date().toISOString().slice(0,10)}`));
- $('#download-excel').addEventListener('click',()=>downloadExcel(buildExportReport(c,r),`NTaxer-${c.id}-${new Date().toISOString().slice(0,10)}`));
+ const runExport=(button,download)=>{
+  const originalLabel=button.textContent;
+  button.addEventListener('click',()=>{
+   try{
+    button.disabled=true;button.textContent='Preparing…';
+    download(buildExportReport(c,r),`NTaxer-${c.id}-${new Date().toISOString().slice(0,10)}`);
+    button.textContent='Downloaded';
+   }catch(error){
+    console.error('Export failed',error);
+    button.textContent='Try again';
+    button.setAttribute('aria-label',`${originalLabel} failed. Try again.`);
+   }finally{
+    setTimeout(()=>{button.disabled=false;button.textContent=originalLabel;button.removeAttribute('aria-label');},1400);
+   }
+  });
+ };
+ runExport($('#download-pdf'),downloadPdf);
+ runExport($('#download-excel'),downloadExcel);
  $('#breakdown').innerHTML=available?`<div class="panel-head"><h2>At a glance</h2><span class="mini-label">${r.currency||'NGN'}</span></div><div class="rows">${r.rows.slice(-6).map(([name,val])=>`<div class="result-row"><span>${escape(name)}</span><strong>${format(val,currency)}</strong></div>`).join('')}</div>`:`<div class="rows">${r.notes.map(n=>`<p class="notice">${escape(n)}</p>`).join('')}</div>`;
  renderDetail(c);
 }

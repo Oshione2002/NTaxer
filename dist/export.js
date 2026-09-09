@@ -18,6 +18,14 @@ const downloadBlob=(blob,filename)=>{
  setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 
+export function buildInputRows(fields,values,formatValue){
+ return fields.filter(field=>field.key).map(field=>[
+  field.label,
+  formatValue(field,values[field.key]),
+  field.hint||''
+ ]);
+}
+
 function approximateWidth(text,size){
  let units=0;
  for(const char of safePdfText(text)){

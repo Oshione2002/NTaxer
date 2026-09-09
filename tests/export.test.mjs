@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {buildPdfBytes,buildExcelBytes} from '../dist/export.js';
+import {buildPdfBytes,buildExcelBytes,buildInputRows} from '../dist/export.js';
 
 const report={
  title:'Personal income / PAYE - tax estimate',subtitle:'Example report',amountLabel:'Estimated annual income tax',amount:'NGN 123,456.78',generatedAt:'2026-09-09T12:00:00.000Z',generatedDisplay:'9 Sep 2026, 13:00',ruleset:'2026',reviewed:'9 September 2026',
@@ -12,6 +12,15 @@ const report={
   {title:'Legal references',tables:[{title:'Legal basis',headers:['Reference','Details'],rows:[['Act sections','Section 58']]}]}
  ]
 };
+
+test('input export formats each field value rather than the complete input record',()=>{
+ const fields=[{key:'income',label:'Annual income',hint:'Before tax'},{key:'resident',label:'Resident',hint:''},{type:'divider',label:'Scope'}];
+ const values={income:'2500000',resident:true};
+ const seen=[];
+ const rows=buildInputRows(fields,values,(field,value)=>{seen.push([field.key,value]);return String(value);});
+ assert.deepEqual(seen,[['income','2500000'],['resident',true]]);
+ assert.deepEqual(rows,[['Annual income','2500000','Before tax'],['Resident','true','']]);
+});
 
 test('PDF export is a complete standalone PDF report',()=>{
  const bytes=buildPdfBytes(report),text=new TextDecoder().decode(bytes);
