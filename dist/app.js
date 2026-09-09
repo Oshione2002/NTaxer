@@ -234,6 +234,16 @@ document.addEventListener('keydown',event=>{
   sidebarToggle.focus({preventScroll:true});
  }
 });
+
+// Keep wheel scrolling inside the sidebar, even over its fixed lower controls.
+const sidebarScroller=$('.sidebar-primary');
+$('#tax-sidebar').addEventListener('wheel',event=>{
+ if(event.ctrlKey||!event.deltaY)return;
+ const unit=event.deltaMode===1?16:event.deltaMode===2?sidebarScroller.clientHeight:1;
+ sidebarScroller.scrollTop+=event.deltaY*unit;
+ event.preventDefault();
+},{passive:false});
+
 $('#calculator-search').addEventListener('input',nav);window.addEventListener('hashchange',route);if(!location.hash)history.replaceState(null,'','#home');route();
 
 const scrollTopButton=$('#scroll-to-top');
