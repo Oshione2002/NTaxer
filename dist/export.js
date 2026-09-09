@@ -28,18 +28,6 @@ export function buildInputRows(fields,values,formatValue){
  ]);
 }
 
-export function chunkExportText(value,maxLength=850){
- const words=String(value??'').split(/\s+/).filter(Boolean),chunks=[];
- let chunk='';
- for(const word of words){
-  const candidate=chunk?`${chunk} ${word}`:word;
-  if(chunk&&candidate.length>maxLength){chunks.push(chunk);chunk=word;}
-  else chunk=candidate;
- }
- if(chunk)chunks.push(chunk);
- return chunks.length?chunks:[''];
-}
-
 function approximateWidth(text,size){
  let units=0;
  for(const char of safePdfText(text)){
