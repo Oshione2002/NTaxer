@@ -188,7 +188,11 @@ function route(){
 }
 const sidebarToggle=$('#sidebar-toggle');
 const smallSidebar=window.matchMedia('(max-width:940px)');
-function setSidebarExpanded(expanded){
+const sidebarStorageKey='ntaxer-sidebar-expanded';
+function savedDesktopSidebarState(){
+ try{return localStorage.getItem(sidebarStorageKey);}catch{return null;}
+}
+function setSidebarExpanded(expanded,{persist=true}={}){
  const sidebar=$('#tax-sidebar');
  sidebar.hidden=!expanded;
  sidebar.inert=!expanded;
@@ -198,10 +202,17 @@ function setSidebarExpanded(expanded){
  const label=expanded?'Collapse sidebar':'Open sidebar';
  sidebarToggle.setAttribute('aria-label',label);
  sidebarToggle.title=label;
+ if(persist&&!smallSidebar.matches){
+  try{localStorage.setItem(sidebarStorageKey,String(expanded));}catch{}
+ }
 }
 sidebarToggle.addEventListener('click',()=>setSidebarExpanded(sidebarToggle.getAttribute('aria-expanded')!=='true'));
-setSidebarExpanded(false);
-smallSidebar.addEventListener('change',()=>setSidebarExpanded(false));
+const savedSidebarState=savedDesktopSidebarState();
+setSidebarExpanded(smallSidebar.matches?false:savedSidebarState===null||savedSidebarState==='true',{persist:false});
+smallSidebar.addEventListener('change',event=>{
+ const saved=savedDesktopSidebarState();
+ setSidebarExpanded(event.matches?false:saved===null||saved==='true',{persist:false});
+});
 $('#tax-sidebar').addEventListener('click',event=>{
  if(smallSidebar.matches&&event.target.closest('a[href]')){
   setSidebarExpanded(false);
