@@ -465,7 +465,7 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 /* Page-level headings and descriptions scroll normally beneath the sticky site header. */
 @media screen{
  .page-header{position:static;top:auto;z-index:auto}
- main{--page-header-height:0px!important}
+ main{--page-header-height:0px}
 }
 
 /* Tax Coverage controls sit beside the main page title. */
@@ -481,4 +481,12 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 .coverage-intro{margin-bottom:18px}
 @media screen{
  .coverage-heading-row{position:sticky;top:var(--header-height);z-index:6;margin-bottom:18px;padding:14px 0 18px;border-bottom:1px solid var(--line);background:var(--tone-f3f6f5)}
+}
+
+
+/* Calculator and methodology titles stay pinned; their descriptions scroll away. */
+.page-subtext{padding-top:16px}
+.sticky-page-heading h1{margin-bottom:0}
+@media screen{
+ .sticky-page-heading{position:sticky;top:var(--header-height);z-index:6;background:var(--tone-f3f6f5)}
 }
