@@ -1,62 +1,46 @@
-/* Sticky bottom navigation for the calculator sidebar. */
+/* Permanently pin Tax Coverage, The Tax Law and Appearance to the bottom of the sidebar.
+   Calculator categories remain the only scrollable sidebar content and flow beneath this footer. */
 @media screen {
   #tax-sidebar {
     --sidebar-sticky-padding-x: 22px;
-    --sidebar-appearance-offset: 76px;
-    --sidebar-reference-row-height: 42px;
-  }
-
-  #tax-sidebar.sidebar-sticky-footer-ready {
+    --sidebar-sticky-footer-height: 174px;
     overflow: hidden;
+    position: fixed;
   }
 
-  #tax-sidebar .sidebar-scroll-region {
+  #tax-sidebar .sidebar-primary,
+  #tax-sidebar .sidebar-primary.calculators-expanded {
     flex: 1 1 auto;
     min-height: 0;
+    height: 100%;
+    margin: 0;
+    border-bottom: 0;
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior-y: auto;
     scrollbar-width: thin;
-    margin-right: calc(-1 * var(--sidebar-sticky-padding-x));
-    padding-right: var(--sidebar-sticky-padding-x);
-    padding-bottom: calc((var(--sidebar-reference-row-height) * 2) + 24px);
+    padding-bottom: calc(var(--sidebar-sticky-footer-height) + 28px);
+    padding-right: 0;
   }
 
-  #tax-sidebar .sidebar-scroll-region .sidebar-primary,
-  #tax-sidebar .sidebar-scroll-region .sidebar-primary.calculators-expanded {
-    flex: 0 0 auto;
-  }
-
-  #tax-sidebar .sidebar-theme-controls {
-    position: relative;
-    z-index: 40;
-    flex: 0 0 auto;
-    margin-top: 0;
-    background: var(--tone-fbfcfb);
-  }
-
-  #tax-sidebar .sidebar-pinned-references {
+  #tax-sidebar .sidebar-sticky-footer {
     position: absolute;
     left: var(--sidebar-sticky-padding-x);
     right: var(--sidebar-sticky-padding-x);
-    bottom: var(--sidebar-appearance-offset);
-    z-index: 35;
+    bottom: 0;
+    z-index: 50;
+    background: var(--tone-fbfcfb);
+    box-shadow: 0 -12px 18px var(--tone-fbfcfb);
+  }
+
+  #tax-sidebar .sidebar-reference-nav {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    background: var(--tone-fbfcfb);
-    pointer-events: none;
+    padding-top: 8px;
   }
 
-  #tax-sidebar .sidebar-pinned-references:not(.has-pinned-links) {
-    display: none;
-  }
-
-  #tax-sidebar .sidebar-pinned-references > a[hidden] {
-    display: none !important;
-  }
-
-  #tax-sidebar .sidebar-pinned-references > a {
+  #tax-sidebar .sidebar-reference-nav > a {
     display: block;
     padding: 10px 12px;
     border-radius: 8px;
@@ -65,41 +49,57 @@
     font-weight: 700;
     color: var(--muted);
     background: var(--tone-fbfcfb);
-    pointer-events: auto;
   }
 
-  #tax-sidebar .sidebar-pinned-references > a:hover {
+  #tax-sidebar .sidebar-reference-nav > a:hover {
     background: var(--tone-ecf1ee);
   }
 
-  #tax-sidebar .sidebar-pinned-references > a.active {
+  #tax-sidebar .sidebar-reference-nav > a.active {
     background: var(--tone-e4eee7);
     color: var(--green);
   }
 
-  #tax-sidebar .sidebar-reference-source-pinned {
-    visibility: hidden;
+  #tax-sidebar .sidebar-theme-controls {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 16px 0 18px;
+    background: var(--tone-fbfcfb);
   }
 }
 
 @media screen and (max-width: 1150px) {
-  #tax-sidebar { --sidebar-sticky-padding-x: 14px; }
+  #tax-sidebar {
+    --sidebar-sticky-padding-x: 14px;
+  }
 }
 
 @media screen and (max-width: 940px) {
-  #tax-sidebar { --sidebar-sticky-padding-x: 10px; }
+  #tax-sidebar {
+    --sidebar-sticky-padding-x: 10px;
+  }
 }
 
 @media screen and (max-width: 650px) {
-  #tax-sidebar { --sidebar-sticky-padding-x: 18px; }
+  #tax-sidebar {
+    --sidebar-sticky-padding-x: 18px;
+  }
 }
 
 @media print {
-  #tax-sidebar .sidebar-scroll-region {
+  #tax-sidebar .sidebar-primary,
+  #tax-sidebar .sidebar-primary.calculators-expanded {
     overflow: visible;
+    padding-bottom: 0;
   }
 
-  #tax-sidebar .sidebar-pinned-references {
+  #tax-sidebar .sidebar-sticky-footer {
     display: none !important;
   }
 }
