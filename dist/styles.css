@@ -131,16 +131,16 @@
  .calculator-menu .calc-link{scroll-margin-top:calc(var(--calculator-heading-height) + var(--calculator-search-height) + 64px)}
 }
 
-/* Expanding calculators reserves a scrolling middle area above the two page links. */
+/* Let the page links flow directly after the calculator categories. */
 .calculator-menu-toggle{width:100%;border:0;background:transparent;font-family:inherit;text-align:left;font-weight:400;flex-shrink:0}
 .calculator-menu-content[hidden]{display:none!important}
 @media screen{
- .sidebar-primary.calculators-expanded{height:100%;min-height:0;margin:0;padding:0;border:0}
+ .sidebar-primary.calculators-expanded{height:auto;min-height:0;margin:0;padding:0;border:0}
  .sidebar-primary>a{display:block;flex-shrink:0}
- .calculator-menu.is-open{display:flex;flex-direction:column;flex:1 1 0;min-height:0}
+ .calculator-menu.is-open{display:block;min-height:0}
  .calculator-menu.is-open>.calculator-menu-toggle{position:relative;top:auto}
- .calculator-menu.is-open .calculator-menu-content{flex:1 1 0;min-height:0;margin:0;overflow-y:auto;overscroll-behavior-y:auto;scrollbar-width:thin}
- .calculator-menu.is-open .calculator-search-bar{top:0;flex-shrink:0}
+ .calculator-menu.is-open .calculator-menu-content{min-height:0;margin:0;overflow:visible}
+ .calculator-menu.is-open .calculator-search-bar{top:0}
  .calculator-menu.is-open .nav-group{top:var(--calculator-search-height)}
  .calculator-menu.is-open .calc-link{scroll-margin-top:calc(var(--calculator-search-height) + 64px)}
 }
@@ -250,7 +250,7 @@ h2,h3{font-weight:750}
 @media screen{
  .sidebar{display:flex;flex-direction:column}
  .sidebar .sidebar-primary{flex:0 0 auto}
- .sidebar .sidebar-primary.calculators-expanded{flex:1 1 0;min-height:0;height:auto}
+ .sidebar .sidebar-primary.calculators-expanded{flex:0 0 auto;min-height:0;height:auto}
 }
 .sidebar-theme-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;margin-top:auto;padding-top:16px}
 .sidebar-theme-controls>span{font-size:14px;font-weight:600;color:var(--muted)}
