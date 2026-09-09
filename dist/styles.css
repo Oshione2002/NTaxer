@@ -446,10 +446,13 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 
 /* Slide the sidebar and animate the matching header icon. */
 @media screen{
- .sidebar{transform:translateX(0);visibility:visible;transition:transform .26s ease,visibility 0s}
- .sidebar[hidden]{display:flex!important;transform:translateX(calc(-100% - 10px));visibility:hidden;pointer-events:none;transition:transform .26s ease,visibility 0s .26s}
+ .sidebar{transform:translateX(0);visibility:visible}
+ .sidebar[hidden]{display:flex!important;transform:translateX(calc(-100% - 10px));visibility:hidden;pointer-events:none}
  .topbar .sidebar-toggle{overflow:hidden}
- .sidebar-toggle .sidebar-open-icon,.sidebar-toggle .sidebar-close-icon{display:block;grid-area:1/1;transition:opacity .18s ease,transform .26s ease}
+ .sidebar-toggle .sidebar-open-icon,.sidebar-toggle .sidebar-close-icon{display:block;grid-area:1/1}
+ body.sidebar-motion-ready .sidebar{transition:transform .26s ease,visibility 0s}
+ body.sidebar-motion-ready .sidebar[hidden]{transition:transform .26s ease,visibility 0s .26s}
+ body.sidebar-motion-ready .sidebar-toggle .sidebar-open-icon,body.sidebar-motion-ready .sidebar-toggle .sidebar-close-icon{transition:opacity .18s ease,transform .26s ease}
  .sidebar-toggle[aria-expanded="true"] .sidebar-open-icon{opacity:0;transform:translateX(-12px) rotate(-90deg)}
  .sidebar-toggle[aria-expanded="true"] .sidebar-close-icon{opacity:1;transform:translateX(0) rotate(0)}
  .sidebar-toggle[aria-expanded="false"] .sidebar-open-icon{opacity:1;transform:translateX(0) rotate(0)}
@@ -457,7 +460,7 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  .sidebar-toggle:active{transform:scale(.94)}
 }
 @media(prefers-reduced-motion:reduce){
- .sidebar,.sidebar[hidden],.sidebar-toggle .sidebar-open-icon,.sidebar-toggle .sidebar-close-icon{transition:none}
+ .sidebar,.sidebar[hidden],.sidebar-toggle .sidebar-open-icon,.sidebar-toggle .sidebar-close-icon{transition:none!important}
 }
 @media print{.sidebar,.sidebar[hidden]{display:none!important}}
 
