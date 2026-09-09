@@ -209,6 +209,7 @@ function setSidebarExpanded(expanded,{persist=true}={}){
 sidebarToggle.addEventListener('click',()=>setSidebarExpanded(sidebarToggle.getAttribute('aria-expanded')!=='true'));
 const savedSidebarState=savedDesktopSidebarState();
 setSidebarExpanded(smallSidebar.matches?false:savedSidebarState===null||savedSidebarState==='true',{persist:false});
+requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.add('sidebar-motion-ready')));
 smallSidebar.addEventListener('change',event=>{
  const saved=savedDesktopSidebarState();
  setSidebarExpanded(event.matches?false:saved===null||saved==='true',{persist:false});
