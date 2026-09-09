@@ -272,7 +272,15 @@ calculatorStickyObserver.observe(calculatorSearchBar);
 calculatorSummary.addEventListener('click',()=>setCalculatorMenuExpanded(calculatorSummary.getAttribute('aria-expanded')!=='true'));
 let savedCalculatorMenuState=null;
 try{savedCalculatorMenuState=localStorage.getItem(calculatorMenuStorageKey);}catch{}
-setCalculatorMenuExpanded(savedCalculatorMenuState==='true',{persist:false});
+const loadingCalculatorPage=(location.hash||'#home').startsWith('#calculator');
+setCalculatorMenuExpanded(loadingCalculatorPage&&savedCalculatorMenuState==='true',{persist:false});
+document.addEventListener('click',event=>{
+ const internalLink=event.target.closest('a[href^="#"]');
+ if(internalLink&&!internalLink.getAttribute('href').startsWith('#calculator'))setCalculatorMenuExpanded(false);
+});
+window.addEventListener('hashchange',()=>{
+ if(!location.hash.startsWith('#calculator'))setCalculatorMenuExpanded(false);
+});
 syncCalculatorStickyHeights();
 
 // Recalculate result offsets whenever the active page heading changes or wraps.
