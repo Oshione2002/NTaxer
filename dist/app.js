@@ -249,23 +249,30 @@ updateScrollTopButton();
 const calculatorMenu=$('.calculator-menu');
 const calculatorSummary=calculatorMenu.querySelector('.calculator-menu-toggle');
 const calculatorSearchBar=$('.calculator-search-bar');
+const calculatorMenuStorageKey='ntaxer-calculator-menu-expanded';
 const syncCalculatorStickyHeights=()=>{
  for(const [element,property] of [[calculatorSummary,'--calculator-heading-height'],[calculatorSearchBar,'--calculator-search-height']]){
   const height=element.getBoundingClientRect().height;
   if(height>0)calculatorMenu.style.setProperty(property,height+'px');
  }
 };
-const calculatorStickyObserver=new ResizeObserver(syncCalculatorStickyHeights);
-calculatorStickyObserver.observe(calculatorSummary);
-calculatorStickyObserver.observe(calculatorSearchBar);
-calculatorSummary.addEventListener('click',()=>{
- const expanded=calculatorSummary.getAttribute('aria-expanded')!=='true';
+function setCalculatorMenuExpanded(expanded,{persist=true}={}){
  calculatorSummary.setAttribute('aria-expanded',String(expanded));
  calculatorMenu.classList.toggle('is-open',expanded);
  $('.sidebar-primary').classList.toggle('calculators-expanded',expanded);
  $('#calculator-menu-options').hidden=!expanded;
+ if(persist){
+  try{localStorage.setItem(calculatorMenuStorageKey,String(expanded));}catch{}
+ }
  syncCalculatorStickyHeights();
-});
+}
+const calculatorStickyObserver=new ResizeObserver(syncCalculatorStickyHeights);
+calculatorStickyObserver.observe(calculatorSummary);
+calculatorStickyObserver.observe(calculatorSearchBar);
+calculatorSummary.addEventListener('click',()=>setCalculatorMenuExpanded(calculatorSummary.getAttribute('aria-expanded')!=='true'));
+let savedCalculatorMenuState=null;
+try{savedCalculatorMenuState=localStorage.getItem(calculatorMenuStorageKey);}catch{}
+setCalculatorMenuExpanded(savedCalculatorMenuState==='true',{persist:false});
 syncCalculatorStickyHeights();
 
 // Recalculate result offsets whenever the active page heading changes or wraps.
