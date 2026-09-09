@@ -490,3 +490,7 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 @media screen{
  .sticky-page-heading{position:sticky;top:var(--header-height);z-index:6;background:var(--tone-f3f6f5)}
 }
+
+
+/* Explanatory text beneath page headings uses the full content width. */
+.law-toolbar+.intro .lead,.coverage-intro .lead,.page-subtext .lead{max-width:none}
