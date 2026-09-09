@@ -80,7 +80,7 @@ export function buildPdfBytes(report){
   const headers=tableData.headers||[],rows=tableData.rows||[];
   if(tableData.title){ensure(25);text(MARGIN,cursor+10,tableData.title,9.5,true,colour.ink);cursor+=18;}
   const available=PAGE_WIDTH-MARGIN*2,count=Math.max(headers.length,1);
-  const ratios=count===2?[.39,.61]:count===3?[.28,.25,.47]:count===4?[.29,.16,.27,.28]:Array(count).fill(1/count);
+  const ratios=count===2?[.39,.61]:count===3?[.28,.25,.47]:count===4?[.39,.08,.265,.265]:Array(count).fill(1/count);
   const widths=ratios.map(ratio=>available*ratio),fontSize=count>2?7.7:8.4,lineHeight=fontSize*1.35,padding=6;
   const drawHeader=()=>{
    const height=25;ensure(height+4);rect(MARGIN,cursor,available,height,colour.green);
@@ -115,6 +115,7 @@ export function buildPdfBytes(report){
  text(PAGE_WIDTH-MARGIN-150,cursor+38,report.generatedDisplay,8,false,colour.ink);
  cursor+=86;
  report.sections.forEach((section,sectionIndex)=>{
+  if(sectionIndex>0)newPage(false);
   sectionHeading(section.title);
   for(const tableData of section.tables)table(tableData,sectionIndex);
  });
