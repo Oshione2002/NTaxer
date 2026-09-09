@@ -3,7 +3,7 @@ import {spawnSync} from 'node:child_process';
 import assert from 'node:assert/strict';
 import {CALCULATORS} from '../dist/calculators.js';
 const root=new URL('../',import.meta.url);
-for(const file of ['app.js','engine.js','calculators.js','schedules.js','coverage.js']){
+for(const file of ['app.js','engine.js','calculators.js','schedules.js','coverage.js','export.js']){
  const proc=spawnSync(process.execPath,['--check',new URL('dist/'+file,root).pathname],{encoding:'utf8'});assert.equal(proc.status,0,proc.stderr);
 }
 const html=await readFile(new URL('dist/index.html',root),'utf8');
