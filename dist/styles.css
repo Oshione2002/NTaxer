@@ -475,3 +475,10 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 @media(max-width:1150px){
  .coverage-heading-row{grid-template-columns:minmax(0,1fr);gap:14px}
 }
+
+
+/* Tax Coverage mirrors the law page: sticky controls, scrolling description. */
+.coverage-intro{margin-bottom:18px}
+@media screen{
+ .coverage-heading-row{position:sticky;top:var(--header-height);z-index:6;margin-bottom:18px;padding:14px 0 18px;border-bottom:1px solid var(--line);background:var(--tone-f3f6f5)}
+}
