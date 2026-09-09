@@ -460,3 +460,18 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  .sidebar,.sidebar[hidden],.sidebar-toggle .sidebar-open-icon,.sidebar-toggle .sidebar-close-icon{transition:none}
 }
 @media print{.sidebar,.sidebar[hidden]{display:none!important}}
+
+
+/* Page-level headings and descriptions scroll normally beneath the sticky site header. */
+@media screen{
+ .page-header{position:static;top:auto;z-index:auto}
+ main{--page-header-height:0px!important}
+}
+
+/* Tax Coverage controls sit beside the main page title. */
+.coverage-heading-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(420px,1fr);align-items:center;gap:24px}
+.coverage-heading-row h1{margin-bottom:0}
+.coverage-heading-row .coverage-toolbar{margin:0}
+@media(max-width:1150px){
+ .coverage-heading-row{grid-template-columns:minmax(0,1fr);gap:14px}
+}
