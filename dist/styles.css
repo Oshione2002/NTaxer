@@ -503,3 +503,53 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 
 /* Explanatory text beneath page headings uses the full content width. */
 .law-toolbar+.intro .lead,.coverage-intro .lead,.page-subtext .lead{max-width:none}
+
+/* Keep reference links and appearance visible while calculator options scroll. */
+@media screen{
+ #tax-sidebar{overflow:hidden}
+ #tax-sidebar .sidebar-primary,
+ #tax-sidebar .sidebar-primary.calculators-expanded{
+  flex:1 1 auto;
+  min-height:0;
+  height:auto;
+  margin:0;
+  padding-bottom:16px;
+  border-bottom:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior-y:auto;
+  scrollbar-width:thin
+ }
+ #tax-sidebar .sidebar-sticky-footer{
+  position:relative;
+  z-index:5;
+  flex:0 0 auto;
+  padding-top:8px;
+  border-top:1px solid var(--line);
+  background:var(--tone-fbfcfb)
+ }
+ #tax-sidebar .sidebar-reference-nav{
+  display:flex;
+  flex-direction:column;
+  gap:6px
+ }
+ #tax-sidebar .sidebar-reference-nav>a{
+  display:block;
+  padding:10px 12px;
+  border-radius:8px;
+  text-decoration:none;
+  color:var(--muted);
+  font-size:14px;
+  font-weight:700
+ }
+ #tax-sidebar .sidebar-reference-nav>a:hover{background:var(--tone-ecf1ee)}
+ #tax-sidebar .sidebar-reference-nav>a.active{
+  background:var(--tone-e4eee7);
+  color:var(--green)
+ }
+ #tax-sidebar .sidebar-theme-controls{
+  margin:0;
+  padding:14px 0 0;
+  background:var(--tone-fbfcfb)
+ }
+}
