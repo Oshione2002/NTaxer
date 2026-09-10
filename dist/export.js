@@ -1,8 +1,13 @@
 const encoder=new TextEncoder();
 
 const xmlEscape=value=>String(value??'').replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&apos;"}[char]));
-const cellText=value=>value&&typeof value==='object'&&'text' in value?String(value.text??''):String(value??'');
+const cellText=value=>value&&typeof value==='object'&&Array.isArray(value.parts)?value.parts.map(cellText).join(value.separator??''):value&&typeof value==='object'&&'text' in value?String(value.text??''):String(value??'');
 const cellUrl=value=>value&&typeof value==='object'&&value.url?String(value.url):'';
+const cellParts=value=>{
+ if(!(value&&typeof value==='object'&&Array.isArray(value.parts)))return [{text:cellText(value),url:cellUrl(value)}];
+ const separator=String(value.separator??'');
+ return value.parts.flatMap((part,index)=>index&&separator?[{text:separator,url:''},{text:cellText(part),url:cellUrl(part)}]:[{text:cellText(part),url:cellUrl(part)}]);
+};
 const safePdfText=value=>String(value??'')
  .replace(/₦/g,'NGN ').replace(/[–—]/g,'-').replace(/[‘’]/g,"'").replace(/[“”]/g,'"')
  .replace(/≤/g,'<=').replace(/≥/g,'>=').replace(/×/g,'x').replace(/…/g,'...')
@@ -54,11 +59,36 @@ function wrapPdfText(value,maxWidth,size){
  }
  return output;
 }
+function layoutPdfRuns(value,maxWidth,size){
+ const lines=[[]];let used=0;
+ const nextLine=()=>{if(lines.at(-1).length||lines.length===1)lines.push([]);used=0;};
+ const addRun=(runText,url)=>{
+  const width=approximateWidth(runText,size);
+  if(used&&used+width>maxWidth)nextLine();
+  lines.at(-1).push({text:runText,url,offset:used,width});used+=width;
+ };
+ for(const part of cellParts(value)){
+  const paragraphs=safePdfText(part.text).split('\n');
+  paragraphs.forEach((paragraph,index)=>{
+   if(paragraph){
+    if(approximateWidth(paragraph,size)<=maxWidth)addRun(paragraph,part.url);
+    else{
+     if(used)nextLine();
+     const wrapped=wrapPdfText(paragraph,maxWidth,size);
+     wrapped.forEach((lineText,lineIndex)=>{addRun(lineText,part.url);if(lineIndex<wrapped.length-1)nextLine();});
+    }
+   }
+   if(index<paragraphs.length-1)nextLine();
+  });
+ }
+ if(!lines.at(-1).length&&lines.length>1)lines.pop();
+ return lines;
+}
 
 export function buildPdfBytes(report){
  const PAGE_WIDTH=595.28,PAGE_HEIGHT=841.89,MARGIN=46,FOOTER_TOP=808;
  const pages=[];let commands=[],links=[],cursor=0;
- const colour={green:'0.027 0.243 0.196',mint:'0.45 0.89 0.66',ink:'0.09 0.14 0.12',muted:'0.34 0.42 0.38',line:'0.82 0.87 0.84',pale:'0.94 0.97 0.95',white:'1 1 1'};
+ const colour={green:'0.027 0.243 0.196',mint:'0.45 0.89 0.66',link:'0.02 0.30 0.68',ink:'0.09 0.14 0.12',muted:'0.34 0.42 0.38',line:'0.82 0.87 0.84',pale:'0.94 0.97 0.95',white:'1 1 1'};
  const rect=(x,top,width,height,fill)=>commands.push(`q ${fill} rg ${x.toFixed(2)} ${(PAGE_HEIGHT-top-height).toFixed(2)} ${width.toFixed(2)} ${height.toFixed(2)} re f Q`);
  const line=(x1,top1,x2,top2,stroke=colour.line,width=.6)=>commands.push(`q ${stroke} RG ${width} w ${x1.toFixed(2)} ${(PAGE_HEIGHT-top1).toFixed(2)} m ${x2.toFixed(2)} ${(PAGE_HEIGHT-top2).toFixed(2)} l S Q`);
  const text=(x,baseline,value,size=9,bold=false,fill=colour.ink)=>commands.push(`BT ${fill} rg /${bold?'F2':'F1'} ${size} Tf 1 0 0 1 ${x.toFixed(2)} ${(PAGE_HEIGHT-baseline).toFixed(2)} Tm (${pdfEscape(value)}) Tj ET`);
@@ -93,15 +123,16 @@ export function buildPdfBytes(report){
   if(headers.length)drawHeader();
   rows.forEach((row,rowIndex)=>{
    const cells=Array.from({length:count},(_,index)=>row[index]??'');
-   const wrapped=cells.map((cell,index)=>wrapPdfText(cellText(cell),widths[index]-padding*2,fontSize));
+   const wrapped=cells.map((cell,index)=>layoutPdfRuns(cell,widths[index]-padding*2,fontSize));
    const height=Math.max(24,...wrapped.map(lines=>lines.length*lineHeight+padding*2));
    if(cursor+height>FOOTER_TOP){newPage(false);if(headers.length)drawHeader();}
    if((rowIndex+sectionIndex)%2===0)rect(MARGIN,cursor,available,height,colour.pale);
    let x=MARGIN;
    wrapped.forEach((cellLines,index)=>{
-    const url=cellUrl(cells[index]);
-    cellLines.forEach((cellLine,lineIndex)=>text(x+padding,cursor+padding+fontSize+lineIndex*lineHeight,cellLine,fontSize,index===0&&count===2,url?colour.green:colour.ink));
-    if(url)addLink(x+2,cursor+2,widths[index]-4,height-4,url);
+    cellLines.forEach((runs,lineIndex)=>runs.forEach(run=>{
+     text(x+padding+run.offset,cursor+padding+fontSize+lineIndex*lineHeight,run.text,fontSize,index===0&&count===2,run.url?colour.link:colour.ink);
+     if(run.url)addLink(x+padding+run.offset,cursor+padding+lineIndex*lineHeight,run.width,lineHeight,run.url);
+    }));
     if(index<count-1)line(x+widths[index],cursor,x+widths[index],cursor+height,colour.line,.4);
     x+=widths[index];
    });
@@ -186,12 +217,14 @@ function zipStored(entries){
 
 const excelColumnName=index=>{let name='';for(let value=index+1;value;value=Math.floor((value-1)/26))name=String.fromCharCode(65+(value-1)%26)+name;return name;};
 function sheetXml(report,section){
- const maxColumns=Math.max(2,...section.tables.map(table=>table.headers.length));
+ const baseMaxColumns=Math.max(2,...section.tables.map(table=>table.headers.length));
+ const hasMultiLinks=section.tables.some(table=>table.rows.some(row=>row.some(value=>value&&typeof value==='object'&&Array.isArray(value.parts))));
+ const maxColumns=hasMultiLinks&&baseMaxColumns===2?5:baseMaxColumns;
  let rowNumber=1;const rows=[],merges=[],hyperlinks=[];
- const cell=(column,value,style=0)=>{
+ const cell=(column,value,style=0,compact=false)=>{
   const reference=`${excelColumnName(column)}${rowNumber}`,url=cellUrl(value);
   if(url)hyperlinks.push({reference,url});
-  const cellStyle=url?(style===5?7:6):style;
+  const cellStyle=url?compact?(style===5?11:10):(style===5?7:6):compact?(style===5?9:8):style;
   return `<c r="${reference}" t="inlineStr" s="${cellStyle}"><is><t xml:space="preserve">${xmlEscape(cellText(value))}</t></is></c>`;
  };
  const mergedRow=(value,style,height)=>{
@@ -201,15 +234,32 @@ function sheetXml(report,section){
  mergedRow(report.title,1,28);mergedRow(section.title,3,23);rowNumber++;
  for(const table of section.tables){
   if(table.title)mergedRow(table.title,3,22);
-  rows.push(`<row r="${rowNumber}" ht="22" customHeight="1">${table.headers.map((header,index)=>cell(index,header,2)).join('')}</row>`);rowNumber++;
+  const expandedTwoColumn=maxColumns>2&&table.headers.length===2;
+  rows.push(`<row r="${rowNumber}" ht="22" customHeight="1">${table.headers.map((header,index)=>cell(index,header,2)).join('')}</row>`);
+  if(expandedTwoColumn)merges.push(`B${rowNumber}:${excelColumnName(maxColumns-1)}${rowNumber}`);
+  rowNumber++;
   table.rows.forEach((row,index)=>{
+   const baseStyle=index%2?5:4;
+   const parts=expandedTwoColumn&&row[1]&&typeof row[1]==='object'&&Array.isArray(row[1].parts)?row[1].parts:null;
+   if(parts){
+    const chunks=[];for(let start=0;start<parts.length;start+=maxColumns-1)chunks.push(parts.slice(start,start+maxColumns-1));
+    const firstRow=rowNumber;
+    chunks.forEach((chunk,chunkIndex)=>{
+     const detailCells=Array.from({length:maxColumns-1},(_,partIndex)=>cell(partIndex+1,chunk[partIndex]??'',baseStyle,true)).join('');
+     rows.push(`<row r="${rowNumber}" ht="22" customHeight="1">${chunkIndex===0?cell(0,row[0],baseStyle):''}${detailCells}</row>`);rowNumber++;
+    });
+    if(chunks.length>1)merges.push(`A${firstRow}:A${rowNumber-1}`);
+    return;
+   }
    const longest=Math.max(...row.map(value=>cellText(value).length));
    const height=Math.min(90,Math.max(20,18+Math.floor(longest/55)*12));
-   rows.push(`<row r="${rowNumber}" ht="${height}" customHeight="1">${row.map((value,column)=>cell(column,value,index%2?5:4)).join('')}</row>`);rowNumber++;
+   rows.push(`<row r="${rowNumber}" ht="${height}" customHeight="1">${row.map((value,column)=>cell(column,value,baseStyle)).join('')}</row>`);
+   if(expandedTwoColumn)merges.push(`B${rowNumber}:${excelColumnName(maxColumns-1)}${rowNumber}`);
+   rowNumber++;
   });
   rowNumber++;
  }
- const widths=Array.from({length:maxColumns},(_,index)=>`<col min="${index+1}" max="${index+1}" width="${index===0?34:index===1?55:24}" customWidth="1"/>`).join('');
+ const widths=Array.from({length:maxColumns},(_,index)=>`<col min="${index+1}" max="${index+1}" width="${index===0?34:hasMultiLinks&&baseMaxColumns===2?55/(maxColumns-1):index===1?55:24}" customWidth="1"/>`).join('');
  const hyperlinkXml=hyperlinks.length?`<hyperlinks>${hyperlinks.map((link,index)=>`<hyperlink ref="${link.reference}" r:id="rId${index+1}"/>`).join('')}</hyperlinks>`:'';
  const relationships=hyperlinks.length?`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${hyperlinks.map((link,index)=>`<Relationship Id="rId${index+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="${xmlEscape(link.url)}" TargetMode="External"/>`).join('')}</Relationships>`:'';
  const xml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetViews><sheetView workbookViewId="0"><pane ySplit="2" topLeftCell="A3" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>${widths}</cols><sheetData>${rows.join('')}</sheetData>${merges.length?`<mergeCells count="${merges.length}">${merges.map(ref=>`<mergeCell ref="${ref}"/>`).join('')}</mergeCells>`:''}${hyperlinkXml}<pageMargins left="0.4" right="0.4" top="0.6" bottom="0.6" header="0.2" footer="0.2"/></worksheet>`;
@@ -230,9 +280,11 @@ export function buildExcelBytes(report){
  const workbook=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView/></bookViews><sheets>${names.map((name,index)=>`<sheet name="${xmlEscape(name)}" sheetId="${index+1}" r:id="rId${index+1}"/>`).join('')}</sheets></workbook>`;
  const workbookRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${report.sections.map((_,index)=>`<Relationship Id="rId${index+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${index+1}.xml"/>`).join('')}<Relationship Id="rId${report.sections.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
  const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="5"><font><sz val="11"/><name val="Calibri"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="16"/><name val="Calibri"/></font><font><b/><color rgb="FF073E32"/><sz val="11"/><name val="Calibri"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Calibri"/></font><font><u/><color rgb="FF0563C1"/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF073E32"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEAF4ED"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border/><border><left style="thin"><color rgb="FFD3E0D7"/></left><right style="thin"><color rgb="FFD3E0D7"/></right><top style="thin"><color rgb="FFD3E0D7"/></top><bottom style="thin"><color rgb="FFD3E0D7"/></bottom></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="8"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"><alignment vertical="top" wrapText="1"/></xf><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0"><alignment vertical="center"/></xf><xf numFmtId="0" fontId="3" fillId="2" borderId="1" xfId="0"><alignment vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="2" fillId="3" borderId="0" xfId="0"><alignment vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0"><alignment vertical="top" wrapText="1"/></xf><xf numFmtId="0" fontId="0" fillId="3" borderId="1" xfId="0"><alignment vertical="top" wrapText="1"/></xf><xf numFmtId="0" fontId="4" fillId="0" borderId="1" xfId="0"><alignment vertical="top" wrapText="1"/></xf><xf numFmtId="0" fontId="4" fillId="3" borderId="1" xfId="0"><alignment vertical="top" wrapText="1"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+ const compactLinkStyles='<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"><alignment vertical="top" wrapText="1"/></xf><xf numFmtId="0" fontId="0" fillId="3" borderId="0" xfId="0"><alignment vertical="top" wrapText="1"/></xf><xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0"><alignment vertical="top" wrapText="1"/></xf><xf numFmtId="0" fontId="4" fillId="3" borderId="0" xfId="0"><alignment vertical="top" wrapText="1"/></xf>';
+ const stylesWithCompactLinks=styles.replace('cellXfs count="8"','cellXfs count="12"').replace('</cellXfs>',`${compactLinkStyles}</cellXfs>`);
  const core=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${xmlEscape(report.title)}</dc:title><dc:creator>NTaxer</dc:creator><cp:lastModifiedBy>NTaxer</cp:lastModifiedBy><dcterms:created xsi:type="dcterms:W3CDTF">${xmlEscape(report.generatedAt)}</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">${xmlEscape(report.generatedAt)}</dcterms:modified></cp:coreProperties>`;
  const app=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><Application>NTaxer</Application><TitlesOfParts><vt:vector size="${names.length}" baseType="lpstr">${names.map(name=>`<vt:lpstr>${xmlEscape(name)}</vt:lpstr>`).join('')}</vt:vector></TitlesOfParts></Properties>`;
- return zipStored([['[Content_Types].xml',contentTypes],['_rels/.rels',rootRels],['docProps/core.xml',core],['docProps/app.xml',app],['xl/workbook.xml',workbook],['xl/_rels/workbook.xml.rels',workbookRels],['xl/styles.xml',styles],...sheetEntries]);
+ return zipStored([['[Content_Types].xml',contentTypes],['_rels/.rels',rootRels],['docProps/core.xml',core],['docProps/app.xml',app],['xl/workbook.xml',workbook],['xl/_rels/workbook.xml.rels',workbookRels],['xl/styles.xml',stylesWithCompactLinks],...sheetEntries]);
 }
 
 export function downloadPdf(report,filename){downloadBlob(new Blob([buildPdfBytes(report)],{type:'application/pdf'}),`${filename}.pdf`);}

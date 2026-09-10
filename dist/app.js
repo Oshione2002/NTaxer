@@ -66,14 +66,8 @@ function buildExportReport(c,r){
  const calculationTables=[{title:'Full calculation',headers:['Calculation item','Amount / treatment'],rows:r.rows.map(([label,value])=>[label,exportValue(value,currency)])}];
  if(r.bands)calculationTables.unshift({title:'Progressive tax bands',headers:['Annual band','Rate','Income in band','Tax'],rows:r.bands.map(band=>[band.upper===Infinity?`Above ${format(band.lower,currency)}`:`${format(band.lower,currency)} - ${format(band.upper,currency)}`,`${band.rate/100}%`,format(band.used,currency),format(band.tax,currency)])});
  if(c.id==='vat')calculationTables.push({title:'Supply classification reference',headers:['Supply','Treatment','Section'],rows:VAT_CATEGORIES.map(([,name,treatment,reference])=>[name,treatment,reference])});
- const legalRows=c.refs.map(sectionNumber=>{
-  const url=lawUrl(sectionNumber);
-  return [{text:'Act section',url},{text:`Section ${sectionNumber}`,url}];
- });
- if(c.schedules?.length)legalRows.push(...c.schedules.map(scheduleNumber=>{
-  const url=lawUrl(`schedule-${scheduleNumber}`);
-  return [{text:'Schedule',url},{text:`Schedule ${scheduleNumber}`,url}];
- }));
+ const legalRows=[['Act sections',{separator:', ',parts:c.refs.map(sectionNumber=>({text:`Section ${sectionNumber}`,url:lawUrl(sectionNumber)}))}]];
+ if(c.schedules?.length)legalRows.push(['Schedules',{separator:', ',parts:c.schedules.map(scheduleNumber=>({text:`Schedule ${scheduleNumber}`,url:lawUrl(`schedule-${scheduleNumber}`)}))}]);
  legalRows.push(['Ruleset',RULESET],['Review date',REVIEWED],['Scope note','Dates identify this fixed review, not a live tax-law feed.']);
  return {
   title:`${c.name} - tax estimate`,subtitle:c.description,amountLabel:r.title||'Estimated amount',amount:format(r.amount,currency),
