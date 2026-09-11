@@ -553,6 +553,35 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  }
 }
 
+/* Keep the mobile page shade stationary while the sidebar slides over it. */
+@media screen and (max-width:940px){
+ .shell::after,
+ .shell:not(.sidebar-collapsed)::after{
+  content:"";
+  position:fixed;
+  inset:var(--header-height) 0 0 0;
+  z-index:9;
+  background:rgba(0,0,0,.46);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none
+ }
+ .shell:not(.sidebar-collapsed)::after{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto
+ }
+ body.sidebar-motion-ready .shell::after{
+  transition:opacity .2s ease,visibility 0s .2s
+ }
+ body.sidebar-motion-ready .shell:not(.sidebar-collapsed)::after{
+  transition:opacity .2s ease,visibility 0s
+ }
+}
+@media screen and (max-width:940px) and (prefers-reduced-motion:reduce){
+ .shell::after,.shell:not(.sidebar-collapsed)::after{transition:none!important}
+}
+
 /* Installation stays directly below Appearance at the bottom of the sidebar. */
 .sidebar-install-button{
  display:flex;

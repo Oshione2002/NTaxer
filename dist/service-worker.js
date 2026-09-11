@@ -1,4 +1,4 @@
-const CACHE_VERSION='ntaxer-offline-v1';
+const CACHE_VERSION='ntaxer-offline-v2';
 const APP_SHELL=[
  './',
  './index.html',
@@ -38,13 +38,14 @@ async function offlineResponse(request){
   }
  }
  const cached=await cache.match(request,{ignoreSearch:true});
- if(cached)return cached;
+ const keepCached=url.pathname.endsWith('.pdf')||url.pathname.endsWith('/assets/icon.png');
+ if(cached&&keepCached)return cached;
  try{
   const response=await fetch(request);
   if(response.ok)await cache.put(request,response.clone());
   return response;
  }catch{
-  return new Response('This resource is unavailable while offline.',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}});
+  return cached||new Response('This resource is unavailable while offline.',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}});
  }
 }
 
