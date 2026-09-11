@@ -3,7 +3,7 @@ import {spawnSync} from 'node:child_process';
 import assert from 'node:assert/strict';
 import {CALCULATORS} from '../dist/calculators.js';
 const root=new URL('../',import.meta.url);
-for(const file of ['app.js','engine.js','calculators.js','schedules.js','coverage.js','export.js']){
+for(const file of ['app.js','engine.js','calculators.js','schedules.js','coverage.js','export.js','service-worker.js']){
  const proc=spawnSync(process.execPath,['--check',new URL('dist/'+file,root).pathname],{encoding:'utf8'});assert.equal(proc.status,0,proc.stderr);
 }
 const html=await readFile(new URL('dist/index.html',root),'utf8');
@@ -15,4 +15,6 @@ for(const s of law.schedules)assert.ok(s.page&&s.page<=215);
 for(const c of CALCULATORS){assert.ok(c.refs.every(n=>law.sections.some(s=>s.number===n)),`Bad reference in ${c.id}`);assert.equal(new Set(c.fields.filter(f=>f.key).map(f=>f.key)).size,c.fields.filter(f=>f.key).length,`Duplicate fields in ${c.id}`);}
 for(const file of ['vercel.json','dist/manifest.webmanifest'])JSON.parse(await readFile(new URL(file,root),'utf8'));
 const vercel=JSON.parse(await readFile(new URL('vercel.json',root),'utf8'));assert.equal(vercel.outputDirectory,'dist');
+const manifest=JSON.parse(await readFile(new URL('dist/manifest.webmanifest',root),'utf8'));
+assert.equal(manifest.display,'standalone');assert.equal(manifest.scope,'./');assert.ok(manifest.start_url.startsWith('./'));
 console.log(`Validated ${CALCULATORS.length} calculators, 202 law sections, 14 schedules, assets, JavaScript syntax and Vercel configuration.`);

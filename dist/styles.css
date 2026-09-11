@@ -553,6 +553,31 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  }
 }
 
+/* Installation stays directly below Appearance at the bottom of the sidebar. */
+.sidebar-install-button{
+ display:flex;
+ align-items:center;
+ gap:11px;
+ width:100%;
+ margin-top:12px;
+ padding:11px 12px;
+ border:1px solid var(--line);
+ border-radius:10px;
+ background:var(--surface);
+ color:var(--green);
+ text-align:left;
+ touch-action:manipulation
+}
+.sidebar-install-button:hover{background:var(--tone-eaf1eb);border-color:var(--tone-bfcec5)}
+.sidebar-install-button svg{flex:0 0 auto}
+.sidebar-install-button span{display:block;min-width:0}
+.sidebar-install-button strong,.sidebar-install-button small{display:block}
+.sidebar-install-button strong{font-size:14px;line-height:1.25}
+.sidebar-install-button small{margin-top:2px;color:var(--muted);font-size:12px;line-height:1.35}
+.sidebar-install-button:disabled{cursor:default;opacity:1;background:var(--tone-eaf1eb)}
+.install-app-status{margin:8px 2px 0;color:var(--muted);font-size:12px;line-height:1.45}
+@media print{.sidebar-install-button,.install-app-status{display:none!important}}
+
 /* Keep both reference-page searches beside an icon-only filter on phones. */
 @media screen and (max-width:650px){
  .coverage-toolbar{grid-template-columns:minmax(0,1fr) 48px;gap:10px}

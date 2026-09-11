@@ -355,3 +355,61 @@ function observePageHeader(){
 const pageContentObserver=new MutationObserver(observePageHeader);
 pageContentObserver.observe($('#main'),{childList:true});
 observePageHeader();
+
+// Install NTaxer as an app and keep the complete calculator available offline.
+const installButton=$('#install-app');
+const installLabel=installButton?.querySelector('strong');
+const installDetail=installButton?.querySelector('small');
+const installStatus=$('#install-app-status');
+let deferredInstallPrompt=null;
+let offlineReady=false;
+const installedMode=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+function setInstallCopy(label,detail,{disabled=false,status=''}={}){
+ if(!installButton)return;
+ installLabel.textContent=label;
+ installDetail.textContent=detail;
+ installButton.disabled=disabled;
+ if(status){installStatus.textContent=status;installStatus.hidden=false;}
+ else{installStatus.textContent='';installStatus.hidden=true;}
+}
+function updateInstallButton(){
+ if(installedMode()){setInstallCopy('NTaxer installed',offlineReady?'Ready to use offline':'Preparing offline access…',{disabled:true});return;}
+ setInstallCopy('Install NTaxer',offlineReady?'Available offline after installation':'Preparing offline access…');
+}
+window.addEventListener('beforeinstallprompt',event=>{
+ event.preventDefault();
+ deferredInstallPrompt=event;
+ updateInstallButton();
+});
+window.addEventListener('appinstalled',()=>{
+ deferredInstallPrompt=null;
+ setInstallCopy('NTaxer installed','Ready to use offline',{disabled:true,status:'Installation complete. NTaxer can now launch from your device.'});
+});
+installButton?.addEventListener('click',async()=>{
+ if(deferredInstallPrompt){
+  const prompt=deferredInstallPrompt;
+  deferredInstallPrompt=null;
+  await prompt.prompt();
+  const choice=await prompt.userChoice;
+  if(choice.outcome==='dismissed')setInstallCopy('Install NTaxer',offlineReady?'Available offline after installation':'Preparing offline access…',{status:'Installation was cancelled. You can try again.'});
+  return;
+ }
+ const isiOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+ const message=isiOS?'Tap the browser Share button, choose Add to Home Screen, then tap Add.':'Open your browser menu and choose Install app, Install page as app, or Add to Home screen.';
+ setInstallCopy('Install NTaxer',offlineReady?'Available offline after installation':'Preparing offline access…',{status:message});
+});
+updateInstallButton();
+
+if('serviceWorker' in navigator){
+ window.addEventListener('load',async()=>{
+  try{
+   await navigator.serviceWorker.register('./service-worker.js',{scope:'./'});
+   await navigator.serviceWorker.ready;
+   offlineReady=true;
+   updateInstallButton();
+  }catch(error){
+   console.error('Offline setup failed',error);
+   setInstallCopy('Install NTaxer','Offline setup needs an online reload',{status:'Reconnect to the internet and reload once to finish offline setup.'});
+  }
+ },{once:true});
+}else setInstallCopy('Install NTaxer','Use your browser installation menu',{status:'This browser does not provide offline web-app installation.'});
