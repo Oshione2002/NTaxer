@@ -223,29 +223,53 @@ function cleanRegistry(value){
 }
 
 function promptFor(file,registry,sourceCalculator){
-  return `You are extracting data for NTaxer, a Nigerian tax planning application.
+  const selectedProfile=sourceCalculator?STATEMENT_PROFILES[sourceCalculator]:null;
+  const registryText=registry.map(calc=>'- '+calc.id+': '+calc.name+' ['+calc.group+']\n'+calc.fields.map(field=>'  - '+field.key+': '+field.label).join('\n')).join('\n');
+  const profileList=registry.map(calc=>STATEMENT_PROFILES[calc.id]?'- '+calc.id+': '+STATEMENT_PROFILES[calc.id].purpose:'').filter(Boolean).join('\n');
+  const calculatorPolicy=selectedProfile
+    ?[
+      'SELECTED CALCULATOR POLICY ('+sourceCalculator+'): ',
+      'Purpose: '+selectedProfile.purpose,
+      'Keep / auto-map candidates: '+selectedProfile.keep,
+      'Needs-review candidates: '+selectedProfile.review,
+      'Ignore for this calculator: '+selectedProfile.ignore,
+      '',
+      'Because a calculator is already selected, RETURN ONLY rows classified as auto_map or review for this calculator. Do not return ignore rows.'
+     ].join('\n')
+    :[
+      'NO CALCULATOR IS PRESELECTED.',
+      'Classify each row against the available calculator purposes below. Keep a row only if it is plausibly useful to at least one available NTaxer calculator; otherwise omit it from rows.',
+      profileList
+     ].join('\n');
 
-DOCUMENT NAME:
-${file.name}
-
-STARTING CALCULATOR:
-${sourceCalculator||'None. Suggest from the registry.'}
-
-AVAILABLE NTAXER CALCULATORS AND FIELDS:
-${registry.map(calc=>`- ${calc.id}: ${calc.name} [${calc.group}]\n${calc.fields.map(field=>`  - ${field.key}: ${field.label}`).join('\n')}`).join('\n')}
-
-TASK:
-1. Extract the statement or financial-document rows faithfully.
-2. Keep real transaction/line-item information even when the narration is vague, such as "Received from Ali", electricity, airtime, utilities, transfers, rent, pension, bank charges, refunds and similar entries.
-3. Ignore only layout noise such as repeated page headers, page numbers and duplicated column headings.
-4. For each monetary row, return date if available, original description, absolute amount, and direction (credit/debit/neutral).
-5. Suggest one NTaxer calculator field only when it is reasonably plausible. Use only calculator IDs and field keys from the supplied registry. If uncertain, return empty strings for both and confidence low.
-6. A suggestion is not a tax decision. Do not assume every credit is taxable income or every debit is deductible.
-7. Do not expose account numbers, BVNs, TINs, addresses or other unnecessary identifiers in descriptions; mask them if present.
-8. Return rows in document order.
-9. If more rows exist than the response can safely contain, return as many as possible and set truncated=true with a warning.
-
-Return structured JSON only.`;
+  return [
+    'You are NTaxer AI statement interpretation layer for a Nigerian tax planning application.',
+    '',
+    'DOCUMENT NAME:',
+    String(file.name||''),
+    '',
+    NORMALIZATION_RULES,
+    '',
+    'AVAILABLE NTAXER CALCULATORS AND FIELDS:',
+    registryText,
+    '',
+    calculatorPolicy,
+    '',
+    'CALCULATOR-AWARE CLASSIFICATION:',
+    '1. Read and normalize the document regardless of the bank or provider format.',
+    '2. Transaction relevance depends on the selected calculator. Airtime, electricity and bank charges are normally irrelevant to PAYE but can be plausible business or company expenses. Apply the selected calculator policy, not a universal blacklist.',
+    '3. auto_map means the statement evidence is clear enough to suggest one exact field from the supplied registry. Use auto_map conservatively.',
+    '4. review means the row could materially affect the selected calculator but the statement alone does not establish its tax character, business purpose, exemption, deductibility or exact field with high confidence.',
+    '5. ignore means the row does not help populate the selected calculator. When a calculator is selected, OMIT ignore rows from the returned rows array entirely.',
+    '6. Never force an incoming transfer into income or an outgoing transfer into an expense. Loans, gifts, refunds, reimbursements, savings movements and own-account transfers must not be treated as taxable or deductible without evidence.',
+    '7. Map only to calculator IDs and field keys supplied above. If a relevant row cannot be safely mapped, leave suggestedCalculatorId and suggestedFieldKey empty and set relevance=review.',
+    '8. Non-transactional or legal-status fields such as residency, exemptions, taxpayer type, recovery percentages, eligibility flags or asset classifications generally cannot be established from a bank statement. Do not infer them merely from account activity.',
+    '9. Preserve document order for retained rows.',
+    '10. If output limits prevent retaining every relevant row, set truncated=true and explain this in warnings.',
+    '11. Do not return page headers, balances carried forward, totals that duplicate underlying rows, account-identification lines or other layout noise.',
+    '',
+    'Return structured JSON only.'
+  ].join('\n');
 }
 
 function interactionText(data){
@@ -329,7 +353,7 @@ async function callGenerateContent(model,file,prompt){
 async function callModel(file,registry,sourceCalculator){
   const prompt=promptFor(file,registry,sourceCalculator)+`
 10. Return ONLY valid JSON matching this exact top-level shape:
-{"documentType":"string","period":"string","truncated":false,"warnings":["string"],"rows":[{"date":"string","description":"string","amount":0,"direction":"credit|debit|neutral","suggestedCalculatorId":"string","suggestedFieldKey":"string","confidence":"high|medium|low","reason":"string"}]}`;
+{"documentType":"string","period":"string","truncated":false,"warnings":["string"],"rows":[{"date":"string","description":"string","amount":0,"direction":"credit|debit|neutral","normalizedCategory":"string","relevance":"auto_map|review|ignore","suggestedCalculatorId":"string","suggestedFieldKey":"string","confidence":"high|medium|low","reason":"string"}]}`;
   const ext=String(file.name||'').split('.').pop()?.toLowerCase();
   const mime=String(file.mimeType||'');
 
@@ -409,22 +433,28 @@ export default async function handler(req,res){
         continue;
       }
       const allowed=new Map(registry.map(calc=>[calc.id,new Set(calc.fields.map(field=>field.key))]));
-      const rows=(Array.isArray(parsed.rows)?parsed.rows:[]).slice(0,200).map((row,index)=>{
-        let calculatorId=String(row.suggestedCalculatorId||'');
-        let fieldKey=String(row.suggestedFieldKey||'');
-        if(!allowed.has(calculatorId)||!allowed.get(calculatorId).has(fieldKey)){calculatorId='';fieldKey='';}
-        return {
-          id:`${String(file.name||'doc').slice(0,40)}-${index+1}`,
-          date:String(row.date||'').slice(0,80),
-          description:String(row.description||'').slice(0,500),
-          amount:Number(row.amount)||0,
-          direction:['credit','debit','neutral'].includes(row.direction)?row.direction:'neutral',
-          suggestedCalculatorId:calculatorId,
-          suggestedFieldKey:fieldKey,
-          confidence:['high','medium','low'].includes(row.confidence)?row.confidence:'low',
-          reason:String(row.reason||'').slice(0,500)
-        };
-      });
+      const rows=(Array.isArray(parsed.rows)?parsed.rows:[])
+        .slice(0,200)
+        .map((row,index)=>{
+          let calculatorId=String(row.suggestedCalculatorId||'');
+          let fieldKey=String(row.suggestedFieldKey||'');
+          if(!allowed.has(calculatorId)||!allowed.get(calculatorId).has(fieldKey)){calculatorId='';fieldKey='';}
+          const relevance=['auto_map','review','ignore'].includes(row.relevance)?row.relevance:(calculatorId&&fieldKey?'auto_map':'review');
+          return {
+            id:`${String(file.name||'doc').slice(0,40)}-${index+1}`,
+            date:String(row.date||'').slice(0,80),
+            description:String(row.description||'').slice(0,500),
+            amount:Number(row.amount)||0,
+            direction:['credit','debit','neutral'].includes(row.direction)?row.direction:'neutral',
+            normalizedCategory:String(row.normalizedCategory||'uncategorized').slice(0,120),
+            relevance,
+            suggestedCalculatorId:calculatorId,
+            suggestedFieldKey:fieldKey,
+            confidence:['high','medium','low'].includes(row.confidence)?row.confidence:'low',
+            reason:String(row.reason||'').slice(0,500)
+          };
+        })
+        .filter(row=>!sourceCalculator||row.relevance!=='ignore');
       documents.push({
         name:String(file.name||'Statement').slice(0,240),
         ok:true,
