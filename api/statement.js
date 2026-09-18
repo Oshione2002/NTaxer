@@ -89,44 +89,61 @@ TASK:
 Return structured JSON only.`;
 }
 
+function interactionText(data){
+  const steps=Array.isArray(data?.steps)?data.steps:[];
+  for(let i=steps.length-1;i>=0;i--){
+    const step=steps[i];
+    if(step?.type!=='model_output')continue;
+    const content=Array.isArray(step.content)?step.content:[];
+    const text=content.filter(item=>item?.type==='text').map(item=>item.text||'').join('').trim();
+    if(text)return text;
+  }
+  return '';
+}
+
 async function callModel(file,registry,sourceCalculator){
   const prompt=promptFor(file,registry,sourceCalculator);
   const ext=String(file.name||'').split('.').pop()?.toLowerCase();
   const mime=String(file.mimeType||'');
-  let contentPart;
+  let input;
   if(ext==='pdf'||mime==='application/pdf'){
-    contentPart={inlineData:{mimeType:'application/pdf',data:String(file.data||'')}};
+    input=[
+      {type:'document',data:String(file.data||''),mime_type:'application/pdf'},
+      {type:'text',text:prompt}
+    ];
   }else if(ext==='csv'||mime==='text/csv'){
     let text='';
     try{text=Buffer.from(String(file.data||''),'base64').toString('utf8');}catch{}
-    contentPart={text:`CSV CONTENT:\n${text.slice(0,900000)}`};
+    input=[{type:'text',text:`${prompt}\n\nCSV CONTENT:\n${text.slice(0,900000)}`}];
   }else{
     return {unsupported:true,error:'Excel analysis is not connected yet. Please use PDF or CSV for this analysis step.'};
   }
 
   let lastError;
   for(const model of MODELS){
-    const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
     for(let attempt=0;attempt<2;attempt++){
       if(attempt)await sleep(400);
-      const response=await fetch(url,{
+      const response=await fetch('https://generativelanguage.googleapis.com/v1beta/interactions',{
         method:'POST',
-        headers:{'Content-Type':'application/json','x-goog-api-key':process.env.GEMINI_API_KEY},
+        headers:{
+          'Content-Type':'application/json',
+          'x-goog-api-key':process.env.GEMINI_API_KEY
+        },
         body:JSON.stringify({
-          systemInstruction:{parts:[{text:'You are NTaxer AI. Extract document data faithfully, suggest mappings conservatively, and never invent transactions or tax conclusions.'}]},
-          contents:[{role:'user',parts:[contentPart,{text:prompt}]}],
-          generationConfig:{
-            temperature:0.05,
-            maxOutputTokens:8192,
-            responseMimeType:'application/json',
-            responseSchema:schema
-          },
-          store:false
+          model,
+          store:false,
+          system_instruction:'You are NTaxer AI. Extract document data faithfully, suggest mappings conservatively, and never invent transactions or tax conclusions.',
+          input,
+          response_format:{
+            type:'text',
+            mime_type:'application/json',
+            schema
+          }
         })
       });
       const data=await response.json().catch(()=>({}));
       if(response.ok){
-        const text=candidateText(data);
+        const text=interactionText(data);
         if(text)return {model,text};
         lastError={status:502,data:{error:{message:'NTaxer AI returned an empty statement response.'}}};
         break;
