@@ -122,9 +122,14 @@ body.scroll-top-visible .ntaxer-ai-launcher{
     width:48px;height:48px;padding:0;gap:0;justify-content:center;border-radius:50%
   }
   .ntaxer-ai-launcher:hover,
-  .ntaxer-ai-launcher:focus-visible,
-  .ntaxer-ai-launcher[aria-expanded="true"]{width:48px;padding:0;gap:0}
+  .ntaxer-ai-launcher:focus-visible{width:48px;padding:0;gap:0}
   .ntaxer-ai-launcher>span:last-child{display:none}
+  .ntaxer-ai-launcher[aria-expanded="true"]{
+    width:164px;padding:0 12px;gap:6px;border-radius:999px
+  }
+  .ntaxer-ai-launcher[aria-expanded="true"]>span:last-child{
+    display:block;max-width:112px;opacity:1;overflow:visible
+  }
   body.scroll-top-visible .ntaxer-ai-launcher{
     right:calc(max(16px,env(safe-area-inset-right)) + 56px)
   }
@@ -139,14 +144,19 @@ body.scroll-top-visible .ntaxer-ai-launcher{
 @media print{.ntaxer-ai-launcher,.ntaxer-ai-panel,.ntaxer-ai-inline,.ntaxer-ai-home-card{display:none!important}}
 @media(prefers-reduced-motion:reduce){.ntaxer-ai-thinking span{animation:none}}
 
-/* Touch devices always keep the launcher icon-only, even when focused or after closing the panel. */
+/* Touch devices stay icon-only until opened; while open, the launcher keeps its label visible. */
 @media (hover:none), (pointer:coarse){
-  .ntaxer-ai-launcher,
-  .ntaxer-ai-launcher:hover,
-  .ntaxer-ai-launcher:focus,
-  .ntaxer-ai-launcher:focus-visible,
-  .ntaxer-ai-launcher[aria-expanded="true"]{
+  .ntaxer-ai-launcher:not([aria-expanded="true"]),
+  .ntaxer-ai-launcher:not([aria-expanded="true"]):hover,
+  .ntaxer-ai-launcher:not([aria-expanded="true"]):focus,
+  .ntaxer-ai-launcher:not([aria-expanded="true"]):focus-visible{
     width:48px!important;height:48px!important;padding:0!important;gap:0!important;border-radius:50%!important
   }
-  .ntaxer-ai-launcher>span:last-child{display:none!important}
+  .ntaxer-ai-launcher:not([aria-expanded="true"])>span:last-child{display:none!important}
+  .ntaxer-ai-launcher[aria-expanded="true"]{
+    width:164px!important;height:48px!important;padding:0 12px!important;gap:6px!important;border-radius:999px!important
+  }
+  .ntaxer-ai-launcher[aria-expanded="true"]>span:last-child{
+    display:block!important;max-width:112px!important;opacity:1!important;overflow:visible!important
+  }
 }
