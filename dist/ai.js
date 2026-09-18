@@ -10,7 +10,10 @@ document.body.insertAdjacentHTML('beforeend',
   '<section id="ntaxer-ai-panel" class="ntaxer-ai-panel" role="dialog" aria-label="NTaxer AI" aria-modal="false" hidden>'+
     '<header class="ntaxer-ai-header">'+
       '<div><span class="ntaxer-ai-kicker">NTaxer AI</span><h2>NTaxer AI <span aria-hidden="true">✦</span></h2></div>'+
-      '<button id="ntaxer-ai-close" class="ntaxer-ai-close" type="button" aria-label="Close NTaxer AI">×</button>'+
+      '<div class="ntaxer-ai-header-actions">'+
+        '<button id="ntaxer-ai-clear" class="ntaxer-ai-header-button" type="button" aria-label="Clear chat" title="Clear chat"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5M14 11v5"/></svg></button>'+
+        '<button id="ntaxer-ai-close" class="ntaxer-ai-close" type="button" aria-label="Close NTaxer AI">×</button>'+
+      '</div>'+
     '</header>'+
     '<div class="ntaxer-ai-modes" role="group" aria-label="AI task">'+
       '<button type="button" data-ai-mode="route">Find my calculator</button>'+
@@ -31,6 +34,7 @@ document.body.insertAdjacentHTML('beforeend',
 
 const launcher=document.querySelector('#ntaxer-ai-launcher');
 const panel=document.querySelector('#ntaxer-ai-panel');
+const clearButton=document.querySelector('#ntaxer-ai-clear');
 const closeButton=document.querySelector('#ntaxer-ai-close');
 const messages=document.querySelector('#ntaxer-ai-messages');
 const form=document.querySelector('#ntaxer-ai-form');
@@ -428,6 +432,12 @@ function enhancePage(){
 }
 
 launcher.addEventListener('click',()=>aiState.open?closePanel():openPanel(pageMode()));
+clearButton.addEventListener('click',()=>{
+  aiState.history=[];
+  input.value='';
+  showGreeting();
+  input.focus();
+});
 closeButton.addEventListener('click',closePanel);
 modeButtons.forEach(button=>button.addEventListener('click',()=>setMode(button.dataset.aiMode,{resetGreeting:true})));
 
