@@ -249,6 +249,16 @@ function importView(sourceCalculator=''){
   <div id="statement-file-status" class="statement-file-status" aria-live="polite" hidden></div>
  </section>
 
+ <section id="statement-next-step" class="statement-next-step" hidden aria-labelledby="statement-next-title">
+  <div class="statement-next-heading">
+   <div><p class="eyebrow">Next step</p><h2 id="statement-next-title">Ready to analyse</h2></div>
+   <button id="statement-back-to-files" class="text-button" type="button">← Back to files</button>
+  </div>
+  <p>Your selected statements are ready for the extraction and mapping stage.</p>
+  <div id="statement-next-summary" class="statement-next-summary"></div>
+  <p class="notice neutral">NTaxer will use this next stage to extract the rows, suggest relevant calculators and let you review every mapping before anything reaches a calculator.</p>
+ </section>
+
  <section class="detail-card detail-area">
   <h2>How statement import will work</h2>
   <ol>
@@ -307,6 +317,9 @@ function importView(sourceCalculator=''){
        <button class="statement-remove-file text-button" type="button" data-file-index="${index}" aria-label="Remove ${escape(file.name)}">Remove</button>
       </div>`;
     }).join('')}
+   </div>
+   <div class="statement-file-actions">
+    <button id="statement-continue" class="button primary statement-continue" type="button">Continue</button>
    </div>`;
   $('#statement-clear-all').addEventListener('click',()=>{
    selectedFiles=[];
@@ -318,7 +331,24 @@ function importView(sourceCalculator=''){
     renderSelectedFiles();
    });
   });
+  $('#statement-continue').addEventListener('click',()=>{
+   const uploadCard=document.querySelector('.statement-upload-card');
+   const nextStep=$('#statement-next-step');
+   const summary=$('#statement-next-summary');
+   summary.innerHTML=`<strong>${selectedFiles.length} ${selectedFiles.length===1?'statement':'statements'} selected</strong><span>${selectedFiles.map(file=>escape(file.name)).join(' · ')}</span>${source?`<small>Starting calculator: ${escape(source.name)}</small>`:''}`;
+   uploadCard.hidden=true;
+   nextStep.hidden=false;
+   nextStep.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+  });
  };
+
+ $('#statement-back-to-files').addEventListener('click',()=>{
+  const uploadCard=document.querySelector('.statement-upload-card');
+  const nextStep=$('#statement-next-step');
+  nextStep.hidden=true;
+  uploadCard.hidden=false;
+  uploadCard.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+ });
 
  const addFiles=files=>{
   const incoming=[...files];
