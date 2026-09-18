@@ -456,6 +456,147 @@ function importView(sourceCalculator=''){
   uploadCard.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
  });
 
+ const analysisButton=$('#statement-analyse');
+ const analysisProgress=$('#statement-analysis-progress');
+ const reviewSection=$('#statement-review');
+ const reviewBody=$('#statement-review-body');
+ const reviewSummary=$('#statement-document-summary');
+ const registryForStatement=CALCULATORS.map(calc=>({
+  id:calc.id,
+  name:calc.name,
+  group:calc.group,
+  fields:calc.fields.filter(field=>field.key&&field.type!=='divider').map(field=>({key:field.key,label:field.label}))
+ }));
+
+ const fileToBase64=file=>new Promise((resolve,reject)=>{
+  const reader=new FileReader();
+  reader.onload=()=>{
+   const value=String(reader.result||'');
+   resolve(value.includes(',')?value.split(',')[1]:value);
+  };
+  reader.onerror=()=>reject(reader.error||new Error('Could not read file'));
+  reader.readAsDataURL(file);
+ });
+
+ const mappingOptions=(calculatorId='',fieldKey='')=>{
+  const selectedValue=calculatorId&&fieldKey?calculatorId+'::'+fieldKey:'';
+  let html='<option value=""'+(!selectedValue?' selected':'')+'>Unmapped / review</option><option value="__exclude__">Ignore / Exclude</option>';
+  for(const calc of CALCULATORS){
+   const fields=calc.fields.filter(field=>field.key&&field.type!=='divider');
+   if(!fields.length)continue;
+   html+='<optgroup label="'+escape(calc.name)+'">';
+   for(const field of fields){
+    const value=calc.id+'::'+field.key;
+    html+='<option value="'+escape(value)+'"'+(value===selectedValue?' selected':'')+'>'+escape(field.label)+'</option>';
+   }
+   html+='</optgroup>';
+  }
+  return html;
+ };
+
+ const formatStatementAmount=(amount,direction)=>{
+  const number=Math.abs(Number(amount)||0);
+  const sign=direction==='credit'?'+':direction==='debit'?'−':'';
+  return sign+'₦'+new Intl.NumberFormat('en-NG',{maximumFractionDigits:2}).format(number);
+ };
+
+ const renderStatementReview=data=>{
+  const documents=Array.isArray(data.documents)?data.documents:[];
+  const allRows=[];
+  reviewSummary.innerHTML=documents.map(doc=>{
+   const rowCount=Array.isArray(doc.rows)?doc.rows.length:0;
+   const warning=(Array.isArray(doc.warnings)&&doc.warnings.length)?'<small>'+doc.warnings.map(item=>escape(item)).join(' · ')+'</small>':'';
+   return '<div class="statement-document-card '+(doc.ok?'':'error')+'"><strong>'+escape(doc.name||'Statement')+'</strong><span>'+(doc.ok?(rowCount+' extracted rows'+(doc.documentType?' · '+escape(doc.documentType):'')):'Could not analyse')+'</span>'+warning+'</div>';
+  }).join('');
+  for(const doc of documents){
+   for(const row of (Array.isArray(doc.rows)?doc.rows:[]))allRows.push({...row,source:doc.name||'Statement'});
+  }
+  reviewBody.innerHTML=allRows.map((row,index)=>`
+   <tr data-statement-row data-row-index="${index}" data-excluded="false">
+    <td>${escape(row.date||'—')}</td>
+    <td><strong>${escape(row.description||'Untitled row')}</strong><small>${escape(row.source||'')}</small>${row.reason?'<em>'+escape(row.reason)+'</em>':''}</td>
+    <td class="statement-amount">${formatStatementAmount(row.amount,row.direction)}</td>
+    <td><span class="statement-type-badge">${escape(row.direction||'neutral')}</span></td>
+    <td><select class="statement-map-select" aria-label="Map ${escape(row.description||'statement row')} to NTaxer field">${mappingOptions(row.suggestedCalculatorId,row.suggestedFieldKey)}</select><small class="statement-confidence">${escape(row.confidence||'low')} confidence</small></td>
+    <td><button class="statement-row-toggle" type="button" aria-label="Exclude ${escape(row.description||'row')}" title="Exclude from calculation">×</button></td>
+   </tr>`).join('');
+  if(!allRows.length){
+   reviewBody.innerHTML='<tr><td colspan="6" class="statement-empty-review">No statement rows were extracted. Check the document summary above.</td></tr>';
+  }
+  $('#statement-next-step').hidden=true;
+  reviewSection.hidden=false;
+  reviewSection.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+ };
+
+ reviewBody.addEventListener('click',event=>{
+  const button=event.target.closest('.statement-row-toggle');
+  if(!button)return;
+  const row=button.closest('[data-statement-row]');
+  const excluded=row.dataset.excluded==='true';
+  row.dataset.excluded=String(!excluded);
+  row.classList.toggle('excluded',!excluded);
+  button.textContent=!excluded?'+':'×';
+  button.title=!excluded?'Add back to calculation':'Exclude from calculation';
+  button.setAttribute('aria-label',!excluded?'Add row back to calculation':'Exclude row from calculation');
+  const select=row.querySelector('.statement-map-select');
+  if(select)select.disabled=!excluded;
+ });
+
+ reviewBody.addEventListener('change',event=>{
+  const select=event.target.closest('.statement-map-select');
+  if(!select)return;
+  const row=select.closest('[data-statement-row]');
+  if(select.value==='__exclude__'){
+   row.dataset.excluded='true';
+   row.classList.add('excluded');
+   row.querySelector('.statement-row-toggle').textContent='+';
+   select.disabled=true;
+  }
+ });
+
+ $('#statement-review-back').addEventListener('click',()=>{
+  reviewSection.hidden=true;
+  $('#statement-next-step').hidden=false;
+  $('#statement-next-step').scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+ });
+
+ analysisButton.addEventListener('click',async()=>{
+  if(!selectedFiles.length)return;
+  analysisButton.disabled=true;
+  analysisButton.textContent='Analysing…';
+  analysisProgress.hidden=false;
+  analysisProgress.innerHTML='<div class="statement-analysis-spinner" aria-hidden="true"></div><div><strong>Analysing statements</strong><span>NTaxer AI is extracting rows and preparing suggested calculator-field mappings.</span></div>';
+  try{
+   const files=[];
+   for(let index=0;index<selectedFiles.length;index++){
+    const file=selectedFiles[index];
+    analysisProgress.querySelector('span').textContent='Preparing '+(index+1)+' of '+selectedFiles.length+': '+file.name;
+    files.push({name:file.name,mimeType:file.type||'',data:await fileToBase64(file)});
+   }
+   analysisProgress.querySelector('span').textContent='Sending prepared statements to NTaxer AI…';
+   const response=await fetch('/api/statement',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+     files,
+     sourceCalculator:source?.id||'',
+     calculators:registryForStatement
+    })
+   });
+   const data=await response.json().catch(()=>({}));
+   if(!response.ok||!data.ok)throw new Error(data.error||'Statement analysis failed.');
+   renderStatementReview(data);
+   analysisProgress.hidden=true;
+  }catch(error){
+   analysisProgress.hidden=false;
+   analysisProgress.classList.add('error');
+   analysisProgress.innerHTML='<div><strong>Could not analyse the statements</strong><span>'+escape(error?.message||'Please try again.')+'</span></div>';
+  }finally{
+   analysisButton.disabled=false;
+   analysisButton.textContent='Analyse statements';
+  }
+ });
+
  browseButton.addEventListener('click',()=>fileInput.click());
  fileInput.addEventListener('change',()=>{
   addFiles(fileInput.files||[]);
