@@ -1527,3 +1527,103 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
   left:calc(var(--sidebar-width) - 22px);
  }
 }
+
+
+/* Plain-English help tooltips for every calculator field. */
+.field-label-row{
+ display:flex;
+ align-items:center;
+ gap:7px;
+ margin-bottom:7px;
+ min-width:0
+}
+.field-label-row>label{
+ min-width:0;
+ font-size:16px;
+ font-weight:600;
+ line-height:1.35
+}
+.field-help-wrap{
+ display:inline-flex;
+ flex:0 0 auto
+}
+.field-help-trigger{
+ display:grid;
+ place-items:center;
+ width:25px;
+ height:25px;
+ padding:0;
+ border:0;
+ border-radius:50%;
+ background:transparent;
+ color:var(--green);
+ line-height:1
+}
+.field-help-trigger svg{
+ width:16px;
+ height:16px;
+ display:block
+}
+.field-help-trigger:hover,
+.field-help-trigger[aria-expanded="true"]{
+ background:var(--tone-e4eee7)
+}
+.field-help-trigger:focus-visible{
+ outline:2px solid var(--tone-219d72);
+ outline-offset:2px
+}
+.field-help-popover{
+ position:fixed;
+ z-index:1000;
+ width:max-content;
+ max-width:min(330px,calc(100vw - 24px));
+ padding:10px 12px;
+ border:1px solid #386758;
+ border-radius:9px;
+ background:var(--strong-surface);
+ color:#fff;
+ box-shadow:0 8px 24px rgba(0,0,0,.18);
+ font-size:13px;
+ line-height:1.45;
+ opacity:0;
+ visibility:hidden;
+ pointer-events:none;
+ transform:translateY(-2px);
+ transition:opacity .12s ease,transform .12s ease,visibility 0s linear .12s
+}
+.field-help-popover.is-visible{
+ opacity:1;
+ visibility:visible;
+ transform:translateY(0);
+ transition:opacity .12s ease,transform .12s ease
+}
+.checkfield-copy{
+ min-width:0;
+ flex:1
+}
+.checkfield-copy .field-label-row{
+ margin-bottom:0
+}
+.checkfield-copy small{
+ display:block;
+ color:var(--muted);
+ font-size:14px;
+ margin-top:3px
+}
+@media(max-width:650px){
+ .field-help-trigger{
+  width:32px;
+  height:32px
+ }
+ .field-help-trigger svg{
+  width:17px;
+  height:17px
+ }
+ .field-help-popover{
+  max-width:calc(100vw - 24px);
+  font-size:13px
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .field-help-popover{transition:none}
+}
