@@ -177,31 +177,48 @@ function currentCalculator(){
   return match?CALCULATORS.find(item=>item.id===match[1])||null:null;
 }
 
-function extractInputs(){
-  const formElement=document.querySelector('#tax-form');
-  if(!formElement)return '';
-  const rows=[];
-  for(const field of formElement.querySelectorAll('.field,.checkfield')){
-    const control=field.querySelector('input,select');
-    if(!control)continue;
-    const label=field.querySelector(':scope > span:first-child')?.textContent||field.childNodes[0]?.textContent||control.name;
-    let value='';
-    if(control.type==='checkbox')value=control.checked?'Yes':'No';
-    else if(control.tagName==='SELECT')value=control.selectedOptions[0]?.textContent||control.value;
-    else value=control.value;
-    rows.push(escapeText(label)+': '+escapeText(value));
+function readableInputValue(field,control){
+  if(control.type==='checkbox')return control.checked?'Yes':'';
+  if(control.tagName==='SELECT')return escapeText(control.selectedOptions[0]?.textContent||control.value);
+  const raw=escapeText(control.value);
+  if(!raw)return '';
+  if(field.type==='money'){
+    const numeric=Number(raw.replace(/,/g,''));
+    if(Number.isFinite(numeric))return new Intl.NumberFormat('en-NG',{style:'currency',currency:'NGN',minimumFractionDigits:2,maximumFractionDigits:2}).format(numeric);
   }
-  return rows.join('\n').slice(0,5000);
+  return raw;
+}
+
+function extractInputs(calc){
+  const formElement=document.querySelector('#tax-form');
+  if(!formElement||!calc)return {text:'',items:[]};
+  const items=[];
+  for(const field of calc.fields){
+    if(!field.key||field.type==='divider')continue;
+    const control=formElement.elements.namedItem(field.key);
+    if(!control)continue;
+    const value=readableInputValue(field,control);
+    if(!value)continue;
+    if((field.type==='money'||field.type==='number')&&Number(String(control.value).replace(/,/g,''))===0)continue;
+    items.push({key:field.key,label:field.label,value});
+  }
+  const selected=items.slice(0,14);
+  return {
+    items:selected,
+    text:selected.map(item=>item.label+': '+item.value).join('\n').slice(0,5000)
+  };
 }
 
 function calculatorContext(){
   const calc=currentCalculator();
+  const inputContext=extractInputs(calc);
   const result=escapeText(document.querySelector('#result')?.innerText||'');
   const breakdown=escapeText(document.querySelector('#breakdown')?.innerText||'');
   const sourceIds=calc?.refs?.map(number=>'section-'+number)||[];
   return {
     calculator:calc?calc.name+' — '+calc.description:'',
-    inputs:extractInputs(),
+    inputs:inputContext.text,
+    inputItems:inputContext.items,
     result,
     breakdown,
     sources:calc?.refs?.map(number=>'Section '+number)||[],
@@ -344,7 +361,7 @@ function explainCurrentResult(){
     return;
   }
   openPanel('explain');
-  ask('Explain this result in plain language.',{silentUser:false});
+  ask('Explain this result using the values currently filled in this calculator. Mention the main entries that drove the result and how they affected the calculation, without recalculating a different amount.',{silentUser:false});
 }
 
 function enhancePage(){
