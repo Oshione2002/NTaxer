@@ -905,3 +905,11 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  justify-self:center;
  align-self:center;
 }
+
+
+/* Ensure Appearance keeps the same left inset as the sidebar rows. */
+#tax-sidebar .sidebar-theme-controls{
+ padding-top:16px;
+ padding-right:12px;
+ padding-left:22px;
+}
