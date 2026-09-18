@@ -1080,3 +1080,46 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  .statement-file-row{gap:10px}
  .statement-file-info{min-width:0}
 }
+
+
+/* Forward action and next stage for statement uploads. */
+.statement-file-actions{
+ display:flex;
+ justify-content:flex-end;
+ padding:12px 14px;
+ border-top:1px solid var(--line)
+}
+.statement-continue{
+ min-width:140px
+}
+.statement-next-step{
+ margin-top:24px;
+ padding:24px;
+ border:1px solid var(--line);
+ border-radius:12px;
+ background:var(--surface)
+}
+.statement-next-heading{
+ display:flex;
+ align-items:flex-start;
+ justify-content:space-between;
+ gap:16px
+}
+.statement-next-summary{
+ display:grid;
+ gap:5px;
+ margin-top:14px;
+ padding:14px;
+ border:1px solid var(--line);
+ border-radius:10px;
+ background:var(--tone-fbfcfb)
+}
+.statement-next-summary strong{font-size:14px;color:var(--tone-233e31)}
+.statement-next-summary span{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.statement-next-summary small{font-size:12px;color:var(--green)}
+@media(max-width:650px){
+ .statement-file-actions{justify-content:stretch}
+ .statement-continue{width:100%}
+ .statement-next-step{padding:18px}
+ .statement-next-heading{flex-direction:column}
+}
