@@ -113,7 +113,7 @@ function addAssistant(payload,{loading=false,error=false}={}){
   const article=document.createElement('article');
   article.className='ntaxer-ai-message assistant'+(loading?' loading':'')+(error?' error':'');
   if(loading){
-    article.innerHTML='<div class="ntaxer-ai-thinking"><span></span><span></span><span></span></div><p>Gemini is working…</p>';
+    article.innerHTML='<div class="ntaxer-ai-thinking"><span></span><span></span><span></span></div><p>NTaxer AI is working…</p>';
     messages.append(article);
     messages.scrollTop=messages.scrollHeight;
     return article;
