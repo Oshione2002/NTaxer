@@ -1158,3 +1158,26 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  opacity:.6;
  cursor:wait
 }
+
+
+/* Compact X control for removing an uploaded statement. */
+.statement-remove-file{
+ display:grid;
+ place-items:center;
+ flex:0 0 34px;
+ width:34px;
+ height:34px;
+ padding:0;
+ border:1px solid var(--line);
+ border-radius:50%;
+ background:transparent;
+ color:var(--muted);
+ font-size:22px;
+ font-weight:400;
+ line-height:1
+}
+.statement-remove-file:hover{
+ background:var(--tone-eaf1eb);
+ color:var(--green);
+ border-color:var(--tone-bfcec5)
+}
