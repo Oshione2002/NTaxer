@@ -1460,3 +1460,29 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  .statement-calculator-grid{grid-template-columns:1fr}
  .statement-total-row{align-items:flex-start;flex-direction:column;gap:6px}
 }
+
+
+/* Statement workflow: never reserve space for hidden or empty placeholders. */
+#statement-file-status[hidden],
+#statement-analysis-progress[hidden],
+#statement-next-step[hidden],
+#statement-review[hidden],
+#statement-calculator-step[hidden],
+#statement-totals-step[hidden]{
+ display:none!important;
+ margin:0!important;
+ padding:0!important;
+ border:0!important;
+ min-height:0!important
+}
+#statement-file-status:empty,
+#statement-analysis-progress:empty,
+#statement-next-summary:empty,
+#statement-document-summary:empty,
+#statement-mapped-totals:empty{
+ display:none!important;
+ margin:0!important;
+ padding:0!important;
+ border:0!important;
+ min-height:0!important
+}
