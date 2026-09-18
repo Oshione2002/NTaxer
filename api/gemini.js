@@ -169,7 +169,9 @@ ${String(context.breakdown||'').slice(0,6000)}
 LEGAL REFERENCES ALREADY ATTACHED TO THIS CALCULATOR:
 ${Array.isArray(context.sources)?context.sources.join(', '):'None supplied'}
 
-Explain how to read this existing result. Do not recalculate it.`;
+Explain how to read this existing result using the current filled calculator entries above.
+Call out the main entered figures that materially drove the result, such as income, deductions, reliefs, transaction values, rates or classifications when they are present.
+Do not mention fields that were not supplied, do not invent missing values, and do not recalculate a different result.`;
   }
 
   const sources=Array.isArray(body.sources)?body.sources.slice(0,6):[];
