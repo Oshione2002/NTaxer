@@ -745,3 +745,80 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 @media print{
  .sidebar-calculator-entry,.sidebar-calculator-view{display:none!important}
 }
+
+
+/* Consistent outline icon system for sidebar navigation. */
+.sidebar-link-main{
+ display:flex;
+ align-items:center;
+ gap:11px;
+ min-width:0
+}
+.sidebar-nav-icon{
+ width:19px;
+ height:19px;
+ flex:0 0 19px;
+ stroke:currentColor
+}
+.sidebar-primary>a,
+#tax-sidebar .sidebar-reference-nav>a{
+ display:flex;
+ align-items:center
+}
+.sidebar-calculator-entry .sidebar-link-main{flex:1 1 auto}
+.sidebar-entry-chevron{flex:0 0 auto}
+.sidebar-theme-controls>.sidebar-link-main{
+ font-size:14px;
+ font-weight:700;
+ color:var(--muted)
+}
+.calculator-group-label{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ min-width:0
+}
+.calculator-group-icon{
+ width:18px;
+ height:18px;
+ flex:0 0 18px;
+ stroke:currentColor
+}
+
+/* One branded sidebar toggle: only its arrow changes direction. */
+.sidebar-toggle{
+ grid-template-columns:26px 18px;
+ column-gap:6px;
+ width:62px;
+ height:48px;
+ padding:0 6px;
+ border-radius:12px;
+ overflow:hidden
+}
+.sidebar-toggle-mark{
+ display:block;
+ width:26px;
+ height:26px;
+ border-radius:7px;
+ object-fit:contain;
+ flex:0 0 auto
+}
+.sidebar-toggle-arrow{
+ display:block;
+ flex:0 0 auto;
+ transform:rotate(0deg)
+}
+.sidebar-toggle[aria-expanded="true"] .sidebar-toggle-arrow{transform:rotate(180deg)}
+.sidebar-toggle[aria-expanded="false"]{
+ left:0;
+ border-radius:0 12px 12px 0
+}
+@media screen{
+ .sidebar-toggle[aria-expanded="true"]{left:calc(var(--sidebar-width) - 31px)}
+}
+@media(prefers-reduced-motion:no-preference){
+ .sidebar-toggle-arrow{transition:transform .18s ease}
+}
+@media(max-width:650px){
+ .sidebar-theme-controls>.sidebar-link-main{font-size:14px}
+}
