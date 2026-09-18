@@ -101,55 +101,115 @@ function interactionText(data){
   return '';
 }
 
-async function callModel(file,registry,sourceCalculator){
-  const prompt=promptFor(file,registry,sourceCalculator);
+function stripJsonFence(text){
+  const value=String(text||'').trim();
+  if(value.startsWith('~~~')||value.startsWith('```')){
+    return value.replace(/^(?:~~~|```)(?:json)?\s*/i,'').replace(/(?:~~~|```)\s*$/,'').trim();
+  }
+  return value;
+}
+
+function generateContentText(data){
+  return data?.candidates?.[0]?.content?.parts?.map(part=>part.text||'').join('').trim()||'';
+}
+
+async function callInteractions(model,input){
+  const response=await fetch('https://generativelanguage.googleapis.com/v1beta/interactions',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-goog-api-key':process.env.GEMINI_API_KEY
+    },
+    body:JSON.stringify({model,input})
+  });
+  const data=await response.json().catch(()=>({}));
+  if(response.ok){
+    const text=interactionText(data);
+    if(text)return {text,model,transport:'interactions'};
+    throw {status:502,data:{error:{message:'NTaxer AI returned an empty statement response.'}}};
+  }
+  throw {status:response.status,data};
+}
+
+async function callGenerateContent(model,file,prompt){
   const ext=String(file.name||'').split('.').pop()?.toLowerCase();
   const mime=String(file.mimeType||'');
-  let input;
+  let parts;
   if(ext==='pdf'||mime==='application/pdf'){
-    input=[
+    parts=[
+      {inline_data:{mime_type:'application/pdf',data:String(file.data||'')}},
+      {text:prompt}
+    ];
+  }else{
+    let text='';
+    try{text=Buffer.from(String(file.data||''),'base64').toString('utf8');}catch{}
+    parts=[{text:`${prompt}\n\nCSV CONTENT:\n${text.slice(0,900000)}`}];
+  }
+
+  const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-goog-api-key':process.env.GEMINI_API_KEY
+    },
+    body:JSON.stringify({
+      contents:[{role:'user',parts}],
+      generationConfig:{temperature:0.05,maxOutputTokens:8192}
+    })
+  });
+  const data=await response.json().catch(()=>({}));
+  if(response.ok){
+    const text=generateContentText(data);
+    if(text)return {text,model,transport:'generateContent'};
+    throw {status:502,data:{error:{message:'NTaxer AI returned an empty statement response.'}}};
+  }
+  throw {status:response.status,data};
+}
+
+async function callModel(file,registry,sourceCalculator){
+  const prompt=promptFor(file,registry,sourceCalculator)+`
+10. Return ONLY valid JSON matching this exact top-level shape:
+{"documentType":"string","period":"string","truncated":false,"warnings":["string"],"rows":[{"date":"string","description":"string","amount":0,"direction":"credit|debit|neutral","suggestedCalculatorId":"string","suggestedFieldKey":"string","confidence":"high|medium|low","reason":"string"}]}`;
+  const ext=String(file.name||'').split('.').pop()?.toLowerCase();
+  const mime=String(file.mimeType||'');
+
+  if(!['pdf','csv'].includes(ext)&&mime!=='application/pdf'&&mime!=='text/csv'){
+    return {unsupported:true,error:'Excel analysis is not connected yet. Please use PDF or CSV for this analysis step.'};
+  }
+
+  let interactionInput;
+  if(ext==='pdf'||mime==='application/pdf'){
+    interactionInput=[
       {type:'document',data:String(file.data||''),mime_type:'application/pdf'},
       {type:'text',text:prompt}
     ];
-  }else if(ext==='csv'||mime==='text/csv'){
+  }else{
     let text='';
     try{text=Buffer.from(String(file.data||''),'base64').toString('utf8');}catch{}
-    input=[{type:'text',text:`${prompt}\n\nCSV CONTENT:\n${text.slice(0,900000)}`}];
-  }else{
-    return {unsupported:true,error:'Excel analysis is not connected yet. Please use PDF or CSV for this analysis step.'};
+    interactionInput=[{type:'text',text:`${prompt}\n\nCSV CONTENT:\n${text.slice(0,900000)}`}];
   }
 
   let lastError;
   for(const model of MODELS){
     for(let attempt=0;attempt<2;attempt++){
       if(attempt)await sleep(400);
-      const response=await fetch('https://generativelanguage.googleapis.com/v1beta/interactions',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'x-goog-api-key':process.env.GEMINI_API_KEY
-        },
-        body:JSON.stringify({
-          model,
-          store:false,
-          system_instruction:'You are NTaxer AI. Extract document data faithfully, suggest mappings conservatively, and never invent transactions or tax conclusions.',
-          input,
-          response_format:{
-            type:'text',
-            mime_type:'application/json',
-            schema
-          }
-        })
-      });
-      const data=await response.json().catch(()=>({}));
-      if(response.ok){
-        const text=interactionText(data);
-        if(text)return {model,text};
-        lastError={status:502,data:{error:{message:'NTaxer AI returned an empty statement response.'}}};
-        break;
+      try{
+        const result=await callInteractions(model,interactionInput);
+        return {...result,text:stripJsonFence(result.text)};
+      }catch(error){
+        lastError=error;
+        if(!RETRYABLE.has(Number(error?.status))&&Number(error?.status)!==400)break;
       }
-      lastError={status:response.status,data};
-      if(!RETRYABLE.has(response.status))break;
+    }
+
+    // Compatibility fallback: use the legacy generateContent endpoint with the
+    // documented REST inline_data / mime_type field names for PDF input.
+    try{
+      const result=await callGenerateContent(model,file,prompt);
+      return {...result,text:stripJsonFence(result.text)};
+    }catch(error){
+      lastError=error;
+      if(!RETRYABLE.has(Number(error?.status))&&Number(error?.status)!==400)continue;
     }
   }
   throw lastError||{status:502,data:{}};
