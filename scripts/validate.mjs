@@ -6,6 +6,9 @@ const root=new URL('../',import.meta.url);
 for(const file of ['app.js','engine.js','calculators.js','schedules.js','coverage.js','export.js','service-worker.js']){
  const proc=spawnSync(process.execPath,['--check',new URL('dist/'+file,root).pathname],{encoding:'utf8'});assert.equal(proc.status,0,proc.stderr);
 }
+for(const file of ['api/gemini-test.js']){
+ const proc=spawnSync(process.execPath,['--check',new URL(file,root).pathname],{encoding:'utf8'});assert.equal(proc.status,0,proc.stderr);
+}
 const html=await readFile(new URL('dist/index.html',root),'utf8');
 for(const [,asset] of html.matchAll(/(?:src|href)="([^"#][^"]*)"/g))if(!/^https?:/.test(asset))assert.ok((await stat(new URL('dist/'+asset,root))).isFile(),`Missing asset ${asset}`);
 const law=JSON.parse(await readFile(new URL('dist/law.json',root),'utf8'));
