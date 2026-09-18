@@ -1,13 +1,18 @@
-const MODEL='gemini-3.8-flash';
+const MODELS=[
+  'gemini-3.7-flash',
+  'gemini-3.6-flash',
+  'gemini-3.5-flash',
+  'gemini-3.5-flash-lite',
+  'gemini-3.1-flash-lite',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite'
+];
 
-async function runGeminiCheck(res){
-  if(!process.env.GEMINI_API_KEY){
-    return res.status(503).json({ok:false,error:'GEMINI_API_KEY is not configured.'});
-  }
-
+async function testModel(model){
+  const started=Date.now();
   try{
     const response=await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
       {
         method:'POST',
         headers:{
@@ -17,7 +22,7 @@ async function runGeminiCheck(res){
         body:JSON.stringify({
           contents:[{
             role:'user',
-            parts:[{text:'Reply with exactly NTAXER_GEMINI_OK'}]
+            parts:[{text:'Reply with exactly NTAXER_AI_OK'}]
           }],
           generationConfig:{temperature:0,maxOutputTokens:24}
         })
@@ -25,52 +30,90 @@ async function runGeminiCheck(res){
     );
 
     const data=await response.json().catch(()=>({}));
-
-    if(!response.ok){
-      return res.status(response.status).json({
-        ok:false,
-        model:MODEL,
-        geminiStatus:response.status,
-        code:data?.error?.status||null,
-        error:data?.error?.message||'NTaxer AI request failed.'
-      });
-    }
-
     const reply=data?.candidates?.[0]?.content?.parts
       ?.map(part=>part.text||'')
       .join('')
       .trim()||'';
 
-    return res.status(200).json({
+    if(!response.ok){
+      return {
+        ok:false,
+        model,
+        status:response.status,
+        code:data?.error?.status||null,
+        error:data?.error?.message||'NTaxer AI request failed.',
+        durationMs:Date.now()-started
+      };
+    }
+
+    return {
       ok:true,
-      model:MODEL,
+      model,
+      status:response.status,
+      verified:reply.includes('NTAXER_AI_OK'),
       reply,
-      verified:reply.includes('NTAXER_GEMINI_OK')
-    });
+      durationMs:Date.now()-started
+    };
   }catch{
-    return res.status(502).json({
+    return {
       ok:false,
-      model:MODEL,
-      error:'Could not reach the NTaxer AI service.'
-    });
+      model,
+      status:502,
+      error:'Could not reach the NTaxer AI service.',
+      durationMs:Date.now()-started
+    };
   }
 }
 
 export default async function handler(req,res){
   res.setHeader('Cache-Control','no-store');
 
-  if(req.method==='GET'){
-    if(String(req.query?.run||'')==='1')return runGeminiCheck(res);
+  if(req.method!=='GET'&&req.method!=='POST'){
+    res.setHeader('Allow','GET, POST');
+    return res.status(405).json({ok:false,error:'Method not allowed'});
+  }
+
+  if(!process.env.GEMINI_API_KEY){
+    return res.status(503).json({ok:false,error:'GEMINI_API_KEY is not configured.'});
+  }
+
+  const requested=String(req.query?.model||'').trim();
+
+  if(String(req.query?.all||'')==='1'){
+    const results=[];
+    for(const model of MODELS)results.push(await testModel(model));
+    const working=results.filter(item=>item.ok&&item.verified).map(item=>item.model);
     return res.status(200).json({
-      ok:true,
-      configured:Boolean(process.env.GEMINI_API_KEY),
-      model:MODEL,
-      note:'Add ?run=1 to perform a live NTaxer AI connectivity test.'
+      ok:working.length>0,
+      configured:true,
+      tested:MODELS.length,
+      working,
+      recommended:working[0]||null,
+      results
     });
   }
 
-  if(req.method==='POST')return runGeminiCheck(res);
+  if(requested){
+    if(!MODELS.includes(requested)){
+      return res.status(400).json({
+        ok:false,
+        error:'Unsupported test model.',
+        availableModels:MODELS
+      });
+    }
+    const result=await testModel(requested);
+    return res.status(result.ok?200:result.status||502).json(result);
+  }
 
-  res.setHeader('Allow','GET, POST');
-  return res.status(405).json({ok:false,error:'Method not allowed'});
+  if(String(req.query?.run||'')==='1'){
+    const result=await testModel(MODELS[0]);
+    return res.status(result.ok?200:result.status||502).json(result);
+  }
+
+  return res.status(200).json({
+    ok:true,
+    configured:true,
+    availableModels:MODELS,
+    note:'Use ?model=MODEL_NAME to test one model, or ?all=1 to test all listed models.'
+  });
 }
