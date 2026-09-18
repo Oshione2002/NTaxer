@@ -268,7 +268,7 @@ function importView(sourceCalculator=''){
    <div><p class="eyebrow">Review extraction</p><h2 id="statement-review-title">Review and map statement rows</h2></div>
    <button id="statement-review-back" class="text-button" type="button">← Back</button>
   </div>
-  <p class="statement-review-copy">NTaxer AI suggestions are only starting points. Change any mapping, or use × to exclude a row from calculation. Excluded rows stay visible and can be restored with +.</p>
+  <p class="statement-review-copy">NTaxer AI suggestions are only starting points. Change any mapping, or use × to exclude a row from calculation. Excluded rows stay visible and can be restored with +.${source?` Because this import started from ${escape(source.name)}, the mapping dropdown is limited to that calculator’s amount fields.`:'' }</p>
   <div id="statement-document-summary" class="statement-document-summary"></div>
   <div class="statement-review-table-wrap">
    <table class="statement-review-table">
@@ -493,11 +493,12 @@ function importView(sourceCalculator=''){
  const reviewBody=$('#statement-review-body');
  const reviewSummary=$('#statement-document-summary');
  let analysedRows=[];
- const registryForStatement=CALCULATORS.map(calc=>({
+ const statementCalculators=source?[source]:CALCULATORS;
+ const registryForStatement=statementCalculators.map(calc=>({
   id:calc.id,
   name:calc.name,
   group:calc.group,
-  fields:calc.fields.filter(field=>field.key&&field.type!=='divider').map(field=>({key:field.key,label:field.label}))
+  fields:calc.fields.filter(field=>field.key&&field.type==='money').map(field=>({key:field.key,label:field.label}))
  }));
 
  const fileToBase64=file=>new Promise((resolve,reject)=>{
@@ -511,10 +512,18 @@ function importView(sourceCalculator=''){
  });
 
  const mappingOptions=(calculatorId='',fieldKey='')=>{
-  const selectedValue=calculatorId&&fieldKey?calculatorId+'::'+fieldKey:'';
+  const allowedCalculators=source?[source]:CALCULATORS;
+  const availableValues=new Set();
+  for(const calc of allowedCalculators){
+   for(const field of calc.fields.filter(field=>field.key&&field.type==='money')){
+    availableValues.add(calc.id+'::'+field.key);
+   }
+  }
+  const requestedValue=calculatorId&&fieldKey?calculatorId+'::'+fieldKey:'';
+  const selectedValue=availableValues.has(requestedValue)?requestedValue:'';
   let html='<option value=""'+(!selectedValue?' selected':'')+'>Unmapped / review</option><option value="__exclude__">Ignore / Exclude</option>';
-  for(const calc of CALCULATORS){
-   const fields=calc.fields.filter(field=>field.key&&field.type!=='divider');
+  for(const calc of allowedCalculators){
+   const fields=calc.fields.filter(field=>field.key&&field.type==='money');
    if(!fields.length)continue;
    html+='<optgroup label="'+escape(calc.name)+'">';
    for(const field of fields){
