@@ -849,3 +849,18 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 @media screen{
  .sidebar-toggle[aria-expanded="true"]{left:calc(var(--sidebar-width) - 24px)}
 }
+
+
+/* Align Appearance with the main sidebar navigation rows. */
+.sidebar-theme-controls{
+ padding:16px 12px 0;
+}
+.sidebar-theme-controls>span{
+ font-size:14px;
+ font-weight:700;
+ line-height:1.4;
+}
+@media(max-width:650px){
+ .sidebar-theme-controls{padding-left:12px;padding-right:12px}
+ .sidebar-theme-controls>span{font-size:14px}
+}
