@@ -556,10 +556,10 @@ function importView(sourceCalculator=''){
   reviewBody.innerHTML=allRows.map((row,index)=>`
    <tr data-statement-row data-row-index="${index}" data-excluded="false">
     <td>${escape(row.date||'—')}</td>
-    <td><strong>${escape(row.description||'Untitled row')}</strong><small>${escape(row.source||'')}</small>${row.reason?'<em>'+escape(row.reason)+'</em>':''}</td>
+    <td><strong>${escape(row.description||'Untitled row')}</strong><small>${escape(row.source||'')}</small>${row.normalizedCategory?'<small class="statement-row-classification">'+escape(row.relevance==='auto_map'?'Relevant · '+row.normalizedCategory:'Needs review · '+row.normalizedCategory)+'</small>':''}${row.reason?'<em>'+escape(row.reason)+'</em>':''}</td>
     <td class="statement-amount">${formatStatementAmount(row.amount,row.direction)}</td>
     <td><span class="statement-type-badge">${escape(row.direction||'neutral')}</span></td>
-    <td><select class="statement-map-select" aria-label="Map ${escape(row.description||'statement row')} to NTaxer field">${mappingOptions(row.suggestedCalculatorId,row.suggestedFieldKey)}</select><small class="statement-confidence">${escape(row.confidence||'low')} confidence</small></td>
+    <td><select class="statement-map-select" aria-label="Map ${escape(row.description||'statement row')} to NTaxer field">${mappingOptions(row.suggestedCalculatorId,row.suggestedFieldKey)}</select><small class="statement-confidence">${escape(row.relevance==='auto_map'?'Relevant · '+(row.confidence||'low')+' confidence':'Needs review · '+(row.confidence||'low')+' confidence')}</small></td>
     <td><button class="statement-row-toggle" type="button" aria-label="Exclude ${escape(row.description||'row')}" title="Exclude from calculation">×</button></td>
    </tr>`).join('');
   if(!allRows.length){
