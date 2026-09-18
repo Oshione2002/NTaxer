@@ -276,6 +276,37 @@ function importView(sourceCalculator=''){
     <tbody id="statement-review-body"></tbody>
    </table>
   </div>
+  <div class="statement-review-actions">
+   <button id="statement-review-continue" class="button primary" type="button">Continue</button>
+  </div>
+ </section>
+
+ <section id="statement-calculator-step" class="statement-review" hidden aria-labelledby="statement-calculator-title">
+  <div class="statement-review-heading">
+   <div><p class="eyebrow">Calculator selection</p><h2 id="statement-calculator-title">Choose calculators</h2></div>
+   <button id="statement-calculator-back" class="text-button" type="button">← Back</button>
+  </div>
+  <p class="statement-review-copy">Start with calculators suggested by the reviewed mappings, or choose from all NTaxer calculators.</p>
+  <div id="statement-suggested-calculators"></div>
+  <details class="statement-all-calculators">
+   <summary>All calculators</summary>
+   <div id="statement-all-calculator-list"></div>
+  </details>
+  <div class="statement-review-actions">
+   <button id="statement-calculator-continue" class="button primary" type="button">Continue to mapped totals</button>
+  </div>
+ </section>
+
+ <section id="statement-totals-step" class="statement-review" hidden aria-labelledby="statement-totals-title">
+  <div class="statement-review-heading">
+   <div><p class="eyebrow">Final review</p><h2 id="statement-totals-title">Mapped totals</h2></div>
+   <button id="statement-totals-back" class="text-button" type="button">← Back</button>
+  </div>
+  <p class="statement-review-copy">Check exactly what NTaxer will put into each selected calculator field.</p>
+  <div id="statement-mapped-totals" class="statement-mapped-totals"></div>
+  <div class="statement-review-actions">
+   <button id="statement-apply" class="button primary" type="button">Apply to calculators</button>
+  </div>
  </section>
 
  <section class="detail-card detail-area">
