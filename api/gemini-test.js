@@ -1,22 +1,6 @@
 const MODEL='gemini-3.8-flash';
 
-export default async function handler(req,res){
-  res.setHeader('Cache-Control','no-store');
-
-  if(req.method==='GET'){
-    return res.status(200).json({
-      ok:true,
-      configured:Boolean(process.env.GEMINI_API_KEY),
-      model:MODEL,
-      note:'Send POST to test Gemini connectivity.'
-    });
-  }
-
-  if(req.method!=='POST'){
-    res.setHeader('Allow','GET, POST');
-    return res.status(405).json({ok:false,error:'Method not allowed'});
-  }
-
+async function runGeminiCheck(res){
   if(!process.env.GEMINI_API_KEY){
     return res.status(503).json({ok:false,error:'GEMINI_API_KEY is not configured.'});
   }
@@ -63,11 +47,30 @@ export default async function handler(req,res){
       reply,
       verified:reply.includes('NTAXER_GEMINI_OK')
     });
-  }catch(error){
+  }catch{
     return res.status(502).json({
       ok:false,
       model:MODEL,
       error:'Could not reach the Gemini API.'
     });
   }
+}
+
+export default async function handler(req,res){
+  res.setHeader('Cache-Control','no-store');
+
+  if(req.method==='GET'){
+    if(String(req.query?.run||'')==='1')return runGeminiCheck(res);
+    return res.status(200).json({
+      ok:true,
+      configured:Boolean(process.env.GEMINI_API_KEY),
+      model:MODEL,
+      note:'Add ?run=1 to perform a live Gemini connectivity test.'
+    });
+  }
+
+  if(req.method==='POST')return runGeminiCheck(res);
+
+  res.setHeader('Allow','GET, POST');
+  return res.status(405).json({ok:false,error:'Method not allowed'});
 }
