@@ -1,0 +1,13 @@
+# Ensure GitHub Linguist counts NTaxer's real source languages inside dist/.
+# The application is intentionally shipped as a dependency-free static bundle.
+dist/**/*.html linguist-vendored=false
+dist/**/*.html linguist-generated=false
+dist/**/*.html linguist-detectable=true
+
+dist/**/*.css linguist-vendored=false
+dist/**/*.css linguist-generated=false
+dist/**/*.css linguist-detectable=true
+
+dist/**/*.js linguist-vendored=false
+dist/**/*.js linguist-generated=false
+dist/**/*.js linguist-detectable=true
