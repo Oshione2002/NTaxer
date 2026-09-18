@@ -40,10 +40,15 @@ body.scroll-top-visible .ntaxer-ai-launcher{
 .ntaxer-ai-header h2{font-size:22px;margin:2px 0 0;color:white}
 .ntaxer-ai-header h2 span{color:var(--mint)}
 .ntaxer-ai-kicker{display:block;font-size:11px;font-weight:800;letter-spacing:1.15px;text-transform:uppercase;color:#b8d6c7}
+.ntaxer-ai-header-actions{display:flex;align-items:center;gap:8px}
+.ntaxer-ai-header-button,
 .ntaxer-ai-close{
   width:38px;height:38px;border:1px solid #3b6759;border-radius:50%;background:transparent;color:white;
-  font-size:25px;line-height:1;display:grid;place-items:center
+  line-height:1;display:grid;place-items:center
 }
+.ntaxer-ai-header-button{font-size:0}
+.ntaxer-ai-close{font-size:25px}
+.ntaxer-ai-header-button:hover,
 .ntaxer-ai-close:hover{background:#1d5142}
 .ntaxer-ai-modes{
   display:flex;gap:7px;overflow-x:auto;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--tone-fbfcfb);
