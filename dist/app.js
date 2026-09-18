@@ -100,7 +100,7 @@ function inputHtml(f,values){
 }
 function calcView(id){
  const c=CALCULATORS.find(c=>c.id===id)||CALCULATORS[0];state.current=c.id;state.tab='calculation';
- $('#main').innerHTML=`<div class="page-header sticky-page-heading"><p class="eyebrow">${escape(c.group)} / 2026 tax year</p><div class="heading-row"><h1>${escape(c.name)}</h1><span class="badge ${c.status}">${statusLabel(c.status)}</span></div></div><div class="intro page-subtext"><p class="lead">${escape(c.description)}</p></div>
+ $('#main').innerHTML=`<div class="page-header sticky-page-heading"><p class="eyebrow">${escape(c.group)} / 2026 tax year</p><div class="heading-row"><h1>${escape(c.name)}</h1><a class="calculator-import-button" href="#import/${c.id}" aria-label="Upload statement for ${escape(c.name)}" title="Upload statement"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg><span>Upload statement</span></a></div></div><div class="intro page-subtext"><p class="lead">${escape(c.description)}</p></div>
  <aside id="sticky-estimate" class="sticky-estimate" aria-live="polite" aria-atomic="true"></aside>
  <div class="workspace"><section class="panel"><div class="panel-head"><h2>Your details</h2></div><form id="tax-form" novalidate><div class="fields">${c.fields.map(f=>inputHtml(f,state.inputs[c.id])).join('')}</div><div class="form-actions"><span>Results update as you type</span><button type="button" id="reset" class="text-button">Reset example ↺</button></div></form></section><div class="result-column" tabindex="0" role="region" aria-label="Tax estimate and breakdown"><section id="result" aria-live="polite" aria-atomic="true"></section><div id="breakdown" class="panel breakdown"></div><p class="info-note">Calculated from your inputs. Check assumptions and legal scope before using an estimate.</p></div></div>
  <section class="detail-area" aria-label="Calculation details"><div class="tabbar" role="tablist" aria-label="Result information"><button id="tab-calculation" class="active" role="tab" aria-selected="true" aria-controls="detail-content" data-tab="calculation">Calculation breakdown</button><button id="tab-assumptions" role="tab" aria-selected="false" tabindex="-1" aria-controls="detail-content" data-tab="assumptions">Assumptions & scope</button><button id="tab-sources" role="tab" aria-selected="false" tabindex="-1" aria-controls="detail-content" data-tab="sources">Legal references</button></div><div id="detail-content" class="detail-card" role="tabpanel" aria-labelledby="tab-calculation"></div></section><div class="print-only"><p>NTaxer estimate · Ruleset ${RULESET} · Review ${REVIEWED} · ${escape(c.name)}</p><p>Source: https://nass.gov.ng/documents/download/11249</p></div>`;
@@ -217,7 +217,8 @@ function sourcesView(){
  <section class="detail-card detail-area"><h2>Using your estimate</h2><p>Calculators work independently. Some results overlap, and withholding tax may be a credit against another liability. Do not add every calculator result together as your total tax bill.</p><p>Eligibility, exemptions, reliefs and sector-specific treatment depend on your circumstances. Where confirmation is required, follow the instructions in that calculator. Complex payroll, insurance, trusts, free zones, petroleum operations, treaties, customs and state or local charges may need further assessment.</p><p>NTaxer provides planning estimates. It does not submit returns, make tax payments or issue an official assessment.</p></section>
  <section class="detail-card detail-area"><h2>Your information and records</h2><p>Calculations run in your browser. Entered figures stay in page memory and reset when you reload. No account or financial-data upload is required.</p><p>Use <strong>Download PDF</strong> for a structured, paginated report or <strong>Download Excel</strong> for the same report in a formatted workbook. Both include your inputs, result, calculation breakdown, assumptions, scope and legal references.</p><p>${link('https://github.com/Oshione2002/NTaxer','View the calculation code')}</p></section>`;
 }
-function importView(){
+function importView(sourceCalculator=''){
+ const source=CALCULATORS.find(c=>c.id===sourceCalculator);
  $('#main').innerHTML=`<div class="page-header sticky-page-heading"><p class="eyebrow">Statement import</p><h1>Import Statement</h1></div>
  <div class="intro page-subtext"><p class="lead">Bring a bank statement, financial statement, Excel file or CSV into NTaxer, review the extracted rows and decide exactly which calculator fields they should populate.</p></div>
  <section class="detail-card">
@@ -246,7 +247,7 @@ function route(){
   a.classList.toggle('active',active);
   if(a.tagName==='A'){if(active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');}
  });
- if(page==='import')importView();
+ if(page==='import')importView(target);
  else if(page==='coverage')coverageView();
  else if(page==='law')lawView(target);
  else if(page==='sources')sourcesView();
