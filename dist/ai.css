@@ -19,12 +19,12 @@ body.scroll-top-visible .ntaxer-ai-launcher{
   .ntaxer-ai-launcher:hover,
   .ntaxer-ai-launcher:focus-visible,
   .ntaxer-ai-launcher[aria-expanded="true"]{
-    width:154px;gap:9px;padding:0 16px
+    width:188px;gap:10px;padding:0 18px
   }
   .ntaxer-ai-launcher:hover>span:last-child,
   .ntaxer-ai-launcher:focus-visible>span:last-child,
   .ntaxer-ai-launcher[aria-expanded="true"]>span:last-child{
-    max-width:110px;opacity:1
+    max-width:130px;opacity:1;overflow:visible
   }
 }
 .ntaxer-ai-panel{
