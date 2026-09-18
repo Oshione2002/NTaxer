@@ -15,16 +15,14 @@
 body.scroll-top-visible .ntaxer-ai-launcher{
   right:calc(max(24px,env(safe-area-inset-right)) + 60px)
 }
-@media(min-width:651px){
+@media(min-width:651px) and (hover:hover) and (pointer:fine){
   .ntaxer-ai-launcher:hover,
-  .ntaxer-ai-launcher:focus-visible,
   .ntaxer-ai-launcher[aria-expanded="true"]{
-    width:188px;gap:10px;padding:0 18px
+    width:170px;gap:6px;padding:0 12px
   }
   .ntaxer-ai-launcher:hover>span:last-child,
-  .ntaxer-ai-launcher:focus-visible>span:last-child,
   .ntaxer-ai-launcher[aria-expanded="true"]>span:last-child{
-    max-width:130px;opacity:1;overflow:visible
+    max-width:118px;opacity:1;overflow:visible
   }
 }
 .ntaxer-ai-panel{
@@ -140,3 +138,15 @@ body.scroll-top-visible .ntaxer-ai-launcher{
 }
 @media print{.ntaxer-ai-launcher,.ntaxer-ai-panel,.ntaxer-ai-inline,.ntaxer-ai-home-card{display:none!important}}
 @media(prefers-reduced-motion:reduce){.ntaxer-ai-thinking span{animation:none}}
+
+/* Touch devices always keep the launcher icon-only, even when focused or after closing the panel. */
+@media (hover:none), (pointer:coarse){
+  .ntaxer-ai-launcher,
+  .ntaxer-ai-launcher:hover,
+  .ntaxer-ai-launcher:focus,
+  .ntaxer-ai-launcher:focus-visible,
+  .ntaxer-ai-launcher[aria-expanded="true"]{
+    width:48px!important;height:48px!important;padding:0!important;gap:0!important;border-radius:50%!important
+  }
+  .ntaxer-ai-launcher>span:last-child{display:none!important}
+}
