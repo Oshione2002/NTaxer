@@ -1627,3 +1627,57 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 @media(prefers-reduced-motion:reduce){
  .field-help-popover{transition:none}
 }
+
+
+/* Richer field-help content: explanation, entry guidance and common mistakes. */
+.field-help-popover{
+ max-width:min(390px,calc(100vw - 24px));
+ padding:13px 14px;
+}
+.field-help-title{
+ margin-bottom:10px;
+ padding-bottom:8px;
+ border-bottom:1px solid #386758;
+ font-size:14px;
+ font-weight:800;
+ line-height:1.35;
+ color:#fff;
+}
+.field-help-section{
+ display:grid;
+ gap:2px;
+}
+.field-help-section+.field-help-section{
+ margin-top:9px;
+}
+.field-help-section strong{
+ font-size:11px;
+ letter-spacing:.4px;
+ text-transform:uppercase;
+ color:#b9d8c8;
+}
+.field-help-section span{
+ font-size:13px;
+ line-height:1.5;
+ color:#fff;
+}
+.field-help-watch{
+ margin-top:10px!important;
+ padding-top:9px;
+ border-top:1px solid #386758;
+}
+.field-help-watch strong{
+ color:var(--mint);
+}
+@media(max-width:650px){
+ .field-help-popover{
+  max-width:calc(100vw - 24px);
+  padding:12px 13px;
+ }
+ .field-help-title{
+  font-size:14px;
+ }
+ .field-help-section span{
+  font-size:13px;
+ }
+}
