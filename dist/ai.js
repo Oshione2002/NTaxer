@@ -229,8 +229,9 @@ function calculatorContext(){
 }
 
 function currentLawContext(){
-  const target=(location.hash.match(/^#law\/(.+)$/)||[])[1]||'';
-  const item=(target&&document.getElementById('law-'+target))||document.querySelector('.law-item[open]');
+  const rawTarget=(location.hash.match(/^#law\/(.+)$/)||[])[1]||'';
+  const item=(rawTarget&&document.getElementById('law-'+rawTarget))||document.querySelector('.law-item[open]');
+  const target=rawTarget?(rawTarget.startsWith('schedule-')?rawTarget:'section-'+rawTarget):'';
   if(!item)return {target,title:'',excerpt:''};
   const number=escapeText(item.querySelector('.section-no')?.textContent||'');
   const title=escapeText(item.querySelector('.law-section-title')?.textContent||'');
