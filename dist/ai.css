@@ -99,8 +99,15 @@
 .ntaxer-ai-home-card strong{display:block;font-size:16px;margin-bottom:2px}
 .ntaxer-ai-home-card small{display:block;color:var(--muted);font-size:13px;line-height:1.45;font-weight:500}
 @media(max-width:650px){
-  .ntaxer-ai-launcher{right:72px;bottom:max(16px,env(safe-area-inset-bottom));padding:11px 13px}
+  .ntaxer-ai-launcher{
+    right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));
+    width:48px;height:48px;padding:0;gap:0;justify-content:center;border-radius:50%;
+    transition:right .2s ease
+  }
   .ntaxer-ai-launcher span:last-child{display:none}
+  body.scroll-top-visible .ntaxer-ai-launcher{
+    right:calc(max(16px,env(safe-area-inset-right)) + 56px)
+  }
   .ntaxer-ai-panel{
     right:10px;bottom:max(72px,calc(env(safe-area-inset-bottom) + 72px));width:calc(100vw - 20px);
     height:min(660px,calc(100dvh - var(--header-height) - 18px));border-radius:16px
