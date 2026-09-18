@@ -214,6 +214,7 @@ function calculatorContext(){
   const inputContext=extractInputs(calc);
   const result=escapeText(document.querySelector('#result')?.innerText||'');
   const breakdown=escapeText(document.querySelector('#breakdown')?.innerText||'');
+  const details=escapeText(document.querySelector('#detail-content')?.innerText||'').slice(0,4000);
   const sourceIds=calc?.refs?.map(number=>'section-'+number)||[];
   return {
     calculator:calc?calc.name+' — '+calc.description:'',
@@ -221,8 +222,39 @@ function calculatorContext(){
     inputItems:inputContext.items,
     result,
     breakdown,
+    details,
     sources:calc?.refs?.map(number=>'Section '+number)||[],
     sourceIds
+  };
+}
+
+function currentLawContext(){
+  const target=(location.hash.match(/^#law\/(.+)$/)||[])[1]||'';
+  const item=(target&&document.getElementById('law-'+target))||document.querySelector('.law-item[open]');
+  if(!item)return {target,title:'',excerpt:''};
+  const number=escapeText(item.querySelector('.section-no')?.textContent||'');
+  const title=escapeText(item.querySelector('.law-section-title')?.textContent||'');
+  const excerpt=escapeText(item.querySelector('.law-body,pre')?.innerText||'').slice(0,3000);
+  return {target,title:[number,title].filter(Boolean).join(' — '),excerpt};
+}
+
+function currentPageContext(){
+  const main=document.querySelector('#main');
+  const hash=location.hash||'#home';
+  const page=hash.slice(1).split('/')[0]||'home';
+  const calculator=currentCalculator();
+  const law=currentLawContext();
+  return {
+    page,
+    hash,
+    heading:escapeText(main?.querySelector('h1')?.textContent||''),
+    eyebrow:escapeText(main?.querySelector('.eyebrow')?.textContent||''),
+    summary:escapeText(main?.querySelector('.lead')?.textContent||'').slice(0,1200),
+    activeTab:escapeText(main?.querySelector('[data-tab].active')?.textContent||''),
+    calculator:calculator?calculator.name:'',
+    lawTarget:law.target,
+    lawTitle:law.title,
+    lawExcerpt:law.excerpt
   };
 }
 
@@ -251,7 +283,7 @@ function countHits(text,token){
   return count;
 }
 
-async function retrieveLaw(question){
+async function retrieveLaw(question,pageContext=currentPageContext()){
   const law=await loadLaw();
   const tokens=queryTokens(question);
   const entries=law.sections.map(section=>({
@@ -285,6 +317,7 @@ async function retrieveLaw(question){
     const scheduleNumber=Number(entry.id.replace('schedule-',''));
     if(entry.id.startsWith('section-')&&exactSections.includes(sectionNumber))score+=1000;
     if(entry.id.startsWith('schedule-')&&exactSchedules.includes(scheduleNumber))score+=1000;
+    if(pageContext?.lawTarget&&entry.id===pageContext.lawTarget)score+=1400;
     return {...entry,score};
   }).sort((a,b)=>b.score-a.score);
 
@@ -309,13 +342,14 @@ function historyForRequest(){
 }
 
 async function buildRequest(question){
-  const base={mode:aiState.mode,question,history:historyForRequest()};
+  const pageContext=currentPageContext();
+  const base={mode:aiState.mode,question,history:historyForRequest(),pageContext};
   if(aiState.mode==='route')return {...base,calculators:registry()};
   if(aiState.mode==='explain')return {...base,context:calculatorContext()};
-  return {...base,sources:await retrieveLaw(question)};
+  return {...base,sources:await retrieveLaw(question,pageContext)};
 }
 
-async function ask(question,{silentUser=false}={}){
+async function ask(question,{silentUser=false,displayText=''}={}){
   if(aiState.busy)return;
   if(!navigator.onLine){
     addAssistant({answer:'NTaxer AI needs an internet connection. The calculators and tax-law reference remain available offline.'},{error:true});
@@ -325,7 +359,7 @@ async function ask(question,{silentUser=false}={}){
   const clean=String(question||'').trim();
   if(aiState.mode!=='explain'&&!clean)return;
   const actual=clean||(aiState.mode==='explain'?'Explain this result in plain language.':'');
-  if(!silentUser)addUser(actual);
+  if(!silentUser)addUser(displayText||actual);
   aiState.history.push({role:'user',text:actual});
   const loading=addAssistant({}, {loading:true});
   aiState.busy=true;
@@ -361,7 +395,10 @@ function explainCurrentResult(){
     return;
   }
   openPanel('explain');
-  ask('Explain this result using the values currently filled in this calculator. Mention the main entries that drove the result and how they affected the calculation, without recalculating a different amount.',{silentUser:false});
+  ask(
+    'Explain this result using the values currently filled in this calculator. Mention the main entries that drove the result and how they affected the calculation, without recalculating a different amount.',
+    {silentUser:false,displayText:'Explain this result'}
+  );
 }
 
 function enhancePage(){
