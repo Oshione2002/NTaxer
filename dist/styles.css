@@ -822,3 +822,30 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 @media(max-width:650px){
  .sidebar-theme-controls>.sidebar-link-main{font-size:14px}
 }
+
+
+/* Main sidebar toggle follows the supplied sidebar-panel glyph. */
+.sidebar-toggle{
+ display:grid;
+ place-items:center;
+ width:48px;
+ height:48px;
+ padding:0;
+ border-radius:12px
+}
+.sidebar-toggle-glyph{
+ display:block;
+ width:28px;
+ height:28px;
+ flex:0 0 auto
+}
+.sidebar-toggle-arrow{
+ transform-box:fill-box;
+ transform-origin:center;
+ transform:rotate(0deg)
+}
+.sidebar-toggle[aria-expanded="true"] .sidebar-toggle-arrow{transform:rotate(180deg)}
+.sidebar-toggle-mark{display:none!important}
+@media screen{
+ .sidebar-toggle[aria-expanded="true"]{left:calc(var(--sidebar-width) - 24px)}
+}
