@@ -134,11 +134,25 @@ If the excerpts do not establish the answer, clearly say that the available NTax
 function buildPrompt(body){
   const question=String(body.question||'').trim();
   const history=Array.isArray(body.history)?body.history.slice(-4):[];
+  const page=body.pageContext&&typeof body.pageContext==='object'?body.pageContext:{};
+  const pageContext=[
+    page.page?`Page type: ${String(page.page).slice(0,80)}`:'',
+    page.heading?`Page heading: ${String(page.heading).slice(0,300)}`:'',
+    page.eyebrow?`Page category: ${String(page.eyebrow).slice(0,200)}`:'',
+    page.summary?`Page summary: ${String(page.summary).slice(0,1200)}`:'',
+    page.activeTab?`Active tab: ${String(page.activeTab).slice(0,120)}`:'',
+    page.calculator?`Current calculator: ${String(page.calculator).slice(0,200)}`:'',
+    page.lawTarget?`Current law reference: ${String(page.lawTarget).slice(0,80)}`:'',
+    page.lawTitle?`Current law title: ${String(page.lawTitle).slice(0,300)}`:''
+  ].filter(Boolean).join('\n')||'No specific page context.';
 
   if(body.mode==='route'){
     const registry=Array.isArray(body.calculators)?body.calculators.slice(0,40):[];
     return `USER QUESTION:
 ${question}
+
+CURRENT PAGE CONTEXT:
+${pageContext}
 
 RECENT CONVERSATION:
 ${history.map(item=>`${item.role}: ${String(item.text||'').slice(0,900)}`).join('\n')||'None'}
@@ -154,6 +168,9 @@ Return a short answer plus only relevant calculator IDs from this registry.`;
     return `USER QUESTION:
 ${question||'Explain this result.'}
 
+CURRENT PAGE CONTEXT:
+${pageContext}
+
 CURRENT NTAXER CALCULATOR:
 ${String(context.calculator||'').slice(0,300)}
 
@@ -166,6 +183,9 @@ ${String(context.result||'').slice(0,3500)}
 CALCULATION BREAKDOWN:
 ${String(context.breakdown||'').slice(0,6000)}
 
+CURRENT DETAILS / ACTIVE TAB:
+${String(context.details||'').slice(0,4000)||'No additional detail tab content supplied.'}
+
 LEGAL REFERENCES ALREADY ATTACHED TO THIS CALCULATOR:
 ${Array.isArray(context.sources)?context.sources.join(', '):'None supplied'}
 
@@ -177,6 +197,9 @@ Do not mention fields that were not supplied, do not invent missing values, and 
   const sources=Array.isArray(body.sources)?body.sources.slice(0,6):[];
   return `USER QUESTION:
 ${question}
+
+CURRENT PAGE CONTEXT:
+${pageContext}
 
 RECENT CONVERSATION:
 ${history.map(item=>`${item.role}: ${String(item.text||'').slice(0,900)}`).join('\n')||'None'}
