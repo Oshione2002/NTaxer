@@ -257,6 +257,25 @@ function importView(sourceCalculator=''){
   <p>Your selected statements are ready for the extraction and mapping stage.</p>
   <div id="statement-next-summary" class="statement-next-summary"></div>
   <p class="notice neutral">NTaxer will use this next stage to extract the rows, suggest relevant calculators and let you review every mapping before anything reaches a calculator.</p>
+  <div class="statement-analysis-actions">
+   <button id="statement-analyse" class="button primary" type="button">Analyse statements</button>
+  </div>
+  <div id="statement-analysis-progress" class="statement-analysis-progress" aria-live="polite" hidden></div>
+ </section>
+
+ <section id="statement-review" class="statement-review" hidden aria-labelledby="statement-review-title">
+  <div class="statement-review-heading">
+   <div><p class="eyebrow">Review extraction</p><h2 id="statement-review-title">Review and map statement rows</h2></div>
+   <button id="statement-review-back" class="text-button" type="button">← Back</button>
+  </div>
+  <p class="statement-review-copy">NTaxer AI suggestions are only starting points. Change any mapping, or use × to exclude a row from calculation. Excluded rows stay visible and can be restored with +.</p>
+  <div id="statement-document-summary" class="statement-document-summary"></div>
+  <div class="statement-review-table-wrap">
+   <table class="statement-review-table">
+    <thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Type</th><th>Map to NTaxer field</th><th>Use</th></tr></thead>
+    <tbody id="statement-review-body"></tbody>
+   </table>
+  </div>
  </section>
 
  <section class="detail-card detail-area">
