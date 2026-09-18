@@ -244,10 +244,10 @@ export default async function handler(req,res){
   try{
     const data=await callGemini(mode,buildPrompt({...body,mode,question}));
     const text=candidateText(data);
-    if(!text)throw {status:502,data:{error:{message:'Gemini returned no usable response.'}}};
+    if(!text)throw {status:502,data:{error:{message:'NTaxer AI returned no usable response.'}}};
 
     let parsed;
-    try{parsed=JSON.parse(text);}catch{throw {status:502,data:{error:{message:'Gemini returned an invalid structured response.'}}};}
+    try{parsed=JSON.parse(text);}catch{throw {status:502,data:{error:{message:'NTaxer AI returned an invalid structured response.'}}};}
 
     const allowedCalculators=new Set((Array.isArray(body.calculators)?body.calculators:[]).map(item=>String(item.id)));
     const allowedSources=new Set(
@@ -280,7 +280,7 @@ export default async function handler(req,res){
     const friendly=RETRYABLE.has(status)
       ?'NTaxer AI is temporarily busy. Please try again shortly; the calculators and tax-law reference still work normally.'
       :status===401||status===403
-        ?'NTaxer AI could not authenticate with Gemini.'
+        ?'NTaxer AI could not authenticate with its AI service.'
         :apiMessage||'NTaxer AI could not complete this request.';
 
     return send(res,status,{ok:false,error:friendly,geminiStatus:status});
