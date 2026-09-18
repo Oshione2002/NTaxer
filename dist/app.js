@@ -281,6 +281,8 @@ function importView(sourceCalculator=''){
  const status=$('#statement-file-status');
  const supportedExtensions=['pdf','csv','xls','xlsx'];
  let selectedFiles=[];
+ const preparation=new Map();
+ let unsupportedCount=0;
 
  const formatBytes=bytes=>{
   if(bytes<1024)return bytes+' B';
@@ -289,6 +291,20 @@ function importView(sourceCalculator=''){
  };
  const fileKey=file=>[file.name,file.size,file.lastModified].join('::');
  const fileExtension=file=>(file.name.split('.').pop()||'').toLowerCase();
+
+ const overallPreparation=()=>{
+  if(!selectedFiles.length)return {percent:0,ready:false,error:false};
+  let loaded=0,total=0,error=false;
+  for(const file of selectedFiles){
+   const state=preparation.get(fileKey(file))||{loaded:0,total:file.size||1,status:'pending'};
+   const size=file.size||1;
+   total+=size;
+   loaded+=Math.min(state.loaded||0,size);
+   if(state.status==='error')error=true;
+  }
+  const percent=total?Math.round((loaded/total)*100):100;
+  return {percent:Math.min(100,percent),ready:percent>=100&&!error,error};
+ };
 
  const renderSelectedFiles=()=>{
   dropzone.classList.toggle('has-file',selectedFiles.length>0);
@@ -299,48 +315,119 @@ function importView(sourceCalculator=''){
    return;
   }
   const totalSize=selectedFiles.reduce((sum,file)=>sum+file.size,0);
+  const progress=overallPreparation();
   status.hidden=false;
   status.className='statement-file-status selected multiple';
   status.innerHTML=`
+   ${unsupportedCount?'<div class="statement-file-warning">'+unsupportedCount+' unsupported '+(unsupportedCount===1?'file was':'files were')+' skipped. Use PDF, Excel or CSV.</div>':''}
    <div class="statement-file-summary">
     <div><strong>${selectedFiles.length} ${selectedFiles.length===1?'statement':'statements'} selected</strong><small>${formatBytes(totalSize)} total</small></div>
     <button id="statement-clear-all" class="text-button" type="button">Clear all</button>
    </div>
+   <div class="statement-upload-progress" aria-live="polite">
+    <div class="statement-progress-copy">
+     <span>${progress.error?'A file could not be prepared':progress.ready?'Files ready':'Preparing files'}</span>
+     <strong>${progress.percent}%</strong>
+    </div>
+    <div class="statement-progress-track" role="progressbar" aria-label="Statement preparation progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.percent}">
+     <span style="width:${progress.percent}%"></span>
+    </div>
+   </div>
    <div class="statement-file-list">
     ${selectedFiles.map((file,index)=>{
       const extension=fileExtension(file);
+      const state=preparation.get(fileKey(file))||{loaded:0,total:file.size||1,status:'pending'};
+      const filePercent=Math.min(100,Math.round(((state.loaded||0)/(file.size||1))*100));
+      const stateLabel=state.status==='error'?'Error':state.status==='ready'?'Ready':filePercent+'%';
       return `<div class="statement-file-row">
        <div class="statement-file-info">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>
-        <span><strong>${escape(file.name)}</strong><small>${escape(extension.toUpperCase())} · ${formatBytes(file.size)}</small></span>
+        <span><strong>${escape(file.name)}</strong><small>${escape(extension.toUpperCase())} · ${formatBytes(file.size)} · ${stateLabel}</small></span>
        </div>
        <button class="statement-remove-file text-button" type="button" data-file-index="${index}" aria-label="Remove ${escape(file.name)}">Remove</button>
       </div>`;
     }).join('')}
    </div>
    <div class="statement-file-actions">
-    <button id="statement-continue" class="button primary statement-continue" type="button">Continue</button>
+    <button id="statement-continue" class="button primary statement-continue" type="button" ${progress.ready?'':'disabled'}>${progress.ready?'Continue':'Preparing…'}</button>
    </div>`;
-  $('#statement-clear-all').addEventListener('click',()=>{
-   selectedFiles=[];
+ };
+
+ const prepareFile=file=>{
+  const key=fileKey(file);
+  preparation.set(key,{loaded:0,total:file.size||1,status:'preparing'});
+  const reader=new FileReader();
+  reader.onprogress=event=>{
+   const state=preparation.get(key);
+   if(!state)return;
+   state.loaded=event.lengthComputable?event.loaded:Math.min(file.size||1,(state.loaded||0)+Math.max(1,Math.round((file.size||1)*0.08)));
+   state.total=event.lengthComputable?event.total:(file.size||1);
    renderSelectedFiles();
-  });
-  status.querySelectorAll('.statement-remove-file').forEach(button=>{
-   button.addEventListener('click',()=>{
-    selectedFiles.splice(Number(button.dataset.fileIndex),1);
-    renderSelectedFiles();
-   });
-  });
-  $('#statement-continue').addEventListener('click',()=>{
+  };
+  reader.onload=()=>{
+   preparation.set(key,{loaded:file.size||1,total:file.size||1,status:'ready'});
+   renderSelectedFiles();
+  };
+  reader.onerror=()=>{
+   preparation.set(key,{loaded:0,total:file.size||1,status:'error'});
+   renderSelectedFiles();
+  };
+  reader.onabort=()=>{
+   preparation.set(key,{loaded:0,total:file.size||1,status:'error'});
+   renderSelectedFiles();
+  };
+  reader.readAsArrayBuffer(file);
+ };
+
+ const addFiles=files=>{
+  const incoming=[...files];
+  if(!incoming.length)return;
+  const invalid=incoming.filter(file=>!supportedExtensions.includes(fileExtension(file)));
+  const valid=incoming.filter(file=>supportedExtensions.includes(fileExtension(file)));
+  unsupportedCount=invalid.length;
+  const existingKeys=new Set(selectedFiles.map(fileKey));
+  const added=[];
+  for(const file of valid){
+   const key=fileKey(file);
+   if(!existingKeys.has(key)){
+    selectedFiles.push(file);
+    existingKeys.add(key);
+    added.push(file);
+   }
+  }
+  renderSelectedFiles();
+  for(const file of added)prepareFile(file);
+ };
+
+ status.addEventListener('click',event=>{
+  const remove=event.target.closest('.statement-remove-file');
+  if(remove){
+   const index=Number(remove.dataset.fileIndex);
+   const file=selectedFiles[index];
+   if(file)preparation.delete(fileKey(file));
+   selectedFiles.splice(index,1);
+   renderSelectedFiles();
+   return;
+  }
+  if(event.target.closest('#statement-clear-all')){
+   selectedFiles=[];
+   preparation.clear();
+   unsupportedCount=0;
+   renderSelectedFiles();
+   return;
+  }
+  if(event.target.closest('#statement-continue')){
+   const progress=overallPreparation();
+   if(!progress.ready)return;
    const uploadCard=document.querySelector('.statement-upload-card');
    const nextStep=$('#statement-next-step');
    const summary=$('#statement-next-summary');
-   summary.innerHTML=`<strong>${selectedFiles.length} ${selectedFiles.length===1?'statement':'statements'} selected</strong><span>${selectedFiles.map(file=>escape(file.name)).join(' · ')}</span>${source?`<small>Starting calculator: ${escape(source.name)}</small>`:''}`;
+   summary.innerHTML=`<strong>${selectedFiles.length} ${selectedFiles.length===1?'statement':'statements'} ready</strong><span>${selectedFiles.map(file=>escape(file.name)).join(' · ')}</span>${source?`<small>Starting calculator: ${escape(source.name)}</small>`:''}`;
    uploadCard.hidden=true;
    nextStep.hidden=false;
    nextStep.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
-  });
- };
+  }
+ });
 
  $('#statement-back-to-files').addEventListener('click',()=>{
   const uploadCard=document.querySelector('.statement-upload-card');
@@ -349,28 +436,6 @@ function importView(sourceCalculator=''){
   uploadCard.hidden=false;
   uploadCard.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
  });
-
- const addFiles=files=>{
-  const incoming=[...files];
-  if(!incoming.length)return;
-  const invalid=incoming.filter(file=>!supportedExtensions.includes(fileExtension(file)));
-  const valid=incoming.filter(file=>supportedExtensions.includes(fileExtension(file)));
-  const existingKeys=new Set(selectedFiles.map(fileKey));
-  for(const file of valid){
-   if(!existingKeys.has(fileKey(file))){
-    selectedFiles.push(file);
-    existingKeys.add(fileKey(file));
-   }
-  }
-  renderSelectedFiles();
-  if(invalid.length){
-   const message=document.createElement('div');
-   message.className='statement-file-warning';
-   message.textContent=`${invalid.length} unsupported ${invalid.length===1?'file was':'files were'} skipped. Use PDF, Excel or CSV.`;
-   status.prepend(message);
-   status.hidden=false;
-  }
- };
 
  browseButton.addEventListener('click',()=>fileInput.click());
  fileInput.addEventListener('change',()=>{
