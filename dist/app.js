@@ -257,13 +257,36 @@ function route(){
  if(page!=='law')window.scrollTo({top:0,behavior:'instant'});
 }
 const sidebarToggle=$('#sidebar-toggle');
+const sidebarMainView=$('#sidebar-main-view');
+const sidebarCalculatorView=$('#sidebar-calculator-view');
+const openCalculatorsButton=$('#open-calculators');
+const calculatorSidebarBack=$('#calculator-sidebar-back');
 const smallSidebar=window.matchMedia('(max-width:940px)');
 const sidebarStorageKey='ntaxer-sidebar-expanded';
+
 function savedDesktopSidebarState(){
  try{return localStorage.getItem(sidebarStorageKey);}catch{return null;}
 }
+function setSidebarView(view,{focus=false}={}){
+ const showCalculators=view==='calculators';
+ sidebarMainView.hidden=showCalculators;
+ sidebarMainView.inert=showCalculators;
+ sidebarMainView.setAttribute('aria-hidden',String(showCalculators));
+ sidebarCalculatorView.hidden=!showCalculators;
+ sidebarCalculatorView.inert=!showCalculators;
+ sidebarCalculatorView.setAttribute('aria-hidden',String(!showCalculators));
+ openCalculatorsButton.setAttribute('aria-expanded',String(showCalculators));
+ $('#tax-sidebar').classList.toggle('calculator-view-active',showCalculators);
+ if(showCalculators){
+  nav();
+  if(focus)requestAnimationFrame(()=>$('#calculator-search').focus({preventScroll:true}));
+ }else if(focus){
+  requestAnimationFrame(()=>openCalculatorsButton.focus({preventScroll:true}));
+ }
+}
 function setSidebarExpanded(expanded,{persist=true}={}){
  const sidebar=$('#tax-sidebar');
+ if(!expanded)setSidebarView('main',{focus:false});
  sidebar.hidden=!expanded;
  sidebar.inert=!expanded;
  sidebar.setAttribute('aria-hidden',String(!expanded));
@@ -276,10 +299,15 @@ function setSidebarExpanded(expanded,{persist=true}={}){
   try{localStorage.setItem(sidebarStorageKey,String(expanded));}catch{}
  }
 }
+openCalculatorsButton.addEventListener('click',()=>setSidebarView('calculators',{focus:true}));
+calculatorSidebarBack.addEventListener('click',()=>setSidebarView('main',{focus:true}));
 sidebarToggle.addEventListener('click',()=>setSidebarExpanded(sidebarToggle.getAttribute('aria-expanded')!=='true'));
+
+setSidebarView('main',{focus:false});
 const savedSidebarState=savedDesktopSidebarState();
 setSidebarExpanded(smallSidebar.matches?false:savedSidebarState===null||savedSidebarState==='true',{persist:false});
 requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.add('sidebar-motion-ready')));
+
 smallSidebar.addEventListener('change',event=>{
  const saved=savedDesktopSidebarState();
  setSidebarExpanded(event.matches?false:saved===null||saved==='true',{persist:false});
@@ -299,22 +327,30 @@ document.addEventListener('pointerdown',event=>{
  }
 });
 document.addEventListener('keydown',event=>{
- if(event.key==='Escape'&&smallSidebar.matches&&!$('#tax-sidebar').hidden){
+ const sidebar=$('#tax-sidebar');
+ if(event.key!=='Escape'||sidebar.hidden)return;
+ if(!sidebarCalculatorView.hidden){
+  setSidebarView('main',{focus:true});
+ }else if(smallSidebar.matches){
   setSidebarExpanded(false);
   sidebarToggle.focus({preventScroll:true});
  }
 });
 
-// Keep wheel scrolling inside the sidebar, even over its fixed lower controls.
-const sidebarScroller=$('.sidebar-primary');
+// Keep wheel scrolling inside whichever sidebar view is active.
 $('#tax-sidebar').addEventListener('wheel',event=>{
  if(event.ctrlKey||!event.deltaY)return;
- const unit=event.deltaMode===1?16:event.deltaMode===2?sidebarScroller.clientHeight:1;
- sidebarScroller.scrollTop+=event.deltaY*unit;
+ const scroller=sidebarCalculatorView.hidden?$('.sidebar-primary'):$('#calculator-nav');
+ if(!scroller)return;
+ const unit=event.deltaMode===1?16:event.deltaMode===2?scroller.clientHeight:1;
+ scroller.scrollTop+=event.deltaY*unit;
  event.preventDefault();
 },{passive:false});
 
-$('#calculator-search').addEventListener('input',nav);window.addEventListener('hashchange',route);if(!location.hash)history.replaceState(null,'','#home');route();
+$('#calculator-search').addEventListener('input',nav);
+window.addEventListener('hashchange',route);
+if(!location.hash)history.replaceState(null,'','#home');
+route();
 
 const scrollTopButton=$('#scroll-to-top');
 const updateScrollTopButton=()=>{
@@ -328,44 +364,6 @@ scrollTopButton.addEventListener('click',()=>{
  window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
 });
 updateScrollTopButton();
-
-// Keep the pinned category headings below the actual menu and search heights.
-const calculatorMenu=$('.calculator-menu');
-const calculatorSummary=calculatorMenu.querySelector('.calculator-menu-toggle');
-const calculatorSearchBar=$('.calculator-search-bar');
-const calculatorMenuStorageKey='ntaxer-calculator-menu-expanded';
-const syncCalculatorStickyHeights=()=>{
- for(const [element,property] of [[calculatorSummary,'--calculator-heading-height'],[calculatorSearchBar,'--calculator-search-height']]){
-  const height=element.getBoundingClientRect().height;
-  if(height>0)calculatorMenu.style.setProperty(property,height+'px');
- }
-};
-function setCalculatorMenuExpanded(expanded,{persist=true}={}){
- calculatorSummary.setAttribute('aria-expanded',String(expanded));
- calculatorMenu.classList.toggle('is-open',expanded);
- $('.sidebar-primary').classList.toggle('calculators-expanded',expanded);
- $('#calculator-menu-options').hidden=!expanded;
- if(persist){
-  try{localStorage.setItem(calculatorMenuStorageKey,String(expanded));}catch{}
- }
- syncCalculatorStickyHeights();
-}
-const calculatorStickyObserver=new ResizeObserver(syncCalculatorStickyHeights);
-calculatorStickyObserver.observe(calculatorSummary);
-calculatorStickyObserver.observe(calculatorSearchBar);
-calculatorSummary.addEventListener('click',()=>setCalculatorMenuExpanded(calculatorSummary.getAttribute('aria-expanded')!=='true'));
-let savedCalculatorMenuState=null;
-try{savedCalculatorMenuState=localStorage.getItem(calculatorMenuStorageKey);}catch{}
-const loadingCalculatorPage=(location.hash||'#home').startsWith('#calculator');
-setCalculatorMenuExpanded(loadingCalculatorPage&&savedCalculatorMenuState==='true',{persist:false});
-document.addEventListener('click',event=>{
- const internalLink=event.target.closest('a[href^="#"]');
- if(internalLink&&!internalLink.getAttribute('href').startsWith('#calculator'))setCalculatorMenuExpanded(false);
-});
-window.addEventListener('hashchange',()=>{
- if(!location.hash.startsWith('#calculator'))setCalculatorMenuExpanded(false);
-});
-syncCalculatorStickyHeights();
 
 // Recalculate result offsets whenever the active page heading changes or wraps.
 let currentPageHeader;
