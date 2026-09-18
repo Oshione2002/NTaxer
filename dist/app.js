@@ -492,6 +492,7 @@ function importView(sourceCalculator=''){
  const reviewSection=$('#statement-review');
  const reviewBody=$('#statement-review-body');
  const reviewSummary=$('#statement-document-summary');
+ let analysedRows=[];
  const registryForStatement=CALCULATORS.map(calc=>({
   id:calc.id,
   name:calc.name,
@@ -542,6 +543,7 @@ function importView(sourceCalculator=''){
   for(const doc of documents){
    for(const row of (Array.isArray(doc.rows)?doc.rows:[]))allRows.push({...row,source:doc.name||'Statement'});
   }
+  analysedRows=allRows;
   reviewBody.innerHTML=allRows.map((row,index)=>`
    <tr data-statement-row data-row-index="${index}" data-excluded="false">
     <td>${escape(row.date||'—')}</td>
@@ -589,6 +591,154 @@ function importView(sourceCalculator=''){
   reviewSection.hidden=true;
   $('#statement-next-step').hidden=false;
   $('#statement-next-step').scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+ });
+
+ const calculatorStep=$('#statement-calculator-step');
+ const totalsStep=$('#statement-totals-step');
+ const suggestedCalculatorBox=$('#statement-suggested-calculators');
+ const allCalculatorBox=$('#statement-all-calculator-list');
+ const totalsBox=$('#statement-mapped-totals');
+
+ const activeStatementMappings=()=>{
+  const mappings=[];
+  reviewBody.querySelectorAll('[data-statement-row]').forEach(rowEl=>{
+   if(rowEl.dataset.excluded==='true')return;
+   const select=rowEl.querySelector('.statement-map-select');
+   const value=select?.value||'';
+   if(!value||value==='__exclude__'||!value.includes('::'))return;
+   const [calculatorId,fieldKey]=value.split('::');
+   const sourceRow=analysedRows[Number(rowEl.dataset.rowIndex)];
+   if(!sourceRow)return;
+   mappings.push({calculatorId,fieldKey,row:sourceRow});
+  });
+  return mappings;
+ };
+
+ const selectedCalculatorIds=()=>new Set(
+  [...calculatorStep.querySelectorAll('input[data-statement-calculator]:checked')].map(input=>input.value)
+ );
+
+ const calculatorChoice=(calc,checked=false,suggested=false)=>`
+  <label class="statement-calculator-choice">
+   <input type="checkbox" data-statement-calculator value="${escape(calc.id)}" ${checked?'checked':''}>
+   <span><strong>${escape(calc.name)}</strong><small>${escape(calc.group)}${suggested?' · Suggested':''}</small></span>
+  </label>`;
+
+ const renderCalculatorStep=()=>{
+  const mappedIds=new Set(activeStatementMappings().map(item=>item.calculatorId));
+  if(source?.id)mappedIds.add(source.id);
+  const suggested=CALCULATORS.filter(calc=>mappedIds.has(calc.id));
+  suggestedCalculatorBox.innerHTML=`<h3>Suggested for this statement</h3><div class="statement-calculator-grid">${suggested.length?suggested.map(calc=>calculatorChoice(calc,true,true)).join(''):'<p class="statement-empty-choice">No calculator could be suggested confidently. Choose from all calculators below.</p>'}</div>`;
+
+  const groups=new Map();
+  for(const calc of CALCULATORS){
+   if(!groups.has(calc.group))groups.set(calc.group,[]);
+   groups.get(calc.group).push(calc);
+  }
+  allCalculatorBox.innerHTML=[...groups].map(([group,calcs])=>`<div class="statement-calculator-group"><h4>${escape(group)}</h4><div class="statement-calculator-grid">${calcs.map(calc=>calculatorChoice(calc,mappedIds.has(calc.id),false)).join('')}</div></div>`).join('');
+
+  calculatorStep.querySelectorAll('input[data-statement-calculator]').forEach(input=>{
+   input.addEventListener('change',()=>{
+    calculatorStep.querySelectorAll('input[data-statement-calculator]').forEach(other=>{
+     if(other!==input&&other.value===input.value)other.checked=input.checked;
+    });
+   });
+  });
+
+  reviewSection.hidden=true;
+  calculatorStep.hidden=false;
+  calculatorStep.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+ };
+
+ const buildMappedTotals=()=>{
+  const selected=selectedCalculatorIds();
+  const totals=new Map();
+  let unmapped=0,excluded=0;
+  reviewBody.querySelectorAll('[data-statement-row]').forEach(rowEl=>{
+   if(rowEl.dataset.excluded==='true'){excluded+=1;return;}
+   const select=rowEl.querySelector('.statement-map-select');
+   const value=select?.value||'';
+   if(!value||value==='__exclude__'||!value.includes('::')){unmapped+=1;return;}
+   const [calculatorId,fieldKey]=value.split('::');
+   if(!selected.has(calculatorId))return;
+   const sourceRow=analysedRows[Number(rowEl.dataset.rowIndex)];
+   if(!sourceRow)return;
+   const key=calculatorId+'::'+fieldKey;
+   const current=totals.get(key)||{calculatorId,fieldKey,total:0,count:0};
+   current.total+=Math.abs(Number(sourceRow.amount)||0);
+   current.count+=1;
+   totals.set(key,current);
+  });
+  return {totals:[...totals.values()],unmapped,excluded,selected};
+ };
+
+ const renderTotalsStep=()=>{
+  const result=buildMappedTotals();
+  if(!result.selected.size){
+   totalsBox.innerHTML='<p class="notice">Choose at least one calculator before continuing.</p>';
+   return false;
+  }
+  const groups=new Map();
+  for(const item of result.totals){
+   if(!groups.has(item.calculatorId))groups.set(item.calculatorId,[]);
+   groups.get(item.calculatorId).push(item);
+  }
+  const cards=[...groups].map(([calculatorId,items])=>{
+   const calc=CALCULATORS.find(item=>item.id===calculatorId);
+   return `<section class="statement-total-card"><h3>${escape(calc?.name||calculatorId)}</h3><div class="statement-total-rows">${items.map(item=>{
+    const field=calc?.fields.find(field=>field.key===item.fieldKey);
+    const compatible=field&&['money','number'].includes(field.type);
+    return `<div class="statement-total-row"><span><strong>${escape(field?.label||item.fieldKey)}</strong><small>${item.count} mapped ${item.count===1?'row':'rows'}${compatible?'':' · manual review required'}</small></span><b>₦${new Intl.NumberFormat('en-NG',{maximumFractionDigits:2}).format(item.total)}</b></div>`;
+   }).join('')}</div></section>`;
+  }).join('');
+  totalsBox.innerHTML=(cards||'<p class="notice">No active statement rows are mapped to the selected calculators yet.</p>')+`<div class="statement-total-meta"><span>${result.unmapped} unmapped</span><span>${result.excluded} excluded</span></div>`;
+  calculatorStep.hidden=true;
+  totalsStep.hidden=false;
+  totalsStep.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+  $('#statement-apply').disabled=!result.totals.length;
+  return true;
+ };
+
+ $('#statement-review-continue').addEventListener('click',renderCalculatorStep);
+
+ $('#statement-calculator-back').addEventListener('click',()=>{
+  calculatorStep.hidden=true;
+  reviewSection.hidden=false;
+  reviewSection.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+ });
+
+ $('#statement-calculator-continue').addEventListener('click',()=>{
+  if(!selectedCalculatorIds().size){
+   calculatorStep.querySelector('.statement-empty-choice')?.remove();
+   suggestedCalculatorBox.insertAdjacentHTML('beforeend','<p class="notice">Select at least one calculator to continue.</p>');
+   return;
+  }
+  renderTotalsStep();
+ });
+
+ $('#statement-totals-back').addEventListener('click',()=>{
+  totalsStep.hidden=true;
+  calculatorStep.hidden=false;
+  calculatorStep.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+ });
+
+ $('#statement-apply').addEventListener('click',()=>{
+  const result=buildMappedTotals();
+  let applied=0;
+  for(const item of result.totals){
+   const calc=CALCULATORS.find(calc=>calc.id===item.calculatorId);
+   const field=calc?.fields.find(field=>field.key===item.fieldKey);
+   if(!calc||!field||!['money','number'].includes(field.type))continue;
+   if(!state.inputs[calc.id])state.inputs[calc.id]=structuredClone(DEFAULTS[calc.id]);
+   state.inputs[calc.id][field.key]=String(item.total);
+   applied+=1;
+  }
+  const first=[...result.selected].find(id=>CALCULATORS.some(calc=>calc.id===id));
+  if(!first||!applied){
+   totalsBox.insertAdjacentHTML('afterbegin','<p class="notice">There are no numeric mapped fields to apply yet. Go back and map at least one active row.</p>');
+   return;
+  }
+  location.hash='#calculator/'+first;
  });
 
  analysisButton.addEventListener('click',async()=>{
