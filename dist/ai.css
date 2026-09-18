@@ -1,0 +1,113 @@
+/* NTaxer AI — Gemini-powered guidance layered on top of deterministic calculators. */
+.ntaxer-ai-launcher{
+  position:fixed;right:84px;bottom:max(24px,env(safe-area-inset-bottom));z-index:40;
+  display:inline-flex;align-items:center;gap:9px;padding:12px 16px;border:1px solid #386758;
+  border-radius:999px;background:var(--strong-surface);color:white;font-size:15px;font-weight:800;
+  box-shadow:0 5px 18px var(--tone-073e3226)
+}
+.ntaxer-ai-launcher:hover{background:#125441}
+.ntaxer-ai-spark{color:var(--mint);font-size:18px}
+.ntaxer-ai-panel{
+  position:fixed;right:24px;bottom:max(86px,calc(env(safe-area-inset-bottom) + 86px));z-index:45;
+  width:min(430px,calc(100vw - 32px));height:min(690px,calc(100dvh - var(--header-height) - 36px));
+  display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto;
+  background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;
+  box-shadow:0 18px 60px #0000002e
+}
+.ntaxer-ai-panel[hidden]{display:none}
+.ntaxer-ai-header{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;padding:19px 20px 15px;
+  background:var(--strong-surface);color:white
+}
+.ntaxer-ai-header h2{font-size:22px;margin:2px 0 0;color:white}
+.ntaxer-ai-header h2 span{color:var(--mint)}
+.ntaxer-ai-kicker{display:block;font-size:11px;font-weight:800;letter-spacing:1.15px;text-transform:uppercase;color:#b8d6c7}
+.ntaxer-ai-close{
+  width:38px;height:38px;border:1px solid #3b6759;border-radius:50%;background:transparent;color:white;
+  font-size:25px;line-height:1;display:grid;place-items:center
+}
+.ntaxer-ai-close:hover{background:#1d5142}
+.ntaxer-ai-modes{
+  display:flex;gap:7px;overflow-x:auto;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--tone-fbfcfb);
+  scrollbar-width:none
+}
+.ntaxer-ai-modes::-webkit-scrollbar{display:none}
+.ntaxer-ai-modes button{
+  flex:0 0 auto;border:1px solid var(--line);border-radius:999px;background:var(--surface);padding:7px 10px;
+  color:var(--muted);font-size:12px;font-weight:750
+}
+.ntaxer-ai-modes button.active{background:var(--tone-e4eee7);border-color:var(--tone-b9d2c1);color:var(--green)}
+.ntaxer-ai-messages{
+  min-height:0;overflow:auto;padding:16px;background:var(--tone-f3f6f5);scroll-behavior:smooth
+}
+.ntaxer-ai-message{max-width:92%;margin:0 0 12px;font-size:14px;line-height:1.55}
+.ntaxer-ai-message p{margin:0;white-space:pre-wrap}
+.ntaxer-ai-message.user{
+  margin-left:auto;padding:10px 12px;border-radius:14px 14px 4px 14px;background:var(--strong-surface);color:white
+}
+.ntaxer-ai-message.assistant{
+  padding:12px 13px;border:1px solid var(--line);border-radius:14px 14px 14px 4px;background:var(--surface);color:var(--tone-172e28)
+}
+.ntaxer-ai-message.assistant.error{border-color:var(--tone-e8d9b0);background:var(--tone-fff9ec);color:var(--tone-785b23)}
+.ntaxer-ai-links{display:grid;gap:8px;margin-top:12px}
+.ntaxer-ai-links a{
+  display:block;text-decoration:none;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--tone-fbfcfb)
+}
+.ntaxer-ai-links a:hover{background:var(--tone-eaf1eb)}
+.ntaxer-ai-links strong{display:block;color:var(--green);font-size:13px}
+.ntaxer-ai-links small{display:block;margin-top:3px;color:var(--muted);font-size:12px;line-height:1.45}
+.ntaxer-ai-sources{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.ntaxer-ai-sources>strong{width:100%;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+.ntaxer-ai-sources a{
+  text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:4px 8px;background:var(--tone-fbfcfb);color:var(--green);font-size:11px;font-weight:750
+}
+.ntaxer-ai-cautions{padding-left:18px;margin:10px 0 0;color:var(--muted);font-size:12px}
+.ntaxer-ai-cautions li{margin:4px 0}
+.ntaxer-ai-form{padding:12px 14px 10px;border-top:1px solid var(--line);background:var(--surface)}
+.ntaxer-ai-form>label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.ntaxer-ai-input-row{display:grid;grid-template-columns:minmax(0,1fr) 42px;gap:8px;align-items:end}
+.ntaxer-ai-input-row textarea{
+  width:100%;min-height:46px;max-height:120px;resize:vertical;padding:10px 11px;border:1px solid var(--line);
+  border-radius:12px;background:var(--tone-fbfcfb);color:var(--tone-172e28);font:inherit;font-size:14px;line-height:1.4
+}
+.ntaxer-ai-input-row textarea:focus{outline:2px solid var(--tone-219d72);outline-offset:1px}
+.ntaxer-ai-input-row button{
+  width:42px;height:42px;border:0;border-radius:12px;background:var(--green);color:var(--surface);font-size:20px;font-weight:900
+}
+:root[data-theme="dark"] .ntaxer-ai-input-row button{color:#0d1714}
+.ntaxer-ai-privacy{
+  margin:0;padding:0 14px 13px;background:var(--surface);color:var(--muted);font-size:10.5px;line-height:1.45
+}
+.ntaxer-ai-thinking{display:flex;gap:4px;margin-bottom:5px}
+.ntaxer-ai-thinking span{width:6px;height:6px;border-radius:50%;background:var(--green);opacity:.35;animation:ntaxer-ai-pulse 1s infinite ease-in-out}
+.ntaxer-ai-thinking span:nth-child(2){animation-delay:.15s}.ntaxer-ai-thinking span:nth-child(3){animation-delay:.3s}
+@keyframes ntaxer-ai-pulse{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-2px)}}
+.ntaxer-ai-inline{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;padding:11px 13px;
+  border:1px solid #4e7869;border-radius:10px;background:#174c3d;color:white;font-size:14px;font-weight:800
+}
+.ntaxer-ai-inline span{color:var(--mint)}
+.ntaxer-ai-inline:hover{background:#205b49}
+.ntaxer-ai-home-card{
+  width:100%;margin-top:24px;padding:18px 20px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:14px;
+  text-align:left;border:1px solid var(--tone-b9d2c1);border-radius:var(--radius);background:var(--tone-eaf1eb);color:var(--green)
+}
+.ntaxer-ai-home-card:hover{background:var(--tone-e4eee7)}
+.ntaxer-ai-home-icon{
+  width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--strong-surface);color:var(--mint);font-size:20px
+}
+.ntaxer-ai-home-card strong{display:block;font-size:16px;margin-bottom:2px}
+.ntaxer-ai-home-card small{display:block;color:var(--muted);font-size:13px;line-height:1.45;font-weight:500}
+@media(max-width:650px){
+  .ntaxer-ai-launcher{right:72px;bottom:max(16px,env(safe-area-inset-bottom));padding:11px 13px}
+  .ntaxer-ai-launcher span:last-child{display:none}
+  .ntaxer-ai-panel{
+    right:10px;bottom:max(72px,calc(env(safe-area-inset-bottom) + 72px));width:calc(100vw - 20px);
+    height:min(660px,calc(100dvh - var(--header-height) - 18px));border-radius:16px
+  }
+  .ntaxer-ai-header{padding:16px}
+  .ntaxer-ai-messages{padding:13px}
+  .ntaxer-ai-home-card{padding:15px;gap:11px}
+}
+@media print{.ntaxer-ai-launcher,.ntaxer-ai-panel,.ntaxer-ai-inline,.ntaxer-ai-home-card{display:none!important}}
+@media(prefers-reduced-motion:reduce){.ntaxer-ai-thinking span{animation:none}}
