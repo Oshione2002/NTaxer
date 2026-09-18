@@ -231,7 +231,25 @@ function importView(sourceCalculator=''){
  const source=CALCULATORS.find(c=>c.id===sourceCalculator);
  $('#main').innerHTML=`<div class="page-header sticky-page-heading"><p class="eyebrow">Statement import</p><h1>Import Statement</h1></div>
  <div class="intro page-subtext"><p class="lead">Bring a bank statement, financial statement, Excel file or CSV into NTaxer, review the extracted rows and decide exactly which calculator fields they should populate.</p></div>
- <section class="detail-card">
+
+ <section class="statement-upload-card" aria-labelledby="statement-upload-title">
+  <div class="statement-upload-heading">
+   <div><p class="eyebrow">Start here</p><h2 id="statement-upload-title">Upload your statement</h2></div>
+   ${source?`<span class="statement-source-calculator">For: ${escape(source.name)}</span>`:''}
+  </div>
+  <p class="statement-upload-copy">Choose a supported file. Nothing is added to a calculator until you review and confirm the extracted information.</p>
+  <div id="statement-dropzone" class="statement-dropzone">
+   <input id="statement-file" class="statement-file-input" type="file" accept=".pdf,.csv,.xls,.xlsx,application/pdf,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+   <svg class="statement-upload-icon" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg>
+   <strong>Drop your statement here</strong>
+   <span>or</span>
+   <button id="statement-browse" class="button primary" type="button">Choose statement</button>
+   <small>PDF, Excel (.xlsx / .xls) or CSV</small>
+  </div>
+  <div id="statement-file-status" class="statement-file-status" aria-live="polite" hidden></div>
+ </section>
+
+ <section class="detail-card detail-area">
   <h2>How statement import will work</h2>
   <ol>
    <li><strong>Upload a supported statement.</strong> NTaxer will read PDF, Excel and CSV files.</li>
@@ -246,6 +264,58 @@ function importView(sourceCalculator=''){
   <p>Bank statements, financial statements, transaction exports and similar records in PDF, Excel or CSV format will use this workspace.</p>
   <p class="notice neutral">The import workflow will keep extracted information reviewable before any amount is applied to a tax calculation.</p>
  </section>`;
+
+ const fileInput=$('#statement-file');
+ const browseButton=$('#statement-browse');
+ const dropzone=$('#statement-dropzone');
+ const status=$('#statement-file-status');
+ const supportedExtensions=['pdf','csv','xls','xlsx'];
+
+ const formatBytes=bytes=>{
+  if(bytes<1024)return bytes+' B';
+  if(bytes<1024*1024)return (bytes/1024).toFixed(1)+' KB';
+  return (bytes/(1024*1024)).toFixed(1)+' MB';
+ };
+
+ const clearSelectedFile=()=>{
+  fileInput.value='';
+  dropzone.classList.remove('has-file');
+  status.hidden=true;
+  status.innerHTML='';
+ };
+
+ const showSelectedFile=file=>{
+  const extension=(file.name.split('.').pop()||'').toLowerCase();
+  if(!supportedExtensions.includes(extension)){
+   clearSelectedFile();
+   status.hidden=false;
+   status.className='statement-file-status error';
+   status.innerHTML='<strong>Unsupported file type</strong><span>Please choose a PDF, Excel or CSV file.</span>';
+   return;
+  }
+  dropzone.classList.add('has-file');
+  status.hidden=false;
+  status.className='statement-file-status selected';
+  status.innerHTML=`<div class="statement-file-info"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg><span><strong>${escape(file.name)}</strong><small>${escape(extension.toUpperCase())} · ${formatBytes(file.size)}</small></span></div><button id="statement-remove" class="text-button" type="button">Remove</button>`;
+  $('#statement-remove').addEventListener('click',clearSelectedFile);
+ };
+
+ browseButton.addEventListener('click',()=>fileInput.click());
+ fileInput.addEventListener('change',()=>{const file=fileInput.files?.[0];if(file)showSelectedFile(file);});
+ dropzone.addEventListener('dragover',event=>{event.preventDefault();dropzone.classList.add('dragging');});
+ dropzone.addEventListener('dragleave',()=>dropzone.classList.remove('dragging'));
+ dropzone.addEventListener('drop',event=>{
+  event.preventDefault();
+  dropzone.classList.remove('dragging');
+  const file=event.dataTransfer?.files?.[0];
+  if(!file)return;
+  try{
+   const transfer=new DataTransfer();
+   transfer.items.add(file);
+   fileInput.files=transfer.files;
+  }catch{}
+  showSelectedFile(file);
+ });
 }
 
 function route(){
