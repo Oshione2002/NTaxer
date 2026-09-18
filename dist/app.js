@@ -217,6 +217,26 @@ function sourcesView(){
  <section class="detail-card detail-area"><h2>Using your estimate</h2><p>Calculators work independently. Some results overlap, and withholding tax may be a credit against another liability. Do not add every calculator result together as your total tax bill.</p><p>Eligibility, exemptions, reliefs and sector-specific treatment depend on your circumstances. Where confirmation is required, follow the instructions in that calculator. Complex payroll, insurance, trusts, free zones, petroleum operations, treaties, customs and state or local charges may need further assessment.</p><p>NTaxer provides planning estimates. It does not submit returns, make tax payments or issue an official assessment.</p></section>
  <section class="detail-card detail-area"><h2>Your information and records</h2><p>Calculations run in your browser. Entered figures stay in page memory and reset when you reload. No account or financial-data upload is required.</p><p>Use <strong>Download PDF</strong> for a structured, paginated report or <strong>Download Excel</strong> for the same report in a formatted workbook. Both include your inputs, result, calculation breakdown, assumptions, scope and legal references.</p><p>${link('https://github.com/Oshione2002/NTaxer','View the calculation code')}</p></section>`;
 }
+function importView(){
+ $('#main').innerHTML=`<div class="page-header sticky-page-heading"><p class="eyebrow">Statement import</p><h1>Import Statement</h1></div>
+ <div class="intro page-subtext"><p class="lead">Bring a bank statement, financial statement, Excel file or CSV into NTaxer, review the extracted rows and decide exactly which calculator fields they should populate.</p></div>
+ <section class="detail-card">
+  <h2>How statement import will work</h2>
+  <ol>
+   <li><strong>Upload a supported statement.</strong> NTaxer will read PDF, Excel and CSV files.</li>
+   <li><strong>Review every extracted row.</strong> Nothing is silently discarded; rows can be excluded and restored.</li>
+   <li><strong>Choose calculators and fields.</strong> Use NTaxer AI suggestions or browse every calculator and field yourself.</li>
+   <li><strong>Confirm mapped totals.</strong> See exactly what will be added to each calculator before applying anything.</li>
+   <li><strong>Calculate with NTaxer.</strong> Confirmed values feed the existing deterministic calculator engine.</li>
+  </ol>
+ </section>
+ <section class="detail-card detail-area">
+  <h2>Supported statement types</h2>
+  <p>Bank statements, financial statements, transaction exports and similar records in PDF, Excel or CSV format will use this workspace.</p>
+  <p class="notice neutral">The import workflow will keep extracted information reviewable before any amount is applied to a tax calculation.</p>
+ </section>`;
+}
+
 function route(){
  lawToolbarObserver?.disconnect();
  const hash=location.hash||'#home';
@@ -226,7 +246,8 @@ function route(){
   a.classList.toggle('active',active);
   if(a.tagName==='A'){if(active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');}
  });
- if(page==='coverage')coverageView();
+ if(page==='import')importView();
+ else if(page==='coverage')coverageView();
  else if(page==='law')lawView(target);
  else if(page==='sources')sourcesView();
  else if(page==='calculator')calcView(target||'paye');
