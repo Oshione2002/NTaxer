@@ -1,83 +1,256 @@
 # NTaxer
 
-A responsive Nigeria tax calculator and legal-reference web app, prepared for Vercel. The application runs entirely in the browser, with no database, API keys, analytics or financial-data uploads.
+<div align="center">
+  <img src="./dist/assets/icon.png" alt="NTaxer logo" width="150" />
 
-## Included
+  <h3>Nigerian tax calculations, explained clearly.</h3>
 
-- 24 calculator workspaces covering personal income/PAYE, self-employment, gains, crypto disposals, compensation, companies income tax, development levy, minimum effective tax, presumptive income/disposal payments, VAT, withholding, stamp/transfer duties, capital allowances, economic-development credits, foreign tax relief, hydrocarbon/PPT/PSC taxes, petroleum/mineral royalties, non-residents and assessment scenarios.
-- All 48 Ninth Schedule stamp-duty categories and 73 Eighth Schedule mineral-royalty entries.
-- Searchable reference for all 202 sections and 14 schedules of the National Assembly version of the Nigeria Tax Act 2025, with a preserved source PDF.
-- Per-calculator itemised results, assumptions and source references; print/save-PDF layout and JSON calculation-record exports.
-- Custom NTaxer icon, favicon and web app manifest.
-- Responsive desktop/mobile layout, keyboard-accessible native form controls, labelled errors, reduced-motion handling, no external script dependencies and restrictive Vercel security headers.
+  <p>
+    Calculate taxes, understand the breakdown, and check the legal basis — all in one place.
+  </p>
 
-## Deploy on Vercel
+  <p>
+    <a href="https://n-taxer.vercel.app/"><strong>Open NTaxer →</strong></a>
+    &nbsp;&nbsp;•&nbsp;&nbsp;
+    <a href="https://n-taxer.vercel.app/#coverage">Tax Coverage</a>
+    &nbsp;&nbsp;•&nbsp;&nbsp;
+    <a href="https://n-taxer.vercel.app/#law">The Tax Law</a>
+  </p>
 
-1. Sign in at [Vercel](https://vercel.com/new) and import **Oshione2002/NTaxer**.
-2. Use the repository root, framework preset **Other**, and Node.js **22.x or newer**.
-3. `vercel.json` supplies the build command (`npm run check`) and output directory (`dist`). No environment variables are required.
-4. Deploy. Vercel runs the calculation tests and static validation before publishing.
+  <p>
+    <img alt="Nigeria" src="https://img.shields.io/badge/Nigeria-Tax%20Calculator-073E32?style=flat-square" />
+    <img alt="Installable" src="https://img.shields.io/badge/Installable-PWA-159965?style=flat-square" />
+    <img alt="Offline ready" src="https://img.shields.io/badge/Offline-Ready-285844?style=flat-square" />
+    <img alt="No account required" src="https://img.shields.io/badge/No%20Account-Required-405049?style=flat-square" />
+  </p>
+</div>
 
-Official configuration documentation: https://vercel.com/docs/project-configuration/vercel-json
+---
 
-This repository is ready for import. A Vercel deployment/account connection is not created by the code itself.
+## What is NTaxer?
 
-## Run checks locally
+**NTaxer is a Nigerian tax calculator and tax-law reference app built to make tax calculations easier to understand.**
 
-Node.js 22 or later. There are no third-party packages to install.
+Instead of giving you only a final figure, NTaxer shows the calculation behind the estimate, the assumptions being used, and the legal references connected to it.
 
-```sh
-npm run check
-```
+The app is built around the **Nigeria Tax Act 2025** and related official tax materials used in the current NTaxer ruleset.
 
-Alternatively, run the dependency-free commands directly:
+> **No account is required.** Your calculator inputs are handled in your browser; NTaxer does not require you to upload your financial information to an account or tax database.
 
-```sh
-node --test tests/tax.test.mjs
-node scripts/validate.mjs
-```
+---
 
-Serve `dist` with any static HTTP server; opening the HTML via `file://` will not load ES modules and the searchable JSON reference reliably. For example, with Python installed:
+## What can you do with NTaxer?
 
-```sh
-python -m http.server 8000 --directory dist
-```
+<table>
+<tr>
+<td width="50%" valign="top">
 
-Open http://localhost:8000. Navigation uses URL fragments, so no server route rewrites are needed.
+### 🧮 Calculate taxes
 
-## Legal basis and limits
+Use dedicated calculators for personal, business, transaction and specialist tax situations.
 
-**Ruleset:** `NTA2025-NASS-2026.1` · **Research review:** 8 September 2026 · **Calculation year:** 2026.
+</td>
+<td width="50%" valign="top">
 
-The supplied NRS-hosted PDF differs materially from the subsequent National Assembly release. NTaxer consistently uses the [National Assembly copy](https://nass.gov.ng/documents/download/11249), not a mixture of section numbers or small-company definitions. See [the research and rule register](docs/legal-research.md).
+### 📊 Understand the result
 
-Additional sources include the gazetted 2024 Withholding Regulations, the JRB-hosted 2026 Presumptive Tax Regulations and NRS Virtual Assets Circular 2026/21.
+See an itemised calculation breakdown instead of receiving only a final amount.
 
-**Coverage is explicitly tiered.** Common calculations implement statutory formulas. Specialist calculators accept verified taxable bases and require classification. Unverified commencement orders and unresolved source conflicts produce a review-needed result or a clearly labelled scenario, not a fabricated tax liability.
+</td>
+</tr>
 
-This is a planning tool, not a complete tax return preparation system. Insurance reserves, free-zone apportionment, trust allocation, petroleum chargeable-profit schedules, full crypto ledgers, treaty eligibility, customs tariffs, state/local levies, administrative penalties and filing are not fully automated. The coverage page explains each boundary. A zero result is not proof of exemption from filing.
+<tr>
+<td width="50%" valign="top">
 
-Do not add every output together. Withholding, credits, presumptive tax and final income tax can overlap; development levy is already included in the company calculator.
+### ⚖️ Check the legal basis
 
-## Architecture
+Open the relevant sections and schedules of the Nigeria Tax Act directly from the app.
 
-| File | Purpose |
-| --- | --- |
-| `dist/engine.js` | Pure calculation functions; integer-kobo arithmetic and explicit review states |
-| `dist/calculators.js` | Form schemas, examples and source register |
-| `dist/schedules.js` | Stamp, mineral and VAT category data |
-| `dist/app.js` | UI, navigation, validation, printing, exports and legal search |
-| `dist/coverage.js` | Sector coverage and chapter mapping |
-| `dist/law.json` | Extracted source text and PDF page references |
-| `tests/tax.test.mjs` | Boundary, calculation, credit, exemption and input tests |
-| `scripts/validate.mjs` | Static asset, JavaScript, law-index and deployment checks |
+</td>
+<td width="50%" valign="top">
 
-Money outputs are integer minor units. Inputs are decimal strings in naira unless otherwise labelled. Ratios use BigInt to avoid floating-point currency multiplication; royalty modelling uses decimal volumes/prices with final US-cent rounding. Rates and sources are pinned, not updated from the internet automatically.
+### 🔎 Search the tax law
 
-## Maintaining the rules
+Search the app's indexed copy of the Act by section, subject or phrase.
 
-Before a legal update: verify an official law/order/circular, record the precise provision and effective date in `docs/legal-research.md`, amend the pure engine and form guidance, add a meaningful boundary/reference-example test, increment the ruleset and review date, then run all checks. Do not silently resolve contradictory source text or apply draft proposals as enacted law.
+</td>
+</tr>
 
-Financial inputs stay in page memory and are cleared on reload. Downloaded records include the user's inputs; they remain the user's responsibility. No authentication, payment collection or tax-authority integration is implemented.
+<tr>
+<td width="50%" valign="top">
 
-Validation performed: automated calculation tests and static validation. Browser/visual/end-to-end tests were not performed in the creation session.
+### 📄 Export your calculation
+
+Download a structured **PDF** or **Excel** report containing your inputs, calculation breakdown, assumptions, scope and legal references.
+
+</td>
+<td width="50%" valign="top">
+
+### 📱 Install NTaxer
+
+On supported browsers, install NTaxer as a standalone web app and keep the core application available for offline use after it has been cached.
+
+</td>
+</tr>
+</table>
+
+---
+
+## Tax areas covered
+
+NTaxer currently includes **24 calculator workspaces** across several areas of Nigerian taxation.
+
+### 👤 Individuals
+
+- Personal income tax / PAYE
+- Self-employment income
+- Chargeable gains
+- Crypto disposals
+- Compensation and related personal-tax situations
+
+### 🏢 Businesses
+
+- Companies income tax
+- Development levy
+- Minimum effective tax
+- Presumptive income and disposal payments
+
+### 🔄 Transactions
+
+- Value Added Tax (VAT)
+- Withholding tax
+- Stamp duties
+- Transfer duties
+
+### 🎯 Reliefs & allowances
+
+- Capital allowances
+- Economic development credits
+- Foreign / double-tax relief
+
+### 🛢️ Specialist sectors
+
+- Hydrocarbon tax
+- Petroleum profits tax
+- Production Sharing Contract scenarios
+- Petroleum royalties
+- Mineral royalties
+- Non-resident taxation
+- Assessment scenarios
+
+NTaxer also includes the **48 Ninth Schedule stamp-duty categories** and **73 Eighth Schedule mineral-royalty entries** used by the relevant calculators.
+
+For the exact scope and limitations of each area, see **[Tax Coverage](https://n-taxer.vercel.app/#coverage)**.
+
+---
+
+## How to use NTaxer
+
+### 1. Choose a calculator
+
+Open **Calculators** and select the tax or situation that matches what you want to estimate.
+
+### 2. Enter your figures
+
+Complete the fields using the information relevant to your situation. The calculator explains what each input represents where guidance is needed.
+
+### 3. Review the estimate
+
+NTaxer updates the result and shows the calculation breakdown so you can see how the amount was derived.
+
+### 4. Check assumptions and legal references
+
+Before relying on an estimate, review the **Assumptions & Scope** and **Legal References** sections attached to the calculator.
+
+### 5. Export when needed
+
+Save a structured **PDF** or **Excel** copy of the calculation for your own records or further review.
+
+---
+
+## The tax law is built into the app
+
+NTaxer is not only a calculator.
+
+The app contains a searchable reference covering all **202 sections** and **14 schedules** of the National Assembly version of the **Nigeria Tax Act 2025**.
+
+You can:
+
+- search by section number;
+- search by subject or phrase;
+- move directly from a calculator to relevant legal provisions;
+- open schedules used by a calculation; and
+- open the preserved source PDF when you need the original document.
+
+**[Search the Tax Law →](https://n-taxer.vercel.app/#law)**
+
+---
+
+## Install NTaxer
+
+NTaxer is a **Progressive Web App (PWA)**.
+
+On supported browsers, use the **Install NTaxer** option in the app or your browser's installation control. Once installed, NTaxer can launch in its own app window instead of feeling like a normal browser tab.
+
+The application also includes an offline cache for its core interface, calculators, legal index, icon and preserved Act PDF.
+
+> Your browser and operating system determine the exact installation experience and where the install option appears.
+
+---
+
+## Privacy
+
+NTaxer is designed as a browser-based planning tool.
+
+- **No sign-up or login is required.**
+- **No financial-data account is created for you.**
+- **No analytics or advertising scripts are required by the application.**
+- Calculator inputs stay in page memory and are cleared when the page is reloaded.
+- Files you export are downloaded to your device and remain your responsibility.
+
+---
+
+## Legal basis
+
+**Current ruleset:** `NTA2025-NASS-2026.1`  
+**Calculation year:** 2026  
+**Research review:** 8 September 2026
+
+NTaxer uses the **National Assembly copy of the Nigeria Tax Act 2025** as its primary calculation and section-number reference.
+
+Additional implemented sources include the gazetted **2024 Withholding Regulations**, the **2026 Presumptive Tax Regulations**, and **NRS Virtual Assets Circular 2026/21** where relevant.
+
+You can review the detailed research and implementation register in [`docs/legal-research.md`](./docs/legal-research.md).
+
+---
+
+## Important notice
+
+NTaxer is an **independent tax planning and reference tool**. It is not a tax assessment issued by the Nigeria Revenue Service or another tax authority, and it is not a substitute for professional advice where the facts of a transaction require specialist interpretation.
+
+Tax treatment can depend on facts that a calculator cannot fully capture. Some specialist calculations therefore require the user to supply a verified taxable base or classification, and some unresolved or unverified situations are intentionally shown as **review needed** rather than being converted into a fabricated liability.
+
+A zero estimate does **not** automatically mean that there is no filing, reporting or other compliance obligation.
+
+Also, do not automatically add every output together. Withholding tax, credits, presumptive payments and final income tax can overlap, and some calculator outputs already incorporate related charges.
+
+---
+
+## Source
+
+Primary statutory reference:
+
+**Nigeria Tax Act 2025 — National Assembly release**  
+https://nass.gov.ng/documents/download/11249
+
+---
+
+<div align="center">
+
+### Ready to calculate?
+
+**[Open NTaxer →](https://n-taxer.vercel.app/)**
+
+<sub>Independent Nigerian tax planning tool · Estimates, not a tax assessment.</sub>
+
+</div>
