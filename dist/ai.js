@@ -9,7 +9,7 @@ document.body.insertAdjacentHTML('beforeend',
   '</button>'+
   '<section id="ntaxer-ai-panel" class="ntaxer-ai-panel" role="dialog" aria-label="NTaxer AI" aria-modal="false" hidden>'+
     '<header class="ntaxer-ai-header">'+
-      '<div><span class="ntaxer-ai-kicker">Powered by Gemini</span><h2>NTaxer AI <span aria-hidden="true">✦</span></h2></div>'+
+      '<div><span class="ntaxer-ai-kicker">NTaxer AI</span><h2>NTaxer AI <span aria-hidden="true">✦</span></h2></div>'+
       '<button id="ntaxer-ai-close" class="ntaxer-ai-close" type="button" aria-label="Close NTaxer AI">×</button>'+
     '</header>'+
     '<div class="ntaxer-ai-modes" role="group" aria-label="AI task">'+
@@ -25,7 +25,7 @@ document.body.insertAdjacentHTML('beforeend',
         '<button id="ntaxer-ai-send" type="submit" aria-label="Send to NTaxer AI">➜</button>'+
       '</div>'+
     '</form>'+
-    '<p class="ntaxer-ai-privacy">AI questions are sent to Gemini. Core calculations stay local unless you choose <strong>Explain my result</strong>, which sends the displayed calculation context. Do not enter names, tax IDs, bank details or other unnecessary identifiers.</p>'+
+    '<p class="ntaxer-ai-privacy">Questions sent through NTaxer AI are processed online. Core calculations stay local unless you choose <strong>Explain my result</strong>, which sends the displayed calculation context. Do not enter names, tax IDs, bank details or other unnecessary identifiers.</p>'+
   '</section>'
 );
 
@@ -354,7 +354,7 @@ function enhancePage(){
     const button=document.createElement('button');
     button.type='button';
     button.className='ntaxer-ai-inline';
-    button.innerHTML='<span aria-hidden="true">✦</span> Explain this result with Gemini';
+    button.innerHTML='<span aria-hidden="true">✦</span> Explain this result with NTaxer AI';
     button.addEventListener('click',explainCurrentResult);
     resultCard.append(button);
   }
@@ -365,7 +365,7 @@ function enhancePage(){
       const card=document.createElement('button');
       card.type='button';
       card.className='ntaxer-ai-home-card';
-      card.innerHTML='<span class="ntaxer-ai-home-icon" aria-hidden="true">✦</span><span><strong>Not sure which calculator you need?</strong><small>Describe your situation to NTaxer AI and Gemini will guide you to the relevant calculator.</small></span><span aria-hidden="true">→</span>';
+      card.innerHTML='<span class="ntaxer-ai-home-icon" aria-hidden="true">✦</span><span><strong>Not sure which calculator you need?</strong><small>Describe your situation to NTaxer AI and it will guide you to the relevant calculator.</small></span><span aria-hidden="true">→</span>';
       card.addEventListener('click',()=>openPanel('route'));
       anchor.insertAdjacentElement('afterend',card);
     }
