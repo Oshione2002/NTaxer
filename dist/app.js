@@ -81,6 +81,16 @@ function buildExportReport(c,r){
   ]
  };
 }
+function calculatorGroupIcon(group){
+ const icons={
+  'Individuals':'<svg class="calculator-group-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+  'Businesses':'<svg class="calculator-group-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 10h2M13 10h2M9 14h2M13 14h2"/></svg>',
+  'Transactions':'<svg class="calculator-group-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 7h10l3 5-3 5H7l-3-5Z"/><path d="M9 12h6"/></svg>',
+  'Reliefs & allowances':'<svg class="calculator-group-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v18M5 8h14M7 16h10"/><path d="M8 5 5 8l3 3M16 13l3 3-3 3"/></svg>',
+  'Specialist sectors':'<svg class="calculator-group-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19h16M6 16l4-5 3 3 5-7"/><path d="M16 7h2v2"/></svg>'
+ };
+ return icons[group]||'<svg class="calculator-group-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8"/></svg>';
+}
 function nav(){
  const query=$('#calculator-search').value.toLowerCase().trim();
  const groups=new Map();
@@ -89,7 +99,7 @@ function nav(){
   if(!groups.has(c.group))groups.set(c.group,[]);
   groups.get(c.group).push(c);
  }
- $('#calculator-nav').innerHTML=[...groups].map(([group,calculators])=>`<details class="calculator-nav-group" ${query||location.hash.startsWith('#calculator')&&calculators.some(c=>c.id===state.current)?'open':''}><summary class="nav-group"><span>${escape(titleCase(group))}</span><svg class="nav-group-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="calculator-nav-links">${calculators.map(c=>`<a href="#calculator/${c.id}" class="calc-link ${state.current===c.id&&location.hash.startsWith('#calculator')?'active':''}" ${state.current===c.id&&location.hash.startsWith('#calculator')?'aria-current="page"':''}><span class="nav-symbol" aria-hidden="true">${c.symbol}</span>${escape(c.short)}</a>`).join('')}</div></details>`).join('')||'<p class="empty">No matching calculators.</p>';
+ $('#calculator-nav').innerHTML=[...groups].map(([group,calculators])=>`<details class="calculator-nav-group" ${query||location.hash.startsWith('#calculator')&&calculators.some(c=>c.id===state.current)?'open':''}><summary class="nav-group"><span class="calculator-group-label">${calculatorGroupIcon(group)}<span>${escape(titleCase(group))}</span></span><svg class="nav-group-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="calculator-nav-links">${calculators.map(c=>`<a href="#calculator/${c.id}" class="calc-link ${state.current===c.id&&location.hash.startsWith('#calculator')?'active':''}" ${state.current===c.id&&location.hash.startsWith('#calculator')?'aria-current="page"':''}><span class="nav-symbol" aria-hidden="true">${c.symbol}</span>${escape(c.short)}</a>`).join('')}</div></details>`).join('')||'<p class="empty">No matching calculators.</p>';
 }
 function inputHtml(f,values){
  if(f.type==='divider')return `<div class="field-divider">${escape(f.label)}</div>`;
