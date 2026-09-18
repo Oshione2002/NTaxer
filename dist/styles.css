@@ -864,3 +864,21 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  .sidebar-theme-controls{padding-left:12px;padding-right:12px}
  .sidebar-theme-controls>span{font-size:14px}
 }
+
+
+/* Make the main sidebar toggle glyph larger, centred and white at rest. */
+.sidebar-toggle{
+ display:grid;
+ place-items:center;
+ background:var(--strong-surface);
+ color:#fff;
+}
+.sidebar-toggle-glyph{
+ width:36px;
+ height:36px;
+ margin:0;
+}
+.sidebar-toggle:hover{
+ background:var(--tone-e4eee7);
+ color:var(--green);
+}
