@@ -3,6 +3,163 @@ const RETRYABLE=new Set([429,500,502,503,504]);
 const MAX_FILES=5;
 const MAX_FILE_BYTES=5*1024*1024;
 
+const STATEMENT_PROFILES={
+  paye:{
+    purpose:'Employment income / PAYE for an individual employee.',
+    keep:'Explicit salary, wages, bonuses, taxable employment allowances or benefits, PAYE/tax credits already deducted, employee pension, NHF, qualifying health insurance, eligible life insurance or annuity premiums, qualifying owner-occupied mortgage interest, rent paid for individual rent relief, and clearly identified other taxable income.',
+    review:'Unlabelled incoming transfers, interest income, reimbursements or credits that could be taxable but whose purpose is not established.',
+    ignore:'Ordinary personal spending, airtime/data, electricity, food, betting, bank/USSD charges, savings movements, own-account transfers, gifts, loans and refunds unless the narration clearly establishes a PAYE-relevant field.'
+  },
+  business:{
+    purpose:'Self-employed or sole-trader taxable business income.',
+    keep:'Customer receipts, sales, professional fees, business rent income, and expenses plausibly incurred for the trade such as business rent, utilities, electricity, airtime/data/internet, bank charges, supplies, inventory, transport, wages, professional fees and other operating costs.',
+    review:'Transfers with unclear business purpose, mixed personal/business expenses, cash withdrawals, reimbursements, loans and owner transfers.',
+    ignore:'Clearly personal consumption, betting, personal gifts and internal savings or own-account movements that do not represent business income or expense.'
+  },
+  gains:{
+    purpose:'Capital or asset disposal gain.',
+    keep:'Clearly identified asset-sale or disposal proceeds, acquisition or purchase cost of the disposed asset, and directly attributable acquisition or disposal expenses.',
+    review:'Large transfers that may represent an asset purchase or sale but do not identify the asset or purpose.',
+    ignore:'Routine income, ordinary living or business expenses, internal transfers and unrelated fees.'
+  },
+  digital:{
+    purpose:'Cryptocurrency or digital-asset disposal income tax.',
+    keep:'Clearly identified crypto or token purchases, exchange deposits, disposals or sales, proceeds and transaction or exchange fees that relate to the disposed asset.',
+    review:'Transfers to or from exchanges or wallets where the underlying buy or sell event is unclear and other taxable income that may affect the calculator.',
+    ignore:'Ordinary bank spending, unrelated transfers and non-digital-asset activity.'
+  },
+  'presumptive-gains':{
+    purpose:'Presumptive payment on a chargeable disposal.',
+    keep:'Clearly identified consideration or proceeds for the relevant disposal.',
+    review:'Large receipts that may be disposal consideration but whose purpose is unclear.',
+    ignore:'Routine income, expenses, transfers and charges unrelated to the disposal.'
+  },
+  compensation:{
+    purpose:'Loss-of-employment compensation.',
+    keep:'Clearly identified severance, redundancy, termination, loss-of-employment or similar compensation payments and clearly identified earlier compensation of the same kind.',
+    review:'Employer-origin credits that could be compensation but are not labelled clearly, plus other taxable income where relevant.',
+    ignore:'Ordinary salary transactions, personal spending, savings and unrelated transfers.'
+  },
+  company:{
+    purpose:'Company income tax from tax-adjusted company activity.',
+    keep:'Business or customer receipts, sales or revenue, finance income, clearly business operating expenses, payroll, rent, utilities, airtime/data/internet, bank charges, supplies, professional fees, asset-disposal proceeds, and clearly identified income-tax credits or payments relevant to the company.',
+    review:'Transfers whose business purpose is unclear, shareholder or director movements, loans, reimbursements and potentially capital rather than revenue expenditure.',
+    ignore:'Clearly personal transactions and internal movements that do not represent company income, deductible cost, gain or tax credit.'
+  },
+  levy:{
+    purpose:'Development levy based on assessable profit.',
+    keep:'Only explicit assessable-profit or tax-adjusted-profit figures from financial statements or records.',
+    review:'Accounting lines that may form part of assessable profit but cannot establish the statutory profit base by themselves.',
+    ignore:'Ordinary bank transactions; a bank statement alone does not establish assessable profit.'
+  },
+  minimum:{
+    purpose:'Minimum effective tax based on adjusted statutory net income and covered taxes.',
+    keep:'Explicit adjusted statutory net income and clearly identified covered-tax payments or amounts from financial statements or tax records.',
+    review:'Tax payments whose covered-tax status is unclear.',
+    ignore:'Ordinary receipts and spending that do not directly establish the statutory net-income or covered-tax inputs.'
+  },
+  presumptive:{
+    purpose:'Informal-business presumptive tax based primarily on turnover.',
+    keep:'Customer receipts, sales and other clearly identified business turnover.',
+    review:'Incoming transfers that may be business receipts but are not clearly described.',
+    ignore:'Personal transfers, loans, gifts, savings movements and ordinary expenses unless needed to establish business activity.'
+  },
+  vat:{
+    purpose:'VAT on taxable supplies with eligible input VAT.',
+    keep:'Clearly identified sales or supply receipts, VAT-inclusive or VAT-exclusive invoice payments where the supply amount is identifiable, and explicit input VAT amounts or VAT credits.',
+    review:'Customer receipts and supplier payments that may relate to taxable supplies but do not reveal VAT treatment or VAT amount.',
+    ignore:'Personal transfers, savings movements, charges and transactions unrelated to a supply.'
+  },
+  withholding:{
+    purpose:'Withholding tax on a qualifying payment.',
+    keep:'Payments or receipts clearly labelled as professional fees, consultancy, commissions, rent, contract or service payments, interest, dividends, royalties or other transaction classes potentially subject to withholding, plus explicit withholding-tax deductions.',
+    review:'Transfers that may be payment for services or contracts but lack a clear transaction purpose.',
+    ignore:'Personal transfers, savings, ordinary purchases and charges with no withholding-tax relevance.'
+  },
+  stamp:{
+    purpose:'Stamp duties on a dutiable instrument.',
+    keep:'Clearly identified consideration, capital, premium, lease value or other amount tied to a dutiable instrument, plus explicit stamp-duty payments as supporting evidence.',
+    review:'Transactions that may relate to an instrument but do not identify the legal instrument or chargeable base.',
+    ignore:'Routine transfers and spending unrelated to an instrument.'
+  },
+  transfer:{
+    purpose:'Electronic transfer duty.',
+    keep:'Electronic transfers and explicit electronic-transfer levy or duty entries, including information needed to distinguish salary or own-account transfers where the narration establishes it.',
+    review:'Transfers whose exemption status or relationship between accounts is unclear.',
+    ignore:'Non-transfer purchases and unrelated account activity.'
+  },
+  capital:{
+    purpose:'Capital allowances on qualifying capital expenditure.',
+    keep:'Purchases or payments clearly for plant, machinery, equipment, vehicles, buildings or other capital assets and directly attributable qualifying capital expenditure.',
+    review:'Large supplier payments that may be capital expenditure but do not identify the asset.',
+    ignore:'Routine operating expenses, personal spending and unrelated transfers.'
+  },
+  incentive:{
+    purpose:'Economic development incentive or credit.',
+    keep:'Transactions or financial-statement lines explicitly tied to qualifying investment, qualifying expenditure or the incentive base required by the calculator.',
+    review:'Capital or investment expenditure that may qualify but lacks enough project or incentive detail.',
+    ignore:'Routine operating and personal transactions unrelated to the incentive.'
+  },
+  foreign:{
+    purpose:'Foreign tax relief.',
+    keep:'Clearly identified foreign-source income and foreign tax paid or withheld on that income.',
+    review:'International receipts or foreign-currency transfers whose source or foreign-tax relationship is unclear.',
+    ignore:'Domestic activity and unrelated transfers.'
+  },
+  hydrocarbon:{
+    purpose:'Hydrocarbon tax.',
+    keep:'Petroleum upstream revenue, crude or hydrocarbon sales, qualifying petroleum costs, royalties or taxes and financial-statement lines explicitly relevant to the hydrocarbon tax base.',
+    review:'Sector transactions whose tax-base treatment is unclear.',
+    ignore:'Unrelated corporate or personal transactions.'
+  },
+  petroleum:{
+    purpose:'Petroleum profits tax.',
+    keep:'Petroleum-operation revenue, qualifying costs, royalties, rents and tax-base items explicitly tied to petroleum operations.',
+    review:'Sector transactions that may affect petroleum profits but lack sufficient classification.',
+    ignore:'Unrelated activity.'
+  },
+  royalty:{
+    purpose:'Petroleum royalty.',
+    keep:'Petroleum production, sales, royalty payment lines and other values explicitly needed for royalty computation.',
+    review:'Petroleum-sector receipts or payments whose royalty relevance is unclear.',
+    ignore:'Non-petroleum activity.'
+  },
+  mineral:{
+    purpose:'Solid mineral royalty.',
+    keep:'Mineral sales or production receipts, royalty payments and transaction lines explicitly tied to a mineral or royalty base.',
+    review:'Mining-sector receipts or payments whose mineral or royalty treatment is unclear.',
+    ignore:'Non-mining activity.'
+  },
+  nonresident:{
+    purpose:'Tax on a non-resident company or Nigerian-source activity.',
+    keep:'Clearly identified Nigerian-source receipts, contract or service income, permanent-establishment or business receipts, related deductible costs where the calculator permits them, and Nigerian tax credits or withholding.',
+    review:'Cross-border or Nigerian counterparty transfers whose source or tax character is unclear.',
+    ignore:'Activity unrelated to the Nigerian-source tax base.'
+  },
+  surcharge:{
+    purpose:'Fossil-fuel surcharge.',
+    keep:'Explicit fossil-fuel revenue, production or value base, surcharge payments or financial-statement lines required by the calculator.',
+    review:'Energy-sector transactions that may fall within the surcharge base but are not clearly classified.',
+    ignore:'Unrelated activity.'
+  },
+  other:{
+    purpose:'Other assessed taxes and levies.',
+    keep:'Explicit tax, levy, assessment, penalty or statutory payment lines that correspond to a field in this calculator.',
+    review:'Government or statutory payments whose tax or levy type is unclear.',
+    ignore:'Ordinary commercial and personal transactions.'
+  }
+};
+
+const NORMALIZATION_RULES=[
+  'BANK / STATEMENT NORMALIZATION:',
+  '- Statements differ across banks, fintechs, wallets, cards and accounting exports. Never rely on one provider wording or column names.',
+  '- First normalize each monetary line semantically into date, original description, absolute amount, direction (credit/debit/neutral), normalizedCategory, and a concise privacy-safe interpretation.',
+  '- Recognize equivalent wording across providers. For example transfer in, credit transfer, received from and inflow can all be incoming transfers; VTU, airtime purchase and top up can all be airtime; autosave, vault and savings transfer can be internal savings movements.',
+  '- Use direction, narration, merchant or counterparty clues, nearby matching rows and repeated patterns together. Do not classify from a keyword alone.',
+  '- Internal savings movements and likely own-account transfers are not income or expenses merely because money moved.',
+  '- Do not expose names, account numbers, phone numbers, BVNs, TINs, addresses or full transaction references unless absolutely necessary. Generalize counterparties when possible.'
+].join('\n');
+
 function send(res,status,payload){
   res.status(status);
   res.setHeader('Content-Type','application/json; charset=utf-8');
@@ -38,12 +195,14 @@ const schema={
           description:{type:'string'},
           amount:{type:'number'},
           direction:{type:'string',enum:['credit','debit','neutral']},
+          normalizedCategory:{type:'string'},
+          relevance:{type:'string',enum:['auto_map','review','ignore']},
           suggestedCalculatorId:{type:'string'},
           suggestedFieldKey:{type:'string'},
           confidence:{type:'string',enum:['high','medium','low']},
           reason:{type:'string'}
         },
-        required:['date','description','amount','direction','suggestedCalculatorId','suggestedFieldKey','confidence','reason']
+        required:['date','description','amount','direction','normalizedCategory','relevance','suggestedCalculatorId','suggestedFieldKey','confidence','reason']
       }
     }
   },
