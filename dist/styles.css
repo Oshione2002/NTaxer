@@ -1343,3 +1343,18 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  .statement-review{padding:18px}
  .statement-review-heading{flex-direction:column}
 }
+
+
+/* Keep statement-analysis title and status text clearly separated. */
+.statement-analysis-progress>div:last-child{
+ display:flex;
+ flex-direction:column;
+ align-items:flex-start;
+ gap:4px;
+ min-width:0
+}
+.statement-analysis-progress strong,
+.statement-analysis-progress span{
+ display:block;
+ line-height:1.35
+}
