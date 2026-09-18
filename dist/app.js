@@ -704,7 +704,7 @@ function importView(sourceCalculator=''){
   calculatorStep.hidden=true;
   totalsStep.hidden=false;
   totalsStep.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
-  $('#statement-apply').disabled=!result.totals.length;
+  $('#statement-apply').disabled=false;
   return true;
  };
 
@@ -733,21 +733,39 @@ function importView(sourceCalculator=''){
 
  $('#statement-apply').addEventListener('click',()=>{
   const result=buildMappedTotals();
-  let applied=0;
+  const selectedCalculators=[...result.selected]
+   .map(id=>CALCULATORS.find(calc=>calc.id===id))
+   .filter(Boolean);
+
+  if(!selectedCalculators.length){
+   totalsBox.insertAdjacentHTML('afterbegin','<p class="notice">Select at least one calculator before applying the statement.</p>');
+   return;
+  }
+
+  // A statement import should never leave example/default monetary values behind.
+  // Start each selected calculator from zero, then layer confirmed mapped totals on top.
+  for(const calc of selectedCalculators){
+   state.inputs[calc.id]=structuredClone(DEFAULTS[calc.id]);
+   for(const field of calc.fields){
+    if(!field.key)continue;
+    if(field.type==='money'){
+     state.inputs[calc.id][field.key]='0';
+    }else if(field.type==='number'&&Number(field.min??0)<=0){
+     state.inputs[calc.id][field.key]='0';
+    }else if(field.type==='boolean'){
+     state.inputs[calc.id][field.key]=false;
+    }
+   }
+  }
+
   for(const item of result.totals){
    const calc=CALCULATORS.find(calc=>calc.id===item.calculatorId);
    const field=calc?.fields.find(field=>field.key===item.fieldKey);
    if(!calc||!field||!['money','number'].includes(field.type))continue;
-   if(!state.inputs[calc.id])state.inputs[calc.id]=structuredClone(DEFAULTS[calc.id]);
    state.inputs[calc.id][field.key]=String(item.total);
-   applied+=1;
   }
-  const first=[...result.selected].find(id=>CALCULATORS.some(calc=>calc.id===id));
-  if(!first||!applied){
-   totalsBox.insertAdjacentHTML('afterbegin','<p class="notice">There are no numeric mapped fields to apply yet. Go back and map at least one active row.</p>');
-   return;
-  }
-  location.hash='#calculator/'+first;
+
+  location.hash='#calculator/'+selectedCalculators[0].id;
  });
 
  analysisButton.addEventListener('click',async()=>{
