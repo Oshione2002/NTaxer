@@ -120,7 +120,7 @@ async function callInteractions(model,input){
       'Content-Type':'application/json',
       'x-goog-api-key':process.env.GEMINI_API_KEY
     },
-    body:JSON.stringify({model,input})
+    body:JSON.stringify({model,input,store:false})
   });
   const data=await response.json().catch(()=>({}));
   if(response.ok){
@@ -154,7 +154,8 @@ async function callGenerateContent(model,file,prompt){
     },
     body:JSON.stringify({
       contents:[{role:'user',parts}],
-      generationConfig:{temperature:0.05,maxOutputTokens:8192}
+      generationConfig:{temperature:0.05,maxOutputTokens:8192},
+      store:false
     })
   });
   const data=await response.json().catch(()=>({}));
