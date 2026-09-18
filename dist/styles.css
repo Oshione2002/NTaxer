@@ -913,3 +913,126 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  padding-right:12px;
  padding-left:22px;
 }
+
+
+/* Statement import entry point. */
+.statement-upload-card{
+ padding:24px;
+ border:1px solid var(--line);
+ border-radius:12px;
+ background:var(--surface)
+}
+.statement-upload-heading{
+ display:flex;
+ align-items:flex-start;
+ justify-content:space-between;
+ gap:16px
+}
+.statement-upload-heading .eyebrow{margin-bottom:6px}
+.statement-source-calculator{
+ display:inline-flex;
+ align-items:center;
+ padding:6px 10px;
+ border-radius:999px;
+ background:var(--tone-e4eee7);
+ color:var(--green);
+ font-size:12px;
+ font-weight:700;
+ white-space:nowrap
+}
+.statement-upload-copy{
+ margin:10px 0 18px;
+ color:var(--muted);
+ font-size:14px
+}
+.statement-dropzone{
+ position:relative;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ gap:8px;
+ min-height:230px;
+ padding:28px;
+ border:1.5px dashed var(--tone-b9d2c1);
+ border-radius:12px;
+ background:var(--tone-fbfcfb);
+ color:var(--tone-53675d);
+ text-align:center
+}
+.statement-dropzone.dragging,
+.statement-dropzone:hover{
+ border-color:var(--tone-219d72);
+ background:var(--tone-eaf1eb)
+}
+.statement-dropzone.has-file{border-style:solid}
+.statement-file-input{
+ position:absolute;
+ width:1px;
+ height:1px;
+ opacity:0;
+ pointer-events:none
+}
+.statement-upload-icon{color:var(--green)}
+.statement-dropzone>strong{
+ color:var(--tone-233e31);
+ font-size:16px
+}
+.statement-dropzone>span,
+.statement-dropzone>small{
+ color:var(--muted);
+ font-size:13px
+}
+.statement-dropzone .button{
+ margin:2px 0;
+ min-width:150px
+}
+.statement-file-status{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:16px;
+ margin-top:12px;
+ padding:12px 14px;
+ border:1px solid var(--line);
+ border-radius:10px;
+ background:var(--tone-fbfcfb)
+}
+.statement-file-status.error{
+ align-items:flex-start;
+ flex-direction:column;
+ gap:2px;
+ color:var(--tone-c33838)
+}
+.statement-file-info{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ min-width:0
+}
+.statement-file-info svg{flex:0 0 auto;color:var(--green)}
+.statement-file-info span{display:block;min-width:0}
+.statement-file-info strong,
+.statement-file-info small{display:block}
+.statement-file-info strong{
+ max-width:100%;
+ overflow:hidden;
+ text-overflow:ellipsis;
+ white-space:nowrap;
+ color:var(--tone-233e31);
+ font-size:14px
+}
+.statement-file-info small{
+ margin-top:2px;
+ color:var(--muted);
+ font-size:12px
+}
+@media(max-width:650px){
+ .statement-upload-card{padding:18px}
+ .statement-upload-heading{flex-direction:column;gap:8px}
+ .statement-dropzone{min-height:210px;padding:22px 16px}
+ .statement-file-status{align-items:flex-start}
+}
+@media print{
+ .statement-upload-card{display:none}
+}
