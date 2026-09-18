@@ -344,7 +344,7 @@ function importView(sourceCalculator=''){
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>
         <span><strong>${escape(file.name)}</strong><small>${escape(extension.toUpperCase())} · ${formatBytes(file.size)} · ${stateLabel}</small></span>
        </div>
-       <button class="statement-remove-file text-button" type="button" data-file-index="${index}" aria-label="Remove ${escape(file.name)}">Remove</button>
+       <button class="statement-remove-file" type="button" data-file-index="${index}" aria-label="Remove ${escape(file.name)}" title="Remove file">×</button>
       </div>`;
     }).join('')}
    </div>
