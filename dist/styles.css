@@ -892,3 +892,16 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 @media(max-width:650px){
  .sidebar-theme-controls{padding-left:22px;padding-right:12px}
 }
+
+
+/* Centre the single sidebar glyph within the toggle button. */
+.sidebar-toggle{
+ grid-template-columns:1fr;
+ column-gap:0;
+ justify-items:center;
+ align-items:center;
+}
+.sidebar-toggle-glyph{
+ justify-self:center;
+ align-self:center;
+}
