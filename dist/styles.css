@@ -1123,3 +1123,38 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  .statement-next-step{padding:18px}
  .statement-next-heading{flex-direction:column}
 }
+
+
+/* Statement file preparation progress. */
+.statement-upload-progress{
+ padding:12px 14px;
+ border-bottom:1px solid var(--line)
+}
+.statement-progress-copy{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:12px;
+ margin-bottom:8px;
+ font-size:13px
+}
+.statement-progress-copy span{color:var(--muted)}
+.statement-progress-copy strong{color:var(--tone-233e31)}
+.statement-progress-track{
+ width:100%;
+ height:8px;
+ overflow:hidden;
+ border-radius:999px;
+ background:var(--tone-e4eee7)
+}
+.statement-progress-track>span{
+ display:block;
+ height:100%;
+ border-radius:inherit;
+ background:var(--tone-219d72);
+ transition:width .15s ease
+}
+.statement-continue:disabled{
+ opacity:.6;
+ cursor:wait
+}
