@@ -1,4 +1,4 @@
-const MODEL='gemini-3.8-flash';
+const MODELS=['gemini-3.5-flash-lite','gemini-3.1-flash-lite'];
 const RETRYABLE=new Set([429,500,502,503,504]);
 const WINDOW_MS=10*60*1000;
 const MAX_PER_WINDOW=24;
@@ -211,34 +211,45 @@ Answer only from these excerpts and cite the source IDs that support the answer.
 }
 
 async function callGemini(mode,prompt){
-  const url=`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
   let lastError;
 
-  for(let attempt=0;attempt<3;attempt++){
-    if(attempt)await sleep(450*(2**(attempt-1)));
-    const response=await fetch(url,{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-goog-api-key':process.env.GEMINI_API_KEY
-      },
-      body:JSON.stringify({
-        systemInstruction:{parts:[{text:systemInstruction(mode)}]},
-        contents:[{role:'user',parts:[{text:prompt}]}],
-        generationConfig:{
-          temperature:0.15,
-          maxOutputTokens:700,
-          responseMimeType:'application/json',
-          responseSchema:schemas[mode]
-        },
-        store:false
-      })
-    });
+  for(const model of MODELS){
+    const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
-    const data=await response.json().catch(()=>({}));
-    if(response.ok)return data;
-    lastError={status:response.status,data};
-    if(!RETRYABLE.has(response.status))break;
+    for(let attempt=0;attempt<2;attempt++){
+      if(attempt)await sleep(400);
+
+      const response=await fetch(url,{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'x-goog-api-key':process.env.GEMINI_API_KEY
+        },
+        body:JSON.stringify({
+          systemInstruction:{parts:[{text:systemInstruction(mode)}]},
+          contents:[{role:'user',parts:[{text:prompt}]}],
+          generationConfig:{
+            temperature:0.15,
+            maxOutputTokens:700,
+            responseMimeType:'application/json',
+            responseSchema:schemas[mode]
+          },
+          store:false
+        })
+      });
+
+      const data=await response.json().catch(()=>({}));
+
+      if(response.ok){
+        const text=candidateText(data);
+        if(text)return {data,model};
+        lastError={status:502,data:{error:{message:`NTaxer AI received an empty response from ${model}.`}}};
+        break;
+      }
+
+      lastError={status:response.status,data};
+      if(!RETRYABLE.has(response.status))break;
+    }
   }
 
   throw lastError||{status:502,data:{}};
@@ -267,7 +278,7 @@ export default async function handler(req,res){
   if(question.length>2500)return send(res,400,{ok:false,error:'Please shorten the question.'});
 
   try{
-    const data=await callGemini(mode,buildPrompt({...body,mode,question}));
+    const {data,model}=await callGemini(mode,buildPrompt({...body,mode,question}));
     const text=candidateText(data);
     if(!text)throw {status:502,data:{error:{message:'NTaxer AI returned no usable response.'}}};
 
@@ -293,7 +304,7 @@ export default async function handler(req,res){
 
     return send(res,200,{
       ok:true,
-      model:MODEL,
+      model,
       answer:String(parsed.answer||'').trim(),
       calculators,
       sources,
