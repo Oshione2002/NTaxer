@@ -247,7 +247,7 @@ https://nass.gov.ng/documents/download/11249
 
 <div align="center">
 
-### Ready to calculate?
+### Ready to calculate — or ask NTaxer AI?
 
 **[Open NTaxer →](https://n-taxer.vercel.app/)**
 
