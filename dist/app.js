@@ -101,18 +101,156 @@ function nav(){
  }
  $('#calculator-nav').innerHTML=[...groups].map(([group,calculators])=>`<details class="calculator-nav-group" ${query||location.hash.startsWith('#calculator')&&calculators.some(c=>c.id===state.current)?'open':''}><summary class="nav-group"><span class="calculator-group-label">${calculatorGroupIcon(group)}<span>${escape(titleCase(group))}</span></span><svg class="nav-group-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="calculator-nav-links">${calculators.map(c=>`<a href="#calculator/${c.id}" class="calc-link ${state.current===c.id&&location.hash.startsWith('#calculator')?'active':''}" ${state.current===c.id&&location.hash.startsWith('#calculator')?'aria-current="page"':''}><span class="nav-symbol" aria-hidden="true">${c.symbol}</span>${escape(c.short)}</a>`).join('')}</div></details>`).join('')||'<p class="empty">No matching calculators.</p>';
 }
-function inputHtml(f,values){
- if(f.type==='divider')return `<div class="field-divider">${escape(f.label)}</div>`;
- const id='field-'+f.key,value=values[f.key];
- if(f.type==='boolean')return `<label class="checkfield" for="${id}"><input id="${id}" name="${f.key}" type="checkbox" ${value===true?'checked':''}><span>${escape(f.label)}${f.hint?`<small>${escape(f.hint)}</small>`:''}</span></label>`;
- const common=`id="${id}" name="${f.key}" aria-describedby="${id}-hint ${id}-error"`;
- return `<label class="field" for="${id}"><span>${escape(f.label)}</span>${f.type==='select'?`<select ${common}>${f.options.map(([v,label])=>`<option value="${escape(v)}" ${String(value)===String(v)?'selected':''}>${escape(label)}</option>`).join('')}</select>`:`<span class="input-wrap">${f.type==='money'?'<span class="prefix" aria-hidden="true">₦</span>':''}<input ${common} type="text" inputmode="decimal" autocomplete="off" value="${escape(value)}" ${f.type==='number'?`data-min="${f.min}" data-max="${f.max}"`:''}></span>`}<span class="hint" id="${id}-hint">${escape(f.hint)}</span><span class="error" id="${id}-error"></span></label>`;
+const fieldHelpPopover=document.createElement('div');
+fieldHelpPopover.id='field-help-popover';
+fieldHelpPopover.className='field-help-popover';
+fieldHelpPopover.setAttribute('role','tooltip');
+fieldHelpPopover.setAttribute('aria-hidden','true');
+document.body.appendChild(fieldHelpPopover);
+
+let activeFieldHelpTrigger=null;
+let pinnedFieldHelpTrigger=null;
+
+function plainFieldHelp(f,calculator){
+ const hint=String(f.hint||'').trim();
+ if(hint)return hint;
+ const label=String(f.label||'this field');
+ const lower=label.toLowerCase();
+ const calcName=calculator?.name||'this calculator';
+
+ if(/gross cash salary/.test(lower))return 'Enter the salary you receive in cash before tax and other deductions. Include taxable cash allowances and bonuses.';
+ if(/business receipts|gross revenue|turnover/.test(lower))return 'Enter the money earned from sales, customers or business activity before deducting expenses.';
+ if(/assessable operating profit|chargeable profits|taxable profits/.test(lower))return 'Enter the profit amount that remains after the tax adjustments required for this calculation, before the specific reliefs shown separately.';
+ if(/allowable business expenses/.test(lower))return 'Enter business costs that are allowed for tax purposes and were incurred to earn the business income.';
+ if(/capital allowances/.test(lower))return 'Enter the capital allowance you are claiming on qualifying business assets instead of normal accounting depreciation.';
+ if(/loss relief/.test(lower))return 'Enter an eligible business or tax loss from the permitted period that you are allowed to deduct here.';
+ if(/disposal proceeds|transaction consideration/.test(lower))return 'Enter the amount received, or treated as received, for selling or disposing of the asset.';
+ if(/acquisition cost/.test(lower))return 'Enter what you originally paid to acquire the asset, using the amount that is allowed for this tax calculation.';
+ if(/acquisition.*disposal expenses/.test(lower))return 'Enter qualifying costs directly connected with buying or selling the asset, such as eligible transaction or professional fees.';
+ if(/tax.*credit|paye credits|withholding tax already paid/.test(lower))return 'Enter tax that has already been paid or deducted and can legally be credited against the tax calculated here.';
+ if(/input vat/.test(lower))return 'Enter the VAT you paid on purchases that may be recoverable. Enter the VAT amount itself, not the full purchase price.';
+ if(/recovery percentage/.test(lower))return 'Enter the percentage of potentially eligible input VAT that relates to taxable business use and may be recovered.';
+ if(/supply amount/.test(lower))return 'Enter the value of the sale or supply using the VAT-inclusive or VAT-exclusive basis selected above.';
+ if(/foreign-source income/.test(lower))return 'Enter the part of your total income that came from outside Nigeria and is included in this calculation.';
+ if(/foreign income tax paid/.test(lower))return 'Enter qualifying tax already paid to a foreign tax authority on the foreign income being considered.';
+ if(/fixed assets/.test(lower))return 'Enter the value of the company’s fixed assets used for the size or eligibility test in this calculator.';
+ if(/property value/.test(lower))return 'Enter the value of the underlying property or asset connected to this transaction.';
+ if(/lease value/.test(lower))return 'Enter the yearly amount payable under the lease.';
+ if(/lease term/.test(lower))return 'Enter how many years the lease will run.';
+ if(/number of/.test(lower))return 'Enter how many identical transactions or instruments this calculation should cover.';
+ if(/days/.test(lower))return 'Enter the number of days that apply to this calculation.';
+ if(/months/.test(lower))return 'Enter the number of months in the period being calculated.';
+ if(/percentage|rate/.test(lower)&&f.type==='number')return 'Enter the applicable percentage or rate as a number. For example, enter 7.5 for 7.5%.';
+ if(/taxpayer|recipient|category|classification|regime|basis|mode|transaction|product|mineral|terrain|instrument|asset category|salary frequency/.test(lower)&&f.type==='select')return 'Choose the option that best describes your situation. NTaxer uses this choice to apply the correct rules in '+calcName+'.';
+ if(f.type==='boolean')return 'Turn this on only if “'+label+'” is true for your situation. Leave it off if it does not apply or has not been confirmed.';
+ if(f.type==='select')return 'Choose the option that best matches '+label+'. NTaxer uses this selection to decide how '+calcName+' should treat the calculation.';
+ if(f.type==='money')return 'Enter the amount for '+label+' in naira. Use 0 if it does not apply to you.';
+ if(f.type==='number')return 'Enter the number that applies to '+label+'. Use the limits shown by the field where applicable.';
+ return 'Provide the value that applies to '+label+' for '+calcName+'.';
 }
+
+function fieldHelpButton(f,calculator,id){
+ const help=plainFieldHelp(f,calculator);
+ return '<span class="field-help-wrap"><button class="field-help-trigger" type="button" data-field-help="'+escape(help)+'" aria-label="What does '+escape(f.label)+' mean?" aria-expanded="false" aria-controls="field-help-popover"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 10.8v5.4"></path><circle cx="12" cy="7.4" r=".9" fill="currentColor" stroke="none"></circle></svg></button></span>';
+}
+
+function positionFieldHelp(trigger){
+ const rect=trigger.getBoundingClientRect();
+ const popRect=fieldHelpPopover.getBoundingClientRect();
+ const gap=8;
+ let left=rect.left+(rect.width/2)-(popRect.width/2);
+ left=Math.max(12,Math.min(left,window.innerWidth-popRect.width-12));
+ let top=rect.bottom+gap;
+ if(top+popRect.height>window.innerHeight-12&&rect.top-popRect.height-gap>12)top=rect.top-popRect.height-gap;
+ fieldHelpPopover.style.left=Math.round(left)+'px';
+ fieldHelpPopover.style.top=Math.round(top)+'px';
+}
+
+function showFieldHelp(trigger,{pin=false}={}){
+ if(!trigger)return;
+ if(activeFieldHelpTrigger&&activeFieldHelpTrigger!==trigger)activeFieldHelpTrigger.setAttribute('aria-expanded','false');
+ activeFieldHelpTrigger=trigger;
+ if(pin)pinnedFieldHelpTrigger=trigger;
+ fieldHelpPopover.textContent=trigger.dataset.fieldHelp||'';
+ fieldHelpPopover.classList.add('is-visible');
+ fieldHelpPopover.setAttribute('aria-hidden','false');
+ trigger.setAttribute('aria-expanded','true');
+ requestAnimationFrame(()=>positionFieldHelp(trigger));
+}
+
+function hideFieldHelp({force=false}={}){
+ if(pinnedFieldHelpTrigger&&!force)return;
+ if(activeFieldHelpTrigger)activeFieldHelpTrigger.setAttribute('aria-expanded','false');
+ activeFieldHelpTrigger=null;
+ if(force)pinnedFieldHelpTrigger=null;
+ fieldHelpPopover.classList.remove('is-visible');
+ fieldHelpPopover.setAttribute('aria-hidden','true');
+}
+
+document.addEventListener('click',event=>{
+ const trigger=event.target.closest('.field-help-trigger');
+ if(trigger){
+  event.preventDefault();
+  event.stopPropagation();
+  if(pinnedFieldHelpTrigger===trigger){
+   hideFieldHelp({force:true});
+  }else{
+   if(pinnedFieldHelpTrigger&&pinnedFieldHelpTrigger!==trigger)hideFieldHelp({force:true});
+   showFieldHelp(trigger,{pin:true});
+  }
+  return;
+ }
+ if(pinnedFieldHelpTrigger)hideFieldHelp({force:true});
+});
+
+document.addEventListener('mouseover',event=>{
+ if(!window.matchMedia('(hover:hover) and (pointer:fine)').matches)return;
+ const trigger=event.target.closest('.field-help-trigger');
+ if(!trigger||pinnedFieldHelpTrigger)return;
+ showFieldHelp(trigger);
+});
+
+document.addEventListener('mouseout',event=>{
+ if(!window.matchMedia('(hover:hover) and (pointer:fine)').matches)return;
+ const trigger=event.target.closest('.field-help-trigger');
+ if(!trigger||pinnedFieldHelpTrigger)return;
+ if(trigger.contains(event.relatedTarget))return;
+ hideFieldHelp();
+});
+
+document.addEventListener('focusin',event=>{
+ const trigger=event.target.closest('.field-help-trigger');
+ if(trigger&&!pinnedFieldHelpTrigger)showFieldHelp(trigger);
+});
+
+document.addEventListener('focusout',event=>{
+ const trigger=event.target.closest('.field-help-trigger');
+ if(trigger&&!pinnedFieldHelpTrigger)hideFieldHelp();
+});
+
+document.addEventListener('keydown',event=>{
+ if(event.key==='Escape'&&(activeFieldHelpTrigger||pinnedFieldHelpTrigger)){
+  hideFieldHelp({force:true});
+  activeFieldHelpTrigger?.focus?.();
+ }
+});
+
+window.addEventListener('resize',()=>{if(activeFieldHelpTrigger&&fieldHelpPopover.classList.contains('is-visible'))positionFieldHelp(activeFieldHelpTrigger);});
+window.addEventListener('scroll',()=>{if(activeFieldHelpTrigger&&fieldHelpPopover.classList.contains('is-visible'))positionFieldHelp(activeFieldHelpTrigger);},{passive:true});
+
+function inputHtml(f,values,calculator){
+ if(f.type==='divider')return `<div class="field-divider">${escape(f.label)}</div>`;
+ const id='field-'+f.key,value=values[f.key],help=fieldHelpButton(f,calculator,id);
+ if(f.type==='boolean')return `<div class="checkfield"><input id="${id}" name="${f.key}" type="checkbox" ${value===true?'checked':''}><div class="checkfield-copy"><div class="field-label-row"><label for="${id}">${escape(f.label)}</label>${help}</div>${f.hint?`<small>${escape(f.hint)}</small>`:''}</div></div>`;
+ const common=`id="${id}" name="${f.key}" aria-describedby="${id}-hint ${id}-error"`;
+ return `<div class="field"><div class="field-label-row"><label for="${id}">${escape(f.label)}</label>${help}</div>${f.type==='select'?`<select ${common}>${f.options.map(([v,label])=>`<option value="${escape(v)}" ${String(value)===String(v)?'selected':''}>${escape(label)}</option>`).join('')}</select>`:`<span class="input-wrap">${f.type==='money'?'<span class="prefix" aria-hidden="true">₦</span>':''}<input ${common} type="text" inputmode="decimal" autocomplete="off" value="${escape(value)}" ${f.type==='number'?`data-min="${f.min}" data-max="${f.max}"`:''}></span>`}<span class="hint" id="${id}-hint">${escape(f.hint)}</span><span class="error" id="${id}-error"></span></div>`;
+}
+
 function calcView(id){
  const c=CALCULATORS.find(c=>c.id===id)||CALCULATORS[0];state.current=c.id;state.tab='calculation';
  $('#main').innerHTML=`<div class="page-header sticky-page-heading"><p class="eyebrow">${escape(c.group)} / 2026 tax year</p><div class="heading-row"><h1>${escape(c.name)}</h1><a class="calculator-import-button" href="#import/${c.id}" aria-label="Upload statement for ${escape(c.name)}" title="Upload statement"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg><span>Upload statement</span></a></div></div><div class="intro page-subtext"><p class="lead">${escape(c.description)}</p></div>
  <aside id="sticky-estimate" class="sticky-estimate" aria-live="polite" aria-atomic="true"></aside>
- <div class="workspace"><section class="panel"><div class="panel-head"><h2>Your details</h2></div><form id="tax-form" novalidate><div class="fields">${c.fields.map(f=>inputHtml(f,state.inputs[c.id])).join('')}</div><div class="form-actions"><span>Results update as you type</span><button type="button" id="reset" class="text-button">Reset example ↺</button></div></form></section><div class="result-column" tabindex="0" role="region" aria-label="Tax estimate and breakdown"><section id="result" aria-live="polite" aria-atomic="true"></section><div id="breakdown" class="panel breakdown"></div><p class="info-note">Calculated from your inputs. Check assumptions and legal scope before using an estimate.</p></div></div>
+ <div class="workspace"><section class="panel"><div class="panel-head"><h2>Your details</h2></div><form id="tax-form" novalidate><div class="fields">${c.fields.map(f=>inputHtml(f,state.inputs[c.id],c)).join('')}</div><div class="form-actions"><span>Results update as you type</span><button type="button" id="reset" class="text-button">Reset example ↺</button></div></form></section><div class="result-column" tabindex="0" role="region" aria-label="Tax estimate and breakdown"><section id="result" aria-live="polite" aria-atomic="true"></section><div id="breakdown" class="panel breakdown"></div><p class="info-note">Calculated from your inputs. Check assumptions and legal scope before using an estimate.</p></div></div>
  <section class="detail-area" aria-label="Calculation details"><div class="tabbar" role="tablist" aria-label="Result information"><button id="tab-calculation" class="active" role="tab" aria-selected="true" aria-controls="detail-content" data-tab="calculation">Calculation breakdown</button><button id="tab-assumptions" role="tab" aria-selected="false" tabindex="-1" aria-controls="detail-content" data-tab="assumptions">Assumptions & scope</button><button id="tab-sources" role="tab" aria-selected="false" tabindex="-1" aria-controls="detail-content" data-tab="sources">Legal references</button></div><div id="detail-content" class="detail-card" role="tabpanel" aria-labelledby="tab-calculation"></div></section><div class="print-only"><p>NTaxer estimate · Ruleset ${RULESET} · Review ${REVIEWED} · ${escape(c.name)}</p><p>Source: https://nass.gov.ng/documents/download/11249</p></div>`;
  $('#tax-form').addEventListener('submit',event=>event.preventDefault());
  $('#tax-form').addEventListener('input',event=>{const el=event.target;if(!el.name)return;state.inputs[c.id][el.name]=el.type==='checkbox'?el.checked:el.value;updateResult(c);});
