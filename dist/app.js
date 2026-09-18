@@ -111,47 +111,504 @@ document.body.appendChild(fieldHelpPopover);
 let activeFieldHelpTrigger=null;
 let pinnedFieldHelpTrigger=null;
 
-function plainFieldHelp(f,calculator){
- const hint=String(f.hint||'').trim();
- if(hint)return hint;
- const label=String(f.label||'this field');
+function fieldHelpDetails(f,calculator){
+ const label=String(f.label||'This field');
  const lower=label.toLowerCase();
  const calcName=calculator?.name||'this calculator';
+ const calcId=calculator?.id||'';
+ const generic={
+  meaning:'This is one of the inputs NTaxer uses to work out '+calcName+'.',
+  enter:f.type==='money'?'Enter the amount that applies to you in naira. Use 0 when it genuinely does not apply.':f.type==='number'?'Enter the number or percentage that applies to your case.':f.type==='select'?'Choose the option that best describes your actual situation.':'Turn this on only when the statement is true for your situation.',
+  why:'Changing this field can change the tax base, rate, relief, credit or eligibility used in the calculation.',
+  watch:'Do not guess. If you are unsure whether an amount qualifies, check the assumptions and legal references before relying on the estimate.'
+ };
+ const d=(meaning,enter,why,watch)=>({meaning,enter,why,watch});
 
- if(/gross cash salary/.test(lower))return 'Enter the salary you receive in cash before tax and other deductions. Include taxable cash allowances and bonuses.';
- if(/business receipts|gross revenue|turnover/.test(lower))return 'Enter the money earned from sales, customers or business activity before deducting expenses.';
- if(/assessable operating profit|chargeable profits|taxable profits/.test(lower))return 'Enter the profit amount that remains after the tax adjustments required for this calculation, before the specific reliefs shown separately.';
- if(/allowable business expenses/.test(lower))return 'Enter business costs that are allowed for tax purposes and were incurred to earn the business income.';
- if(/capital allowances/.test(lower))return 'Enter the capital allowance you are claiming on qualifying business assets instead of normal accounting depreciation.';
- if(/loss relief/.test(lower))return 'Enter an eligible business or tax loss from the permitted period that you are allowed to deduct here.';
- if(/disposal proceeds|transaction consideration/.test(lower))return 'Enter the amount received, or treated as received, for selling or disposing of the asset.';
- if(/acquisition cost/.test(lower))return 'Enter what you originally paid to acquire the asset, using the amount that is allowed for this tax calculation.';
- if(/acquisition.*disposal expenses/.test(lower))return 'Enter qualifying costs directly connected with buying or selling the asset, such as eligible transaction or professional fees.';
- if(/tax.*credit|paye credits|withholding tax already paid/.test(lower))return 'Enter tax that has already been paid or deducted and can legally be credited against the tax calculated here.';
- if(/input vat/.test(lower))return 'Enter the VAT you paid on purchases that may be recoverable. Enter the VAT amount itself, not the full purchase price.';
- if(/recovery percentage/.test(lower))return 'Enter the percentage of potentially eligible input VAT that relates to taxable business use and may be recovered.';
- if(/supply amount/.test(lower))return 'Enter the value of the sale or supply using the VAT-inclusive or VAT-exclusive basis selected above.';
- if(/foreign-source income/.test(lower))return 'Enter the part of your total income that came from outside Nigeria and is included in this calculation.';
- if(/foreign income tax paid/.test(lower))return 'Enter qualifying tax already paid to a foreign tax authority on the foreign income being considered.';
- if(/fixed assets/.test(lower))return 'Enter the value of the company’s fixed assets used for the size or eligibility test in this calculator.';
- if(/property value/.test(lower))return 'Enter the value of the underlying property or asset connected to this transaction.';
- if(/lease value/.test(lower))return 'Enter the yearly amount payable under the lease.';
- if(/lease term/.test(lower))return 'Enter how many years the lease will run.';
- if(/number of/.test(lower))return 'Enter how many identical transactions or instruments this calculation should cover.';
- if(/days/.test(lower))return 'Enter the number of days that apply to this calculation.';
- if(/months/.test(lower))return 'Enter the number of months in the period being calculated.';
- if(/percentage|rate/.test(lower)&&f.type==='number')return 'Enter the applicable percentage or rate as a number. For example, enter 7.5 for 7.5%.';
- if(/taxpayer|recipient|category|classification|regime|basis|mode|transaction|product|mineral|terrain|instrument|asset category|salary frequency/.test(lower)&&f.type==='select')return 'Choose the option that best describes your situation. NTaxer uses this choice to apply the correct rules in '+calcName+'.';
- if(f.type==='boolean')return 'Turn this on only if “'+label+'” is true for your situation. Leave it off if it does not apply or has not been confirmed.';
- if(f.type==='select')return 'Choose the option that best matches '+label+'. NTaxer uses this selection to decide how '+calcName+' should treat the calculation.';
- if(f.type==='money')return 'Enter the amount for '+label+' in naira. Use 0 if it does not apply to you.';
- if(f.type==='number')return 'Enter the number that applies to '+label+'. Use the limits shown by the field where applicable.';
- return 'Provide the value that applies to '+label+' for '+calcName+'.';
+ if(/salary frequency/.test(lower))return d(
+  'This tells NTaxer whether the salary figure you entered is monthly or annual.',
+  'Choose the period that matches the salary amount in the next field. Do not annualise it yourself if you choose Monthly.',
+  'NTaxer uses this choice to put your employment income on the correct annual basis before calculating PAYE.',
+  'A monthly salary entered while Annual is selected can make the result much too low, while an annual salary entered as Monthly can make it much too high.'
+ );
+ if(/gross cash salary/.test(lower))return d(
+  'This is your cash employment pay before tax and other deductions.',
+  'Enter basic salary plus taxable cash allowances and bonuses that belong in employment income. Do not include non-cash benefits that have their own field.',
+  'It is usually the main starting point for PAYE and determines how much income moves through the progressive tax bands.',
+  'Use gross pay, not take-home pay. Take-home pay already has deductions removed and will understate the taxable amount.'
+ );
+ if(/benefits in kind/.test(lower))return d(
+  'These are non-cash benefits your employer provides that the tax rules treat as part of your employment income.',
+  'Enter the taxable value of benefits such as an employer-provided asset, accommodation or other non-cash benefit where a taxable value has been determined.',
+  'Even though no cash was paid to you, a taxable benefit can increase employment income for PAYE.',
+  'Do not enter the employer’s purchase cost automatically. Use the tax value that applies to the benefit.'
+ );
+ if(/other annual taxable income|other annual chargeable income/.test(lower))return d(
+  'This captures taxable income that is not already included in the main salary, business or transaction fields.',
+  'Enter only income that belongs in the same annual tax computation and has not already been counted elsewhere.',
+  'It can move part of your income into higher tax bands or affect the marginal tax applied to another item.',
+  'Avoid double-counting salary, business receipts or gains that are already entered in another field.'
+ );
+ if(/employee pension contributions/.test(lower))return d(
+  'This is the employee portion of qualifying pension contributions that may reduce taxable employment income.',
+  'Enter the amount actually contributed by you for the relevant year, not the employer’s contribution.',
+  'A qualifying contribution can reduce the amount of income exposed to tax.',
+  'Do not use the total pension paid by both employee and employer unless the law specifically allows both in your case.'
+ );
+ if(/annual rent paid/.test(lower))return d(
+  'This is the rent you personally paid for your residence during the year where the statutory rent relief can apply.',
+  'Enter the qualifying annual rent actually paid for the relevant period.',
+  'NTaxer uses it to determine the rent relief available before arriving at chargeable income.',
+  'Do not enter business rent here unless this is the field specifically intended for that business calculator.'
+ );
+ if(/national housing fund/.test(lower))return d(
+  'This is your qualifying contribution to the National Housing Fund.',
+  'Enter the amount actually contributed for the relevant year.',
+  'A qualifying contribution can reduce the income used to calculate personal income tax.',
+  'Use the contribution amount, not the value of a house, mortgage balance or employer housing allowance.'
+ );
+ if(/health insurance/.test(lower))return d(
+  'This is the amount of qualifying health-insurance contribution that the tax rules allow in the personal income calculation.',
+  'Enter only eligible health-insurance contributions for the relevant period.',
+  'Qualifying contributions can reduce chargeable income before tax bands are applied.',
+  'Ordinary medical bills are not automatically the same thing as a qualifying health-insurance contribution.'
+ );
+ if(/life insurance|annuity premiums/.test(lower))return d(
+  'This covers eligible life-insurance or annuity premiums that can qualify for relief.',
+  'Enter the eligible premium amount for the statutory period that applies to the claim.',
+  'A valid amount can reduce the income on which personal tax is calculated.',
+  'Not every insurance payment qualifies. General motor, property or health expenses should not be placed here unless the law permits it.'
+ );
+ if(/mortgage|owner-occupied housing loan/.test(lower))return d(
+  'This is qualifying interest paid on a loan used for your owner-occupied home.',
+  'Enter the interest portion only where the legal conditions are met.',
+  'Qualifying mortgage interest can reduce chargeable personal income.',
+  'Do not enter the full loan repayment. Principal repayment is different from interest.'
+ );
+ if(/paye credits|income-tax credits|income tax.*already paid/.test(lower))return d(
+  'This is tax already deducted or paid that can be credited against the tax NTaxer calculates.',
+  'Enter only amounts that legally count as a credit for the same tax and period.',
+  'Credits reduce the amount still payable; they do not reduce the underlying income itself.',
+  'Do not include unrelated levies, VAT, development levy or payments that cannot be credited against this tax.'
+ );
+ if(/minimum-wage employment/.test(lower))return d(
+  'This confirms whether your employment meets the specific minimum-wage condition used by this calculator.',
+  'Turn it on only when the employment income and other conditions actually satisfy the statutory test.',
+  'The answer can change whether employment income receives the special minimum-wage treatment.',
+  'Do not use it simply because your take-home pay feels low; it depends on the legal threshold and conditions.'
+ );
+
+ if(/annual business receipts/.test(lower))return d(
+  'This is the total money earned by the sole trade or self-employed activity before deducting business costs.',
+  'Enter sales, fees and other business receipts for the year that belong to this business.',
+  'It is the starting revenue figure from which allowable expenses and reliefs are deducted.',
+  'Do not include loans, owner capital, transfers between your own accounts or personal gifts as business revenue.'
+ );
+ if(/allowable business expenses/.test(lower))return d(
+  'These are business costs that the tax rules allow you to deduct when working out taxable business income.',
+  'Enter qualifying costs incurred to earn the business income, such as appropriate rent, utilities, communication, supplies or professional costs.',
+  'Allowable expenses reduce taxable business profit.',
+  'A payment being made from a business account does not automatically make it deductible. Personal or capital spending may need different treatment.'
+ );
+ if(/loss relief/.test(lower))return d(
+  'This is an eligible tax loss from the business that you are allowed to use against income under the applicable rules.',
+  'Enter only the amount that is legally available to claim in this period.',
+  'Loss relief can reduce the taxable business income carried into the personal or company tax computation.',
+  'Do not enter an accounting loss automatically; tax losses can differ after tax adjustments.'
+ );
+ if(/capital allowances claimed/.test(lower))return d(
+  'Capital allowance is the tax relief given for qualifying capital assets instead of deducting accounting depreciation.',
+  'Enter the amount of capital allowance you are actually claiming for this period.',
+  'It can reduce taxable profit after the relevant tax adjustments.',
+  'Do not enter the asset purchase price here unless the calculator specifically asks for qualifying capital expenditure.'
+ );
+
+ if(/taxpayer$/.test(lower))return d(
+  'This identifies what kind of taxpayer is making the transaction or receiving the income.',
+  'Choose the legal taxpayer category that actually applies, such as an individual or company.',
+  'Different taxpayer types can have different rates, exemptions and calculation methods.',
+  'Choose based on legal status, not the name on a bank account or the size of the transaction.'
+ );
+ if(/asset category/.test(lower))return d(
+  'This tells NTaxer what type of asset was disposed of.',
+  'Choose the category that matches the asset sold, such as shares or another chargeable asset.',
+  'Different asset types can have different exemptions, thresholds and relief rules.',
+  'Do not choose shares merely because the payment moved through an investment account; classify the actual asset disposed of.'
+ );
+ if(/disposal proceeds/.test(lower))return d(
+  'This is what you received, or are treated as receiving, for disposing of the asset.',
+  'Enter the full disposal consideration before deducting acquisition cost or disposal expenses.',
+  'The gain calculation starts by comparing disposal proceeds with allowable cost and expenses.',
+  'Use the value attributable to the actual disposal, not unrelated receipts in the same account.'
+ );
+ if(/acquisition cost/.test(lower))return d(
+  'This is the qualifying cost of acquiring the asset that was later disposed of.',
+  'Enter the cost attributable to the specific asset or portion disposed of.',
+  'It is deducted from disposal proceeds when calculating the gain, subject to the applicable tax rules.',
+  'Do not use today’s market value unless the law specifically requires a substituted value.'
+ );
+ if(/acquisition.*disposal expenses/.test(lower))return d(
+  'These are qualifying costs directly connected with buying or selling the asset.',
+  'Enter eligible transaction, legal, brokerage or professional costs that relate directly to the acquisition or disposal.',
+  'Valid expenses reduce the gain on which tax may be charged.',
+  'General overheads or unrelated bank charges should not automatically be included.'
+ );
+ if(/share proceeds.*12 months/.test(lower))return d(
+  'This tracks other Nigerian-share disposal proceeds within the same 12-month period.',
+  'Enter the gross proceeds from the other relevant share disposals in that period.',
+  'NTaxer uses the aggregate to test thresholds and relief conditions that depend on total share disposals.',
+  'Do not enter gains here; this field asks for proceeds before costs.'
+ );
+ if(/share gains.*12 months/.test(lower))return d(
+  'This is the gain from other relevant share disposals in the same 12-month period.',
+  'Enter the taxable gain amount from those other share disposals.',
+  'It helps NTaxer apply share-disposal rules that depend on aggregate gains as well as proceeds.',
+  'Do not substitute total sale proceeds for the gain.'
+ );
+ if(/reinvested in nigerian shares/.test(lower))return d(
+  'This is disposal money that was reinvested in qualifying Nigerian shares where the reinvestment relief conditions are met.',
+  'Enter the qualifying amount of proceeds actually reinvested in the required period.',
+  'A qualifying reinvestment can reduce the portion of the gain that is immediately taxed.',
+  'Only qualifying reinvestment counts; simply moving cash to an investment account is not enough.'
+ );
+
+ if(/cbn|nafem rate/.test(lower))return d(
+  'This is the naira-per-US-dollar exchange rate used for the relevant acquisition or disposal date.',
+  'Enter the applicable official rate for that specific date as naira for one US dollar.',
+  'The calculator uses it to translate dollar-referenced values consistently when working out the digital-asset result.',
+  'Do not use an average annual rate unless that is specifically the legally required rate.'
+ );
+ if(/token lot/.test(lower))return d(
+  'This is the naira cost allocated to the specific crypto or token units you actually disposed of.',
+  'Enter the acquisition cost attributable to the disposed lot, not your whole wallet balance.',
+  'The calculator compares this allocated cost with disposal proceeds to determine the gain.',
+  'Be careful when only part of a holding was sold; only the corresponding cost should be used.'
+ );
+ if(/naira disposal proceeds/.test(lower))return d(
+  'This is the naira value received from disposing of the crypto or digital asset.',
+  'Enter the proceeds for the units actually sold or exchanged.',
+  'It forms the revenue side of the digital-asset gain calculation.',
+  'Exclude unrelated wallet deposits and transfers that were not a disposal.'
+ );
+
+ if(/loss-of-employment compensation/.test(lower))return d(
+  'This is compensation specifically paid because employment ended, such as qualifying severance or termination compensation.',
+  'Enter the compensation amount that relates to loss of employment.',
+  'The calculator applies the statutory exemption and taxes only the amount that remains taxable.',
+  'Do not include normal salary, leave pay or bonuses unless they legally form part of the compensation treatment.'
+ );
+ if(/earlier compensation/.test(lower))return d(
+  'This records earlier compensation that has already used part of the same statutory exemption.',
+  'Enter the earlier amount that counts against the exemption being tested now.',
+  'The exemption may be shared across related compensation payments, so previous use can reduce what remains available.',
+  'Do not enter unrelated employment income.'
+ );
+
+ if(/annual gross turnover/.test(lower))return d(
+  'This is the company’s gross annual revenue before deducting expenses.',
+  'Enter total turnover for the relevant accounting period.',
+  'Turnover can determine whether the company falls within size-based tax rules and whether certain exclusions or rates apply.',
+  'Use gross turnover, not profit after expenses.'
+ );
+ if(/total fixed assets/.test(lower))return d(
+  'This is the value of the company’s long-term fixed assets used in the applicable company-size test.',
+  'Enter the fixed-asset amount required by the statutory test for the period.',
+  'It can affect whether the company qualifies for special small-company treatment.',
+  'Do not mix current assets such as cash, receivables or inventory into this figure unless the law requires them.'
+ );
+ if(/assessable operating profit/.test(lower))return d(
+  'This is operating profit after the tax adjustments needed to arrive at assessable profit, before the separate losses and capital allowances entered below.',
+  'Enter the tax-adjusted operating profit for the year, excluding gains that have their own field.',
+  'It is the main profit base used to calculate company income tax.',
+  'Accounting profit is not always the same as assessable profit because tax rules may add back or remove items.'
+ );
+ if(/taxable chargeable gains/.test(lower))return d(
+  'This is the taxable gain from chargeable asset disposals that belongs in the company tax computation.',
+  'Enter the gain after applying the relevant disposal rules and reliefs.',
+  'It adds taxable gains to the company’s tax base without mixing them into ordinary operating profit.',
+  'Do not enter the full sale proceeds; this field is for the taxable gain.'
+ );
+ if(/assessable profits for development levy/.test(lower))return d(
+  'This is the profit base on which the development levy is calculated.',
+  'Enter the assessable profit amount that the development-levy rules require.',
+  'The levy is applied to this base, so an incorrect profit figure directly changes the levy.',
+  'Do not assume it is identical to accounting profit or company-income-tax taxable profit without checking the statutory definition.'
+ );
+
+ if(/adjusted statutory net income/.test(lower))return d(
+  'This is the statutory net-income amount used for the minimum-effective-tax test after the required adjustments.',
+  'Enter the adjusted net-income figure prepared under the applicable rules.',
+  'It is the denominator/base against which covered taxes are compared to test the effective tax floor.',
+  'Do not substitute ordinary accounting profit unless it has been adjusted as required.'
+ );
+ if(/eligible covered taxes/.test(lower))return d(
+  'These are taxes that the minimum-effective-tax rules specifically allow to count toward the effective tax rate.',
+  'Enter only taxes that meet the statutory covered-tax definition.',
+  'The amount already covered by eligible taxes determines whether an additional top-up tax is needed.',
+  'Not every payment to government, levy or withholding qualifies as a covered tax.'
+ );
+
+ if(/turnover basis/.test(lower))return d(
+  'This tells the presumptive-tax calculator whether turnover is being entered directly for the year or estimated from daily turnover.',
+  'Choose Annual when you know annual turnover; choose Daily when the calculator should estimate annual turnover from daily sales and working days.',
+  'The selection determines how NTaxer builds the turnover base.',
+  'Do not fill both approaches as if they were separate sources of income.'
+ );
+ if(/estimated daily turnover/.test(lower))return d(
+  'This is the approximate amount the business makes in sales on a typical working day.',
+  'Enter the average daily turnover before deducting expenses.',
+  'NTaxer multiplies it by working days when the Daily turnover basis is selected.',
+  'Use turnover, not daily profit.'
+ );
+ if(/working days/.test(lower))return d(
+  'This is the number of days the business is expected to trade during the year.',
+  'Enter the realistic number of operating days for the annual estimate.',
+  'It converts daily turnover into an estimated annual turnover.',
+  'Do not automatically enter 365 if the business does not trade every day.'
+ );
+
+ if(/amount entered/.test(lower)&&calcId==='vat')return d(
+  'This tells NTaxer whether the supply amount you entered already includes VAT.',
+  'Choose Excluding VAT if VAT should be added on top; choose Including VAT if the entered price already contains VAT.',
+  'NTaxer needs this to separate the taxable value from the VAT correctly.',
+  'Choosing the wrong basis can overstate or understate both the supply value and VAT.'
+ );
+ if(/supply classification/.test(lower))return d(
+  'This identifies how the supply is treated for VAT: standard-rated, zero-rated, exempt or another supported treatment.',
+  'Choose the legal VAT treatment that applies to the actual good or service.',
+  'The classification determines whether VAT is charged and whether input VAT recovery may be available.',
+  'Zero-rated and exempt are not the same: both may show 0% output VAT, but their input-VAT consequences can differ.'
+ );
+ if(/supply amount/.test(lower))return d(
+  'This is the price or value of the taxable supply being tested for VAT.',
+  'Enter the transaction amount using the inclusive or exclusive basis selected above.',
+  'NTaxer uses it to calculate output VAT and the amount payable by or charged to the customer.',
+  'Do not enter the VAT amount itself here unless the field specifically asks for VAT.'
+ );
+ if(/potentially eligible input vat/.test(lower))return d(
+  'This is VAT you paid on business purchases that could be recoverable against output VAT.',
+  'Enter the VAT component of qualifying purchases, not the full purchase price.',
+  'Recoverable input VAT can reduce the VAT that must be remitted.',
+  'VAT on personal, exempt-only or otherwise ineligible purchases should not be included.'
+ );
+ if(/taxable-use recovery percentage/.test(lower))return d(
+  'This is the share of potentially eligible input VAT that relates to taxable business use.',
+  'Enter 100 only when all of that input VAT is attributable to taxable use; reduce it for mixed or non-taxable use.',
+  'The percentage limits how much input VAT NTaxer deducts from output VAT.',
+  'Do not use 100% merely because VAT appears on the supplier invoice.'
+ );
+
+ if(/transaction$/.test(lower)&&calcId==='withholding')return d(
+  'This identifies the type of payment being tested for withholding tax.',
+  'Choose the transaction category that best describes what the payment is actually for.',
+  'The transaction type determines the applicable withholding rate and sometimes whether withholding applies at all.',
+  'Classify by the substance of the payment, not just the counterparty’s business name.'
+ );
+ if(/recipient$/.test(lower))return d(
+  'This identifies who is receiving the payment for withholding-tax purposes.',
+  'Choose the recipient’s actual legal status and residence category.',
+  'Withholding rates can differ between companies, individuals and non-residents.',
+  'Do not infer recipient type from an account name alone if the legal status is uncertain.'
+ );
+ if(/payment basis/.test(lower))return d(
+  'This tells NTaxer whether your figure is the gross amount before withholding or the net amount the recipient must receive after withholding.',
+  'Choose Gross when you know the pre-withholding amount; choose Net when you need NTaxer to gross up from a desired net payment.',
+  'The basis changes how the withholding amount is derived.',
+  'Using a net figure as gross will understate the underlying transaction and withholding.'
+ );
+ if(/payment amount excluding vat/.test(lower))return d(
+  'This is the transaction value on which withholding is tested, excluding VAT.',
+  'Enter the amount payable for the goods, services or other transaction before VAT.',
+  'Withholding is calculated from this payment base according to the selected transaction and recipient.',
+  'Do not include VAT in this amount unless the applicable rule specifically requires it.'
+ );
+
+ if(/dutiable instrument/.test(lower))return d(
+  'This identifies the legal instrument or document on which stamp duty is being tested.',
+  'Choose the instrument that matches the actual document or transaction.',
+  'Stamp-duty rates and thresholds vary by instrument, so this choice drives the duty rule used.',
+  'Do not choose based only on the payment description; identify the underlying legal instrument.'
+ );
+ if(/chargeable consideration|capital.*premium/.test(lower))return d(
+  'This is the amount used as the chargeable base for the selected stamp-duty instrument.',
+  'Enter the consideration, capital, premium or other value that the selected instrument requires.',
+  'NTaxer applies the relevant stamp-duty rule to this base.',
+  'The correct base can differ from the cash that happened to move through the bank.'
+ );
+ if(/underlying property value/.test(lower))return d(
+  'This is the value of the property connected to the instrument, used where a threshold or exemption depends on property value.',
+  'Enter the relevant property value even if it differs from the loan or consideration amount.',
+  'It helps NTaxer test property-based stamp-duty conditions.',
+  'Do not automatically copy the transaction amount into this field.'
+ );
+
+ if(/amount per transfer/.test(lower))return d(
+  'This is the value of each electronic transfer being tested for transfer duty.',
+  'Enter the amount of one transfer. Use the separate count field when several identical transfers are being modelled.',
+  'NTaxer checks the statutory threshold and fixed duty against each transfer.',
+  'Do not add all transfers together here if they are separate transactions.'
+ );
+ if(/number of identical transfers/.test(lower))return d(
+  'This is how many transfers of the same amount and treatment you want to calculate together.',
+  'Enter the number of identical transfers represented by the amount-per-transfer field.',
+  'NTaxer multiplies the per-transfer result by this count.',
+  'Only group transfers when their amount and exemption status are genuinely the same.'
+ );
+
+ if(/qualifying asset class/.test(lower))return d(
+  'This identifies the tax category of the capital asset for capital-allowance purposes.',
+  'Choose the class that matches the asset actually acquired and used.',
+  'The asset class determines the capital-allowance rate or treatment applied.',
+  'Classify the asset by its tax category, not simply by how it appears in the accounting fixed-asset register.'
+ );
+ if(/qualifying capital expenditure/.test(lower))return d(
+  'This is the cost of acquiring qualifying capital assets that can enter the capital-allowance computation.',
+  'Enter eligible capital expenditure for the asset or asset class being calculated.',
+  'It forms the base from which capital allowances are determined.',
+  'Routine repairs, consumables and ordinary operating expenses are not normally capital expenditure.'
+ );
+ if(/allowances already claimed/.test(lower))return d(
+  'This is capital allowance already used on the same new-regime asset in earlier periods.',
+  'Enter the cumulative eligible allowance previously claimed against this asset.',
+  'NTaxer uses it to avoid allowing more relief than remains available.',
+  'Do not include depreciation from the financial statements.'
+ );
+ if(/length of basis period/.test(lower))return d(
+  'This is the number of months covered by the accounting or tax basis period being calculated.',
+  'Enter the actual length of the period.',
+  'Some capital-allowance calculations are adjusted when the basis period is shorter or longer than a normal year.',
+  'Do not assume 12 months when the business has a commencement, cessation or changed year-end period.'
+ );
+
+ if(/foreign-source income included above/.test(lower))return d(
+  'This is the part of total taxable income that arose outside Nigeria and is already included in the total-income field.',
+  'Enter only the foreign-source portion that is being considered for foreign tax relief.',
+  'NTaxer uses it to cap relief so foreign tax does not shelter unrelated Nigerian-source income.',
+  'Do not add foreign income twice: it should already be inside total taxable income.'
+ );
+ if(/qualifying foreign income tax paid/.test(lower))return d(
+  'This is income tax actually paid to a foreign jurisdiction on the same foreign-source income.',
+  'Enter the qualifying foreign tax amount supported by the relevant evidence.',
+  'It is compared with the Nigerian tax attributable to that foreign income to determine the available relief.',
+  'Foreign VAT, sales taxes, penalties or unrelated taxes are not the same as qualifying foreign income tax.'
+ );
+
+ if(/verified chargeable profits/.test(lower))return d(
+  'This is the profit base already adjusted and verified for the selected petroleum or hydrocarbon tax regime.',
+  'Enter the chargeable-profit figure prepared under the relevant regime.',
+  'The applicable tax rate is applied to this base before credits or additional adjustments.',
+  'Do not substitute gross revenue or ordinary accounting profit.'
+ );
+ if(/additional tax|additional chargeable tax/.test(lower))return d(
+  'This is a separate additional tax amount produced by the relevant fiscal-price or regime adjustment.',
+  'Enter the verified additional amount where the statutory calculation requires it.',
+  'It is added to the main tax result before eligible credits are applied.',
+  'Do not estimate it from revenue unless the underlying statutory adjustment has been calculated.'
+ );
+ if(/eligible credits|investment.*tax credits/.test(lower))return d(
+  'These are verified tax credits that the selected petroleum or hydrocarbon regime allows against the calculated tax.',
+  'Enter only credits that are legally available for this period and tax.',
+  'They reduce the final tax payable after the main tax and additional charges are calculated.',
+  'Do not include ordinary business expenses or unrelated withholding credits.'
+ );
+ if(/chargeable barrels/.test(lower))return d(
+  'This is the average number of barrels per production day that fall within the royalty calculation.',
+  'Enter chargeable production volume per day for the relevant field and period.',
+  'Production volume is one of the inputs used to determine petroleum royalty.',
+  'Use chargeable production, not storage capacity or total historical reserves.'
+ );
+ if(/production days/.test(lower))return d(
+  'This is the number of days in the month on which chargeable production is being counted.',
+  'Enter the production days that belong to the royalty period.',
+  'NTaxer uses this with barrels per day to derive chargeable monthly production.',
+  'Do not automatically use calendar days if production did not occur every day.'
+ );
+ if(/fiscal oil price/.test(lower))return d(
+  'This is the US-dollar price per barrel used by the royalty calculation.',
+  'Enter the applicable fiscal oil price for the relevant period.',
+  'The price can affect price-based royalty components.',
+  'Use the prescribed fiscal price, not necessarily the spot price received on one cargo.'
+ );
+ if(/official.*market value/.test(lower))return d(
+  'This is the official or qualifying market value of the mineral quantity used for royalty.',
+  'Enter the value required by the applicable mineral royalty rule.',
+  'The mineral royalty rate is applied to this qualifying value.',
+  'Do not automatically use invoice proceeds if the law requires an official or reference value.'
+ );
+
+ if(/qualifying nigerian gross revenue/.test(lower))return d(
+  'This is Nigerian-source gross revenue that falls within the non-resident-company calculation.',
+  'Enter only revenue attributable to the qualifying Nigerian activity.',
+  'It helps establish the Nigerian tax base for the non-resident company.',
+  'Do not include worldwide revenue that is unrelated to Nigeria.'
+ );
+ if(/global statutory profit margin/.test(lower))return d(
+  'This is the statutory or verified profit margin used to estimate Nigerian taxable profit from revenue where that method applies.',
+  'Enter the permitted percentage margin.',
+  'NTaxer applies the percentage to the relevant revenue base to estimate taxable profit.',
+  'Do not substitute the company’s accounting gross margin unless it is the required statutory margin.'
+ );
+
+ if(/verified taxable base/.test(lower))return d(
+  'This is the amount to which the selected tax or levy rate will be applied.',
+  'Enter a base that you have already verified against the legal source for that assessment.',
+  'NTaxer multiplies this base by the percentage rate and then adds any fixed charge where applicable.',
+  'Do not use a convenient accounting figure unless it is the legally correct base.'
+ );
+ if(/verified percentage rate/.test(lower))return d(
+  'This is the legally verified percentage rate for the selected assessment.',
+  'Enter the percentage exactly as supported by the applicable legal source.',
+  'The rate is applied directly to the taxable base.',
+  'Do not infer a rate from another tax or from a previous year.'
+ );
+ if(/verified fixed charge/.test(lower))return d(
+  'This is a fixed naira amount that applies in addition to, or instead of, a percentage-based charge.',
+  'Enter the verified fixed amount required by the assessment.',
+  'It is added to the percentage-based amount where the calculator calls for both.',
+  'Do not enter penalties or interest here unless they are part of the verified fixed charge.'
+ );
+
+ if(/number of/.test(lower))return d(
+  'This field tells NTaxer how many identical items or transactions the calculation represents.',
+  'Enter the count of items that share the same amount and tax treatment.',
+  'The calculator uses the count to scale the per-item result.',
+  'Do not group items together if their values or tax treatment differ.'
+ );
+ if(/percentage|rate/.test(lower)&&f.type==='number')return d(
+  'This field is a percentage or rate used in the calculation.',
+  'Enter the percentage as a normal number, for example 7.5 for 7.5%.',
+  'The rate changes how much of the base is taxed, credited, recovered or otherwise adjusted.',
+  'Make sure you are using the rate for the correct tax, period and taxpayer.'
+ );
+ if(f.type==='boolean')return d(
+  'This is a yes/no condition that can change how '+calcName+' treats your case.',
+  'Turn it on only when the condition is actually true and, where necessary, has been verified.',
+  'A checked condition can activate an exemption, eligibility rule, special treatment or different calculation path.',
+  'If you are uncertain, leave it off and review the calculator assumptions or legal references before relying on the result.'
+ );
+ if(f.type==='select')return d(
+  'This choice tells NTaxer which rule or treatment applies to '+label+'.',
+  'Select the option that best matches the real transaction, taxpayer or situation.',
+  'The selected option can change the rate, exemption, calculation method or scope used by '+calcName+'.',
+  'Choose based on the legal and factual situation, not simply the option that gives the lowest result.'
+ );
+ if(f.type==='money')return d(
+  'This is the naira amount for '+label+' that '+calcName+' needs as an input.',
+  'Enter the amount that belongs specifically in this field and period. Use 0 when it genuinely does not apply.',
+  'NTaxer uses the figure to build the tax base, deduction, relief, credit or transaction value for the calculation.',
+  'Avoid double-counting an amount that is already included in another field.'
+ );
+ if(f.type==='number')return d(
+  'This is a numeric input that controls part of '+calcName+'.',
+  'Enter the value that applies to your situation, within any minimum or maximum shown by the field.',
+  'NTaxer uses it to scale, limit or classify the calculation.',
+  'Check the unit carefully: a number of days, months, items or a percentage can produce very different results.'
+ );
+ return generic;
 }
 
 function fieldHelpButton(f,calculator,id){
- const help=plainFieldHelp(f,calculator);
- return '<span class="field-help-wrap"><button class="field-help-trigger" type="button" data-field-help="'+escape(help)+'" aria-label="What does '+escape(f.label)+' mean?" aria-expanded="false" aria-controls="field-help-popover"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 10.8v5.4"></path><circle cx="12" cy="7.4" r=".9" fill="currentColor" stroke="none"></circle></svg></button></span>';
+ const help=fieldHelpDetails(f,calculator);
+ return '<span class="field-help-wrap"><button class="field-help-trigger" type="button" data-help-title="'+escape(f.label)+'" data-help-meaning="'+escape(help.meaning)+'" data-help-enter="'+escape(help.enter)+'" data-help-why="'+escape(help.why)+'" data-help-watch="'+escape(help.watch)+'" aria-label="More information about '+escape(f.label)+'" aria-expanded="false" aria-controls="field-help-popover"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 10.8v5.4"></path><circle cx="12" cy="7.4" r=".9" fill="currentColor" stroke="none"></circle></svg></button></span>';
 }
 
 function positionFieldHelp(trigger){
@@ -171,7 +628,16 @@ function showFieldHelp(trigger,{pin=false}={}){
  if(activeFieldHelpTrigger&&activeFieldHelpTrigger!==trigger)activeFieldHelpTrigger.setAttribute('aria-expanded','false');
  activeFieldHelpTrigger=trigger;
  if(pin)pinnedFieldHelpTrigger=trigger;
- fieldHelpPopover.textContent=trigger.dataset.fieldHelp||'';
+ const title=trigger.dataset.helpTitle||'Field help';
+ const meaning=trigger.dataset.helpMeaning||'';
+ const enter=trigger.dataset.helpEnter||'';
+ const why=trigger.dataset.helpWhy||'';
+ const watch=trigger.dataset.helpWatch||'';
+ fieldHelpPopover.innerHTML='<div class="field-help-title">'+escape(title)+'</div>'
+  +'<div class="field-help-section"><strong>What it means</strong><span>'+escape(meaning)+'</span></div>'
+  +'<div class="field-help-section"><strong>What to enter</strong><span>'+escape(enter)+'</span></div>'
+  +'<div class="field-help-section"><strong>Why it matters</strong><span>'+escape(why)+'</span></div>'
+  +'<div class="field-help-section field-help-watch"><strong>Watch out</strong><span>'+escape(watch)+'</span></div>';
  fieldHelpPopover.classList.add('is-visible');
  fieldHelpPopover.setAttribute('aria-hidden','false');
  trigger.setAttribute('aria-expanded','true');
