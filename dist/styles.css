@@ -1494,3 +1494,36 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  font-weight:700;
  text-transform:capitalize
 }
+
+
+/* Final sidebar toggle treatment: icon only, no coloured button tile. */
+.sidebar-toggle,
+.sidebar-toggle[aria-expanded="false"],
+.sidebar-toggle[aria-expanded="true"]{
+ width:44px;
+ height:44px;
+ padding:0;
+ display:grid;
+ place-items:center;
+ background:transparent!important;
+ border:none!important;
+ box-shadow:none!important;
+ color:#fff;
+}
+.sidebar-toggle:hover,
+.sidebar-toggle:focus-visible,
+.sidebar-toggle:active{
+ background:transparent!important;
+ box-shadow:none!important;
+}
+.sidebar-toggle:hover{color:var(--mint)}
+.sidebar-toggle-glyph{
+ width:22px!important;
+ height:22px!important;
+ margin:0!important;
+}
+@media screen{
+ .sidebar-toggle[aria-expanded="true"]{
+  left:calc(var(--sidebar-width) - 22px);
+ }
+}
