@@ -1486,3 +1486,11 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  border:0!important;
  min-height:0!important
 }
+
+
+/* Calculator-aware statement classification labels. */
+.statement-row-classification{
+ color:var(--green)!important;
+ font-weight:700;
+ text-transform:capitalize
+}
