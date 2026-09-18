@@ -234,16 +234,16 @@ function importView(sourceCalculator=''){
 
  <section class="statement-upload-card" aria-labelledby="statement-upload-title">
   <div class="statement-upload-heading">
-   <div><p class="eyebrow">Start here</p><h2 id="statement-upload-title">Upload your statement</h2></div>
+   <div><p class="eyebrow">Start here</p><h2 id="statement-upload-title">Upload your statements</h2></div>
    ${source?`<span class="statement-source-calculator">For: ${escape(source.name)}</span>`:''}
   </div>
-  <p class="statement-upload-copy">Choose a supported file. Nothing is added to a calculator until you review and confirm the extracted information.</p>
+  <p class="statement-upload-copy">Choose one or more supported files. Nothing is added to a calculator until you review and confirm the extracted information.</p>
   <div id="statement-dropzone" class="statement-dropzone">
-   <input id="statement-file" class="statement-file-input" type="file" accept=".pdf,.csv,.xls,.xlsx,application/pdf,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+   <input id="statement-file" class="statement-file-input" type="file" multiple accept=".pdf,.csv,.xls,.xlsx,application/pdf,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
    <svg class="statement-upload-icon" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg>
-   <strong>Drop your statement here</strong>
+   <strong>Drop your statements here</strong>
    <span>or</span>
-   <button id="statement-browse" class="button primary" type="button">Choose statement</button>
+   <button id="statement-browse" class="button primary" type="button">Choose statements</button>
    <small>PDF, Excel (.xlsx / .xls) or CSV</small>
   </div>
   <div id="statement-file-status" class="statement-file-status" aria-live="polite" hidden></div>
@@ -270,51 +270,89 @@ function importView(sourceCalculator=''){
  const dropzone=$('#statement-dropzone');
  const status=$('#statement-file-status');
  const supportedExtensions=['pdf','csv','xls','xlsx'];
+ let selectedFiles=[];
 
  const formatBytes=bytes=>{
   if(bytes<1024)return bytes+' B';
   if(bytes<1024*1024)return (bytes/1024).toFixed(1)+' KB';
   return (bytes/(1024*1024)).toFixed(1)+' MB';
  };
+ const fileKey=file=>[file.name,file.size,file.lastModified].join('::');
+ const fileExtension=file=>(file.name.split('.').pop()||'').toLowerCase();
 
- const clearSelectedFile=()=>{
-  fileInput.value='';
-  dropzone.classList.remove('has-file');
-  status.hidden=true;
-  status.innerHTML='';
- };
-
- const showSelectedFile=file=>{
-  const extension=(file.name.split('.').pop()||'').toLowerCase();
-  if(!supportedExtensions.includes(extension)){
-   clearSelectedFile();
-   status.hidden=false;
-   status.className='statement-file-status error';
-   status.innerHTML='<strong>Unsupported file type</strong><span>Please choose a PDF, Excel or CSV file.</span>';
+ const renderSelectedFiles=()=>{
+  dropzone.classList.toggle('has-file',selectedFiles.length>0);
+  if(!selectedFiles.length){
+   status.hidden=true;
+   status.className='statement-file-status';
+   status.innerHTML='';
    return;
   }
-  dropzone.classList.add('has-file');
+  const totalSize=selectedFiles.reduce((sum,file)=>sum+file.size,0);
   status.hidden=false;
-  status.className='statement-file-status selected';
-  status.innerHTML=`<div class="statement-file-info"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg><span><strong>${escape(file.name)}</strong><small>${escape(extension.toUpperCase())} · ${formatBytes(file.size)}</small></span></div><button id="statement-remove" class="text-button" type="button">Remove</button>`;
-  $('#statement-remove').addEventListener('click',clearSelectedFile);
+  status.className='statement-file-status selected multiple';
+  status.innerHTML=`
+   <div class="statement-file-summary">
+    <div><strong>${selectedFiles.length} ${selectedFiles.length===1?'statement':'statements'} selected</strong><small>${formatBytes(totalSize)} total</small></div>
+    <button id="statement-clear-all" class="text-button" type="button">Clear all</button>
+   </div>
+   <div class="statement-file-list">
+    ${selectedFiles.map((file,index)=>{
+      const extension=fileExtension(file);
+      return `<div class="statement-file-row">
+       <div class="statement-file-info">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>
+        <span><strong>${escape(file.name)}</strong><small>${escape(extension.toUpperCase())} · ${formatBytes(file.size)}</small></span>
+       </div>
+       <button class="statement-remove-file text-button" type="button" data-file-index="${index}" aria-label="Remove ${escape(file.name)}">Remove</button>
+      </div>`;
+    }).join('')}
+   </div>`;
+  $('#statement-clear-all').addEventListener('click',()=>{
+   selectedFiles=[];
+   renderSelectedFiles();
+  });
+  status.querySelectorAll('.statement-remove-file').forEach(button=>{
+   button.addEventListener('click',()=>{
+    selectedFiles.splice(Number(button.dataset.fileIndex),1);
+    renderSelectedFiles();
+   });
+  });
+ };
+
+ const addFiles=files=>{
+  const incoming=[...files];
+  if(!incoming.length)return;
+  const invalid=incoming.filter(file=>!supportedExtensions.includes(fileExtension(file)));
+  const valid=incoming.filter(file=>supportedExtensions.includes(fileExtension(file)));
+  const existingKeys=new Set(selectedFiles.map(fileKey));
+  for(const file of valid){
+   if(!existingKeys.has(fileKey(file))){
+    selectedFiles.push(file);
+    existingKeys.add(fileKey(file));
+   }
+  }
+  renderSelectedFiles();
+  if(invalid.length){
+   const message=document.createElement('div');
+   message.className='statement-file-warning';
+   message.textContent=`${invalid.length} unsupported ${invalid.length===1?'file was':'files were'} skipped. Use PDF, Excel or CSV.`;
+   status.prepend(message);
+   status.hidden=false;
+  }
  };
 
  browseButton.addEventListener('click',()=>fileInput.click());
- fileInput.addEventListener('change',()=>{const file=fileInput.files?.[0];if(file)showSelectedFile(file);});
+ fileInput.addEventListener('change',()=>{
+  addFiles(fileInput.files||[]);
+  fileInput.value='';
+ });
  dropzone.addEventListener('dragover',event=>{event.preventDefault();dropzone.classList.add('dragging');});
  dropzone.addEventListener('dragleave',()=>dropzone.classList.remove('dragging'));
  dropzone.addEventListener('drop',event=>{
   event.preventDefault();
   dropzone.classList.remove('dragging');
-  const file=event.dataTransfer?.files?.[0];
-  if(!file)return;
-  try{
-   const transfer=new DataTransfer();
-   transfer.items.add(file);
-   fileInput.files=transfer.files;
-  }catch{}
-  showSelectedFile(file);
+  addFiles(event.dataTransfer?.files||[]);
  });
 }
 
