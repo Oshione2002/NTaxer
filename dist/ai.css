@@ -1,12 +1,32 @@
-/* NTaxer AI — Gemini-powered guidance layered on top of deterministic calculators. */
+/* NTaxer AI guidance layered on top of deterministic calculators. */
 .ntaxer-ai-launcher{
-  position:fixed;right:84px;bottom:max(24px,env(safe-area-inset-bottom));z-index:40;
-  display:inline-flex;align-items:center;gap:9px;padding:12px 16px;border:1px solid #386758;
-  border-radius:999px;background:var(--strong-surface);color:white;font-size:15px;font-weight:800;
-  box-shadow:0 5px 18px var(--tone-073e3226)
+  position:fixed;right:max(24px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));z-index:40;
+  width:48px;height:48px;padding:0;display:inline-flex;align-items:center;justify-content:center;gap:0;
+  border:1px solid #386758;border-radius:999px;background:var(--strong-surface);color:white;
+  font-size:15px;font-weight:800;overflow:hidden;white-space:nowrap;
+  box-shadow:0 5px 18px var(--tone-073e3226);
+  transition:width .18s ease,right .2s ease,background-color .18s ease
 }
 .ntaxer-ai-launcher:hover{background:#125441}
-.ntaxer-ai-spark{color:var(--mint);font-size:18px}
+.ntaxer-ai-launcher>span:last-child{
+  max-width:0;opacity:0;overflow:hidden;transition:max-width .18s ease,opacity .12s ease
+}
+.ntaxer-ai-spark{color:var(--mint);font-size:18px;flex:0 0 auto}
+body.scroll-top-visible .ntaxer-ai-launcher{
+  right:calc(max(24px,env(safe-area-inset-right)) + 60px)
+}
+@media(min-width:651px){
+  .ntaxer-ai-launcher:hover,
+  .ntaxer-ai-launcher:focus-visible,
+  .ntaxer-ai-launcher[aria-expanded="true"]{
+    width:154px;gap:9px;padding:0 16px
+  }
+  .ntaxer-ai-launcher:hover>span:last-child,
+  .ntaxer-ai-launcher:focus-visible>span:last-child,
+  .ntaxer-ai-launcher[aria-expanded="true"]>span:last-child{
+    max-width:110px;opacity:1
+  }
+}
 .ntaxer-ai-panel{
   position:fixed;right:24px;bottom:max(86px,calc(env(safe-area-inset-bottom) + 86px));z-index:45;
   width:min(430px,calc(100vw - 32px));height:min(690px,calc(100dvh - var(--header-height) - 36px));
@@ -101,10 +121,12 @@
 @media(max-width:650px){
   .ntaxer-ai-launcher{
     right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));
-    width:48px;height:48px;padding:0;gap:0;justify-content:center;border-radius:50%;
-    transition:right .2s ease
+    width:48px;height:48px;padding:0;gap:0;justify-content:center;border-radius:50%
   }
-  .ntaxer-ai-launcher span:last-child{display:none}
+  .ntaxer-ai-launcher:hover,
+  .ntaxer-ai-launcher:focus-visible,
+  .ntaxer-ai-launcher[aria-expanded="true"]{width:48px;padding:0;gap:0}
+  .ntaxer-ai-launcher>span:last-child{display:none}
   body.scroll-top-visible .ntaxer-ai-launcher{
     right:calc(max(16px,env(safe-area-inset-right)) + 56px)
   }
