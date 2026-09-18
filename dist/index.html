@@ -19,33 +19,45 @@
     <a class="brand" href="#home" aria-label="NTaxer home"><img src="assets/icon.png" width="40" height="40" alt=""><span>NTaxer</span></a>
   </header>
   <div class="shell sidebar-collapsed">
-    <aside id="tax-sidebar" class="sidebar" aria-label="Tax calculators" hidden>
-      <nav class="sidebar-primary" aria-label="Main navigation">
-        <a href="#home" data-nav="home">Home</a>
-        <div class="calculator-menu">
-          <button type="button" class="calculator-menu-toggle" data-nav="calculator" aria-expanded="false" aria-controls="calculator-menu-options">Calculators<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div id="calculator-menu-options" class="calculator-menu-content" hidden>
-            <div class="calculator-search-bar"><label class="search"><span aria-hidden="true">⌕</span><input id="calculator-search" type="search" placeholder="Find a tax…" aria-label="Find a calculator"></label></div>
-            <div id="calculator-nav"></div>
-          </div>
+    <aside id="tax-sidebar" class="sidebar" aria-label="NTaxer navigation" hidden>
+      <div id="sidebar-main-view" class="sidebar-view sidebar-main-view">
+        <nav class="sidebar-primary" aria-label="Main navigation">
+          <a href="#home" data-nav="home">Home</a>
+          <button id="open-calculators" type="button" class="sidebar-calculator-entry" data-nav="calculator" aria-controls="sidebar-calculator-view" aria-expanded="false">
+            <span>Calculators</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+          </button>
+        </nav>
+        <nav class="sidebar-reference-nav" aria-label="Tax references">
+          <a href="#import" data-nav="import">Import Statement</a>
+          <a href="#coverage" data-nav="coverage">Tax Coverage</a>
+          <a href="#law" data-nav="law">The Tax Law</a>
+        </nav>
+        <div class="sidebar-theme-controls"><span>Appearance</span>
+          <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">
+            <svg class="moon-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/></svg>
+            <svg class="sun-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+          </button>
         </div>
-      </nav>
-      <nav class="sidebar-reference-nav" aria-label="Tax references">
-        <a href="#import" data-nav="import">Import Statement</a>
-        <a href="#coverage" data-nav="coverage">Tax Coverage</a>
-        <a href="#law" data-nav="law">The Tax Law</a>
-      </nav>
-      <div class="sidebar-theme-controls"><span>Appearance</span>
-        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">
-          <svg class="moon-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/></svg>
-          <svg class="sun-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+        <button id="install-app" class="sidebar-install-button" type="button" aria-describedby="install-app-status">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M5 19h14"/></svg>
+          <span><strong>Install NTaxer</strong><small>Preparing offline access…</small></span>
         </button>
+        <p id="install-app-status" class="install-app-status" aria-live="polite" hidden></p>
       </div>
-      <button id="install-app" class="sidebar-install-button" type="button" aria-describedby="install-app-status">
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M5 19h14"/></svg>
-        <span><strong>Install NTaxer</strong><small>Preparing offline access…</small></span>
-      </button>
-      <p id="install-app-status" class="install-app-status" aria-live="polite" hidden></p>
+
+      <div id="sidebar-calculator-view" class="sidebar-view sidebar-calculator-view" aria-hidden="true" hidden>
+        <div class="calculator-sidebar-header">
+          <button id="calculator-sidebar-back" class="calculator-sidebar-back" type="button" aria-label="Back to main navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+            <span>Calculator</span>
+          </button>
+        </div>
+        <div class="calculator-search-bar">
+          <label class="search"><span aria-hidden="true">⌕</span><input id="calculator-search" type="search" placeholder="Find a tax…" aria-label="Find a calculator"></label>
+        </div>
+        <div id="calculator-nav" class="calculator-sidebar-nav" aria-label="Calculator categories"></div>
+      </div>
     </aside>
     <main id="main" tabindex="-1"></main>
     <footer><span>NTaxer · Independent tax planning tool</span><span>Estimates, not a tax assessment. Check the scope and sources for your case.</span></footer>
