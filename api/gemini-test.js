@@ -32,7 +32,7 @@ async function runGeminiCheck(res){
         model:MODEL,
         geminiStatus:response.status,
         code:data?.error?.status||null,
-        error:data?.error?.message||'Gemini API request failed.'
+        error:data?.error?.message||'NTaxer AI request failed.'
       });
     }
 
@@ -51,7 +51,7 @@ async function runGeminiCheck(res){
     return res.status(502).json({
       ok:false,
       model:MODEL,
-      error:'Could not reach the Gemini API.'
+      error:'Could not reach the NTaxer AI service.'
     });
   }
 }
@@ -65,7 +65,7 @@ export default async function handler(req,res){
       ok:true,
       configured:Boolean(process.env.GEMINI_API_KEY),
       model:MODEL,
-      note:'Add ?run=1 to perform a live Gemini connectivity test.'
+      note:'Add ?run=1 to perform a live NTaxer AI connectivity test.'
     });
   }
 
