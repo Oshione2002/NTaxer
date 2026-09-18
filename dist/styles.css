@@ -882,3 +882,13 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  background:var(--tone-e4eee7);
  color:var(--green);
 }
+
+
+/* Give the Appearance label a little more inset from the sidebar edge. */
+.sidebar-theme-controls{
+ padding-left:22px;
+ padding-right:12px;
+}
+@media(max-width:650px){
+ .sidebar-theme-controls{padding-left:22px;padding-right:12px}
+}
