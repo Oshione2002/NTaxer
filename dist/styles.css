@@ -1181,3 +1181,165 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  color:var(--green);
  border-color:var(--tone-bfcec5)
 }
+
+
+/* Statement analysis and row review. */
+.statement-analysis-actions{
+ display:flex;
+ justify-content:flex-end;
+ margin-top:16px
+}
+.statement-analysis-progress{
+ display:flex;
+ align-items:center;
+ gap:12px;
+ margin-top:14px;
+ padding:13px 14px;
+ border:1px solid var(--line);
+ border-radius:10px;
+ background:var(--tone-fbfcfb)
+}
+.statement-analysis-progress.error{
+ border-color:var(--tone-e8d9b0);
+ background:var(--tone-fff9ec);
+ color:var(--tone-785b23)
+}
+.statement-analysis-progress>div:last-child{display:grid;gap:2px}
+.statement-analysis-progress strong{font-size:14px}
+.statement-analysis-progress span{font-size:12px;color:var(--muted)}
+.statement-analysis-spinner{
+ width:22px;
+ height:22px;
+ flex:0 0 22px;
+ border:2px solid var(--line);
+ border-top-color:var(--tone-219d72);
+ border-radius:50%;
+ animation:statement-spin .8s linear infinite
+}
+@keyframes statement-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.statement-analysis-spinner{animation:none}}
+
+.statement-review{
+ margin-top:24px;
+ padding:24px;
+ border:1px solid var(--line);
+ border-radius:12px;
+ background:var(--surface)
+}
+.statement-review-heading{
+ display:flex;
+ align-items:flex-start;
+ justify-content:space-between;
+ gap:16px
+}
+.statement-review-copy{
+ margin:10px 0 18px;
+ color:var(--muted);
+ font-size:14px
+}
+.statement-document-summary{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+ gap:10px;
+ margin-bottom:16px
+}
+.statement-document-card{
+ display:grid;
+ gap:3px;
+ padding:11px 12px;
+ border:1px solid var(--line);
+ border-radius:9px;
+ background:var(--tone-fbfcfb)
+}
+.statement-document-card.error{
+ border-color:var(--tone-e8d9b0);
+ background:var(--tone-fff9ec)
+}
+.statement-document-card strong{font-size:13px;overflow-wrap:anywhere}
+.statement-document-card span,.statement-document-card small{font-size:12px;color:var(--muted)}
+.statement-review-table-wrap{
+ overflow-x:auto;
+ border:1px solid var(--line);
+ border-radius:10px
+}
+.statement-review-table{
+ width:100%;
+ min-width:920px;
+ border-collapse:collapse
+}
+.statement-review-table th{
+ padding:10px 12px;
+ border-bottom:1px solid var(--line);
+ background:var(--tone-fbfcfb);
+ text-align:left;
+ white-space:nowrap
+}
+.statement-review-table td{
+ padding:10px 12px;
+ border-bottom:1px solid var(--line);
+ vertical-align:middle
+}
+.statement-review-table tbody tr:last-child td{border-bottom:0}
+.statement-review-table td:nth-child(2){min-width:260px}
+.statement-review-table td:nth-child(5){min-width:280px}
+.statement-review-table td strong{display:block;font-size:13px}
+.statement-review-table td small,
+.statement-review-table td em{
+ display:block;
+ margin-top:2px;
+ font-size:11px;
+ color:var(--muted);
+ font-style:normal
+}
+.statement-review-table tr.excluded td{
+ opacity:.45;
+ background:var(--tone-f3f6f5)
+}
+.statement-amount{font-weight:700;white-space:nowrap}
+.statement-type-badge{
+ display:inline-flex;
+ padding:3px 7px;
+ border:1px solid var(--line);
+ border-radius:999px;
+ font-size:11px;
+ text-transform:capitalize
+}
+.statement-map-select{
+ width:100%;
+ min-width:250px;
+ padding:8px 9px;
+ border:1px solid var(--line);
+ border-radius:8px;
+ background:var(--surface);
+ color:var(--tone-172e28);
+ font-size:13px
+}
+.statement-confidence{text-transform:capitalize}
+.statement-row-toggle{
+ display:grid;
+ place-items:center;
+ width:34px;
+ height:34px;
+ padding:0;
+ border:1px solid var(--line);
+ border-radius:50%;
+ background:transparent;
+ color:var(--muted);
+ font-size:21px;
+ line-height:1
+}
+.statement-row-toggle:hover{
+ background:var(--tone-eaf1eb);
+ color:var(--green)
+}
+.statement-empty-review{
+ padding:20px!important;
+ color:var(--muted);
+ text-align:center
+}
+@media(max-width:650px){
+ .statement-analysis-actions{justify-content:stretch}
+ .statement-analysis-actions .button{width:100%}
+ .statement-review{padding:18px}
+ .statement-review-heading{flex-direction:column}
+}
