@@ -295,7 +295,11 @@ $('#tax-sidebar').addEventListener('wheel',event=>{
 $('#calculator-search').addEventListener('input',nav);window.addEventListener('hashchange',route);if(!location.hash)history.replaceState(null,'','#home');route();
 
 const scrollTopButton=$('#scroll-to-top');
-const updateScrollTopButton=()=>{scrollTopButton.hidden=window.scrollY<300;};
+const updateScrollTopButton=()=>{
+ const visible=window.scrollY>=300;
+ scrollTopButton.hidden=!visible;
+ document.body.classList.toggle('scroll-top-visible',visible);
+};
 window.addEventListener('scroll',updateScrollTopButton,{passive:true});
 scrollTopButton.addEventListener('click',()=>{
  $('#main').focus({preventScroll:true});
