@@ -670,9 +670,10 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
  border-radius:8px;
  background:transparent;
  color:var(--tone-233e31);
- font:inherit;
- font-size:16px;
+ font-family:Inter,Aptos,"Segoe UI",system-ui,sans-serif;
+ font-size:14px;
  font-weight:700;
+ letter-spacing:.2px;
  text-align:left;
  cursor:pointer
 }
