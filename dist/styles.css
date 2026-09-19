@@ -1800,3 +1800,24 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 @media(prefers-reduced-motion:reduce){
  #download-pdf,#download-excel{transition:none}
 }
+
+
+/* Keep the icon-only sidebar control visible in both themes. */
+.sidebar-toggle,
+.sidebar-toggle[aria-expanded="false"],
+.sidebar-toggle[aria-expanded="true"]{
+ color:var(--green);
+}
+:root[data-theme="dark"] .sidebar-toggle,
+:root[data-theme="dark"] .sidebar-toggle[aria-expanded="false"],
+:root[data-theme="dark"] .sidebar-toggle[aria-expanded="true"]{
+ color:#fff;
+}
+.sidebar-toggle:hover,
+.sidebar-toggle:focus-visible{
+ color:var(--tone-219d72);
+}
+:root[data-theme="dark"] .sidebar-toggle:hover,
+:root[data-theme="dark"] .sidebar-toggle:focus-visible{
+ color:var(--mint);
+}
