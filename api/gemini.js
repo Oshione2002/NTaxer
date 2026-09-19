@@ -320,17 +320,37 @@ export default async function handler(req,res){
       .slice(0,4)
       .map(item=>({id:String(item.id),reason:String(item.reason||'')}));
 
-    const sources=(Array.isArray(parsed.sources)?parsed.sources:[])
+    let sources=(Array.isArray(parsed.sources)?parsed.sources:[])
       .filter(item=>allowedSources.has(String(item.id)))
-      .slice(0,6)
+      .slice(0,12)
       .map(item=>({id:String(item.id),label:String(item.label||item.id)}));
+
+    if(mode==='route'){
+      const selectedIds=new Set(calculators.map(item=>item.id));
+      const routeSources=[];
+      for(const item of Array.isArray(body.calculators)?body.calculators:[]){
+        if(!selectedIds.has(String(item.id)))continue;
+        for(const number of Array.isArray(item.refs)?item.refs:[])routeSources.push({id:'section-'+number,label:'Section '+number});
+        for(const number of Array.isArray(item.schedules)?item.schedules:[])routeSources.push({id:'schedule-'+number,label:'Schedule '+number});
+      }
+      sources=routeSources;
+    }else if(!sources.length){
+      const fallbackIds=mode==='law'
+        ?(Array.isArray(body.sources)?body.sources:[]).map(item=>String(item.id))
+        :(Array.isArray(body.context?.sourceIds)?body.context.sourceIds:[]).map(String);
+      sources=fallbackIds.filter(id=>allowedSources.has(id)).map(id=>({id,label:legalLabel(id)}));
+    }
+
+    const legal=splitLegalSources(sources);
 
     return send(res,200,{
       ok:true,
       model,
       answer:String(parsed.answer||'').trim(),
       calculators,
-      sources,
+      sources:[...legal.sections,...legal.schedules],
+      sections:legal.sections,
+      schedules:legal.schedules,
       cautions:(Array.isArray(parsed.cautions)?parsed.cautions:[]).slice(0,3).map(String)
     });
   }catch(error){
