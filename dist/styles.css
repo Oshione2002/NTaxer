@@ -1735,3 +1735,19 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
   white-space:nowrap;
  }
 }
+
+
+/* Optically centre the NTaxer wordmark beside the mobile icon. */
+@media screen and (max-width:650px){
+ .topbar .brand{
+  align-items:center;
+ }
+ .topbar .brand>span{
+  display:flex;
+  align-items:center;
+  height:34px;
+  line-height:1;
+  position:relative;
+  top:1px;
+ }
+}
