@@ -33,7 +33,14 @@ export const CALCULATORS=[
  {id:'surcharge',name:'Fossil-fuel surcharge',short:'Fuel surcharge',symbol:'≋',group:'Specialist sectors',status:'scenario',description:'Check product exemptions or model the statutory rate as a planning scenario.',refs:[158,159,160,161],calculate:E.surcharge,fields:[s('product','Product',[['chargeable','Potentially chargeable fossil fuel'],['exempt','Clean / renewable energy, kerosene, cooking gas or CNG']]),n('amount','Retail value of the product',1000000),b('scenario','Model 5% as a scenario only',false,'A commencement order was not verified. Enabling this does not establish a payment obligation.')]},
  {id:'other',name:'Other assessed taxes & levies',short:'Other taxes & levies',symbol:'…',group:'Specialist sectors',status:'scenario',description:'Model an assessment with a rate and base verified from the relevant authority.',refs:[2,194,196,200,201],calculate:E.prescribed,fields:[s('category','Assessment category',[['state','State / local property, land or other levy'],['customs','Customs / excise or import levy'],['gaming','Gaming / betting regulatory levy'],['gas','Gas or legacy petroleum royalty'],['other','Other prescribed assessment']]),n('base','Verified taxable base',1000000),q('rate','Verified percentage rate',0,0,100),n('fixed','Verified fixed charge'),b('confirmed','I have verified this base and rate against its legal source')]}
 ];
-export const DEFAULTS=Object.fromEntries(CALCULATORS.map(c=>[c.id,Object.fromEntries(c.fields.filter(f=>f.key).map(f=>[f.key,f.value]))]));
+export const DEFAULTS=Object.fromEntries(CALCULATORS.map(c=>[
+  c.id,
+  Object.fromEntries(c.fields.filter(f=>f.key).map(f=>{
+    if(f.type==='money')return [f.key,'0'];
+    if(f.type==='number')return [f.key,String(Number(f.min??0)>0?f.min:0)];
+    return [f.key,f.value];
+  }))
+]));
 export const SOURCE_LINKS={
   nta:{title:'Nigeria Tax Act 2025 — National Assembly copy',url:'https://nass.gov.ng/documents/download/11249',detail:'Primary calculation reference. Commencement: 1 January 2026. Local PDF and searchable extracted text included.'},
   release:{title:'Official notice of the National Assembly release',url:'https://fiscalreforms.ng/news/gazetted-tax-reform-acts-authorised-by-national-assembly',detail:'Presidential Committee on Fiscal Policy & Tax Reforms, January 2026.'},
