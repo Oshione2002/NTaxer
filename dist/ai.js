@@ -112,6 +112,17 @@ function sourceHref(id){
   if(id.startsWith('schedule-'))return '#law/'+id;
   return '#law';
 }
+function legalReferencePillLabel(item){
+  const id=String(item?.id||'');
+  if(id.startsWith('section-'))return 'Section '+id.slice(8);
+  if(id.startsWith('schedule-')){
+    const number=Number(id.slice(9));
+    const names=['','First','Second','Third','Fourth','Fifth','Sixth','Seventh','Eighth','Ninth','Tenth','Eleventh','Twelfth','Thirteenth','Fourteenth'];
+    return (names[number]||('Schedule '+number))+(names[number]?' Schedule':'');
+  }
+  return String(item?.label||id);
+}
+
 
 function addAssistant(payload,{loading=false,error=false,showReferences=false}={}){
   const article=document.createElement('article');
@@ -149,29 +160,29 @@ function addAssistant(payload,{loading=false,error=false,showReferences=false}={
     const fallback=Array.isArray(payload.sources)?payload.sources:[];
     const sectionItems=Array.isArray(payload.sections)?payload.sections:fallback.filter(item=>String(item.id||'').startsWith('section-'));
     const scheduleItems=Array.isArray(payload.schedules)?payload.schedules:fallback.filter(item=>String(item.id||'').startsWith('schedule-'));
-    const appendReferenceGroup=(title,items,emptyText)=>{
-      const group=document.createElement('div');
-      group.className='ntaxer-ai-sources ntaxer-ai-reference-group';
+    const references=[...sectionItems,...scheduleItems];
+    const unique=[];
+    const seen=new Set();
+    for(const item of references){
+      const id=String(item?.id||'');
+      if(!id||seen.has(id))continue;
+      seen.add(id);
+      unique.push(item);
+    }
+    if(unique.length){
+      const sources=document.createElement('div');
+      sources.className='ntaxer-ai-sources ntaxer-ai-legal-pills';
       const label=document.createElement('strong');
-      label.textContent=title;
-      group.append(label);
-      if(items.length){
-        for(const item of items){
-          const link=document.createElement('a');
-          link.href=sourceHref(item.id);
-          link.textContent=item.label||item.id;
-          group.append(link);
-        }
-      }else{
-        const empty=document.createElement('span');
-        empty.className='ntaxer-ai-reference-empty';
-        empty.textContent=emptyText;
-        group.append(empty);
+      label.textContent='Legal references';
+      sources.append(label);
+      for(const item of unique){
+        const link=document.createElement('a');
+        link.href=sourceHref(item.id);
+        link.textContent=legalReferencePillLabel(item);
+        sources.append(link);
       }
-      article.append(group);
-    };
-    appendReferenceGroup('Act sections',sectionItems,'No Act section cited for this answer.');
-    appendReferenceGroup('Schedules',scheduleItems,'No Schedule cited for this answer.');
+      article.append(sources);
+    }
   }
 
   if(Array.isArray(payload.cautions)&&payload.cautions.length){
