@@ -1842,3 +1842,67 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 #download-excel:not(:disabled):focus-visible>span{
  color:#073e32!important;
 }
+
+
+/* Final compact header, larger sidebar glyph, and matched export hover behaviour. */
+:root{
+ --header-height:76px;
+}
+.topbar{
+ height:76px;
+ min-height:76px;
+}
+
+/* Keep Excel's own resting style, but give it the same hover treatment as PDF. */
+#download-pdf,
+#download-excel{
+ transition:filter .16s ease,background-color .16s ease,border-color .16s ease,color .16s ease;
+}
+@media (hover:hover) and (pointer:fine){
+ #download-pdf:not(:disabled):hover,
+ #download-excel:not(:disabled):hover{
+  filter:brightness(.88);
+ }
+ #download-excel:not(:disabled):hover{
+  background:inherit!important;
+  border-color:inherit!important;
+  color:#fff!important;
+ }
+ #download-excel:not(:disabled):hover>span{
+  color:#fff!important;
+ }
+}
+#download-pdf:not(:disabled):focus-visible,
+#download-excel:not(:disabled):focus-visible{
+ filter:brightness(.88);
+}
+#download-excel:not(:disabled):focus-visible{
+ background:inherit!important;
+ border-color:inherit!important;
+ color:#fff!important;
+}
+#download-excel:not(:disabled):focus-visible>span{
+ color:#fff!important;
+}
+
+/* Make the icon-only sidebar control easier to see without restoring its tile. */
+.sidebar-toggle-glyph{
+ width:28px!important;
+ height:28px!important;
+}
+
+@media screen and (max-width:650px){
+ :root{
+  --header-height:64px;
+ }
+ .topbar{
+  height:64px;
+  min-height:64px;
+  padding-left:18px;
+  padding-right:18px;
+ }
+ .sidebar-toggle-glyph{
+  width:30px!important;
+  height:30px!important;
+ }
+}
