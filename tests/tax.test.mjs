@@ -44,8 +44,9 @@ test('small-company test uses BOTH inclusive thresholds',()=>{
  assert.equal(E.company({...base,resident:false}).amount,N(3000000));
 });
 test('company loss and capital relief affects income tax; levy stays on assessable profit',()=>{
- const r=E.company({...DEFAULTS.company,profit:10000000,losses:1000000,allowances:2000000});
- assert.equal(r.amount,N(2500000));assert.throws(()=>E.company({...DEFAULTS.company,profit:10,allowances:11}));
+ const base={...DEFAULTS.company,turnover:100000001,assets:250000001};
+ const r=E.company({...base,profit:10000000,losses:1000000,allowances:2000000});
+ assert.equal(r.amount,N(2500000));assert.throws(()=>E.company({...base,profit:10,allowances:11}));
 });
 test('VAT inclusive and exclusive calculations reconcile to the same invoice',()=>{
  const a=E.vat({amount:1000000,mode:'exclusive',treatment:'standard',input:0});
@@ -75,8 +76,8 @@ test('WHT resident/nonresident and recipient-type rates',()=>{
  assert.equal(E.withholding({...base,type:'goods',recipient:'1'}).amount,null);
 });
 test('no-TIN doubling excludes passive income, gross-up and treaty gates work',()=>{
- assert.equal(E.withholding({...DEFAULTS.withholding,noTin:true}).amount,N(100000));
- assert.equal(E.withholding({...DEFAULTS.withholding,type:'rent',noTin:true}).amount,N(100000));
+ assert.equal(E.withholding({...DEFAULTS.withholding,amount:1000000,noTin:true}).amount,N(100000));
+ assert.equal(E.withholding({...DEFAULTS.withholding,amount:1000000,type:'rent',noTin:true}).amount,N(100000));
  const r=E.withholding({...DEFAULTS.withholding,mode:'net',amount:950000});assert.equal(r.base,N(1000000));assert.equal(r.amount,N(50000));
  assert.throws(()=>E.withholding({...DEFAULTS.withholding,treaty:true,recipient:'0'}));
 });
