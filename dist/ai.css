@@ -165,3 +165,16 @@ body.scroll-top-visible .ntaxer-ai-launcher{
     display:block!important;max-width:112px!important;opacity:1!important;overflow:visible!important
   }
 }
+
+
+/* Keep legal references explicit and separated in NTaxer AI answers. */
+.ntaxer-ai-reference-group+.ntaxer-ai-reference-group{
+ margin-top:8px;
+}
+.ntaxer-ai-reference-empty{
+ display:block;
+ width:100%;
+ color:var(--muted);
+ font-size:11px;
+ line-height:1.4;
+}
