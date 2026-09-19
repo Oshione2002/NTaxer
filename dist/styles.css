@@ -1821,3 +1821,24 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 :root[data-theme="dark"] .sidebar-toggle:focus-visible{
  color:var(--mint);
 }
+
+
+/* Final Excel hover contrast: light accent surface with dark-green text. */
+@media (hover:hover) and (pointer:fine){
+ #download-excel:not(:disabled):hover{
+  background:var(--mint)!important;
+  border-color:var(--mint)!important;
+  color:#073e32!important;
+ }
+ #download-excel:not(:disabled):hover>span{
+  color:#073e32!important;
+ }
+}
+#download-excel:not(:disabled):focus-visible{
+ background:var(--mint)!important;
+ border-color:var(--mint)!important;
+ color:#073e32!important;
+}
+#download-excel:not(:disabled):focus-visible>span{
+ color:#073e32!important;
+}
