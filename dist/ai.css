@@ -178,3 +178,25 @@ body.scroll-top-visible .ntaxer-ai-launcher{
  font-size:11px;
  line-height:1.4;
 }
+
+
+/* AI legal references appear as compact individual pills. */
+.ntaxer-ai-legal-pills{
+ gap:7px;
+}
+.ntaxer-ai-legal-pills>strong{
+ margin-bottom:2px;
+}
+.ntaxer-ai-legal-pills a{
+ display:inline-flex;
+ align-items:center;
+ min-height:27px;
+ padding:4px 9px;
+ border-radius:999px;
+ white-space:nowrap;
+}
+.ntaxer-ai-legal-pills a:hover,
+.ntaxer-ai-legal-pills a:focus-visible{
+ background:var(--tone-e4eee7);
+ border-color:var(--tone-bfcec5);
+}
