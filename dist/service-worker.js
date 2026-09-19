@@ -1,4 +1,4 @@
-const CACHE_VERSION='ntaxer-offline-v60';
+const CACHE_VERSION='ntaxer-offline-v61';
 const APP_SHELL=[
  './',
  './index.html',
