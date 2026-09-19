@@ -1438,6 +1438,8 @@ function route(){
  else if(page==='sources')sourcesView();
  else if(page==='calculator')calcView(target||'paye');
  else homeView();
+ if(page!=='calculator')setSidebarView('main',{focus:false});
+ else if(sidebarToggle?.getAttribute('aria-expanded')==='true')setSidebarView('calculators',{focus:false});
  nav();
  if(page!=='law')window.scrollTo({top:0,behavior:'instant'});
 }
@@ -1469,9 +1471,15 @@ function setSidebarView(view,{focus=false}={}){
   requestAnimationFrame(()=>openCalculatorsButton.focus({preventScroll:true}));
  }
 }
+function sidebarViewForCurrentRoute(){
+ const page=(location.hash||'#home').slice(1).split('/')[0];
+ return page==='calculator'?'calculators':'main';
+}
 function setSidebarExpanded(expanded,{persist=true}={}){
  const sidebar=$('#tax-sidebar');
- if(!expanded)setSidebarView('main',{focus:false});
+ // Collapsing must not forget the calculator context. When the sidebar is
+ // opened again, derive the appropriate view from the active route.
+ if(expanded)setSidebarView(sidebarViewForCurrentRoute(),{focus:false});
  sidebar.hidden=!expanded;
  sidebar.inert=!expanded;
  sidebar.setAttribute('aria-hidden',String(!expanded));
