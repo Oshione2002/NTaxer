@@ -1770,12 +1770,7 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 /* Strong, full-button hover states for result exports. */
 #download-pdf,
 #download-excel{
- transition:background-color .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;
-}
-#download-pdf{
- background:var(--mint);
- border-color:var(--mint);
- color:var(--green);
+ transition:background-color .16s ease,border-color .16s ease,color .16s ease,filter .16s ease;
 }
 #download-excel{
  color:#fff;
@@ -1786,25 +1781,21 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
 }
 @media (hover:hover) and (pointer:fine){
  #download-pdf:not(:disabled):hover{
+  filter:brightness(.88);
+ }
+ #download-excel:not(:disabled):hover{
   background:var(--green);
   border-color:var(--green);
   color:#fff;
  }
- #download-excel:not(:disabled):hover{
-  background:var(--mint);
-  border-color:var(--mint);
-  color:var(--green);
- }
 }
 #download-pdf:not(:disabled):focus-visible{
+ filter:brightness(.88);
+}
+#download-excel:not(:disabled):focus-visible{
  background:var(--green);
  border-color:var(--green);
  color:#fff;
-}
-#download-excel:not(:disabled):focus-visible{
- background:var(--mint);
- border-color:var(--mint);
- color:var(--green);
 }
 @media(prefers-reduced-motion:reduce){
  #download-pdf,#download-excel{transition:none}
