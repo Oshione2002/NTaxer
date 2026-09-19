@@ -158,7 +158,7 @@ RECENT CONVERSATION:
 ${history.map(item=>`${item.role}: ${String(item.text||'').slice(0,900)}`).join('\n')||'None'}
 
 AVAILABLE NTAXER CALCULATORS:
-${registry.map(item=>`- ${item.id}: ${item.name} [${item.group}] — ${item.description}`).join('\n')}
+${registry.map(item=>`- ${item.id}: ${item.name} [${item.group}] — ${item.description} | Act sections: ${Array.isArray(item.refs)&&item.refs.length?item.refs.join(', '):'none'} | Schedules: ${Array.isArray(item.schedules)&&item.schedules.length?item.schedules.join(', '):'none'}`).join('\n')}
 
 Return a short answer plus only relevant calculator IDs from this registry.`;
   }
@@ -257,6 +257,29 @@ async function callGemini(mode,prompt){
 
 function candidateText(data){
   return data?.candidates?.[0]?.content?.parts?.map(part=>part.text||'').join('').trim()||'';
+}
+function legalLabel(id,label=''){
+  const text=String(label||'').trim();
+  if(text)return text;
+  const value=String(id||'');
+  if(value.startsWith('section-'))return 'Section '+value.slice(8);
+  if(value.startsWith('schedule-'))return 'Schedule '+value.slice(9);
+  return value;
+}
+
+function splitLegalSources(items){
+  const sections=[];
+  const schedules=[];
+  const seen=new Set();
+  for(const item of items){
+    const id=String(item?.id||'');
+    if(!id||seen.has(id))continue;
+    seen.add(id);
+    const normal={id,label:legalLabel(id,item?.label)};
+    if(id.startsWith('section-'))sections.push(normal);
+    else if(id.startsWith('schedule-'))schedules.push(normal);
+  }
+  return {sections:sections.slice(0,12),schedules:schedules.slice(0,6)};
 }
 
 export default async function handler(req,res){
