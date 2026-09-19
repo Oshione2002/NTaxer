@@ -113,7 +113,7 @@ function sourceHref(id){
   return '#law';
 }
 
-function addAssistant(payload,{loading=false,error=false}={}){
+function addAssistant(payload,{loading=false,error=false,showReferences=false}={}){
   const article=document.createElement('article');
   article.className='ntaxer-ai-message assistant'+(loading?' loading':'')+(error?' error':'');
   if(loading){
@@ -145,19 +145,33 @@ function addAssistant(payload,{loading=false,error=false}={}){
     if(group.children.length)article.append(group);
   }
 
-  if(Array.isArray(payload.sources)&&payload.sources.length){
-    const sources=document.createElement('div');
-    sources.className='ntaxer-ai-sources';
-    const label=document.createElement('strong');
-    label.textContent='Sources';
-    sources.append(label);
-    for(const item of payload.sources){
-      const link=document.createElement('a');
-      link.href=sourceHref(item.id);
-      link.textContent=item.label||item.id;
-      sources.append(link);
-    }
-    article.append(sources);
+  if(showReferences){
+    const fallback=Array.isArray(payload.sources)?payload.sources:[];
+    const sectionItems=Array.isArray(payload.sections)?payload.sections:fallback.filter(item=>String(item.id||'').startsWith('section-'));
+    const scheduleItems=Array.isArray(payload.schedules)?payload.schedules:fallback.filter(item=>String(item.id||'').startsWith('schedule-'));
+    const appendReferenceGroup=(title,items,emptyText)=>{
+      const group=document.createElement('div');
+      group.className='ntaxer-ai-sources ntaxer-ai-reference-group';
+      const label=document.createElement('strong');
+      label.textContent=title;
+      group.append(label);
+      if(items.length){
+        for(const item of items){
+          const link=document.createElement('a');
+          link.href=sourceHref(item.id);
+          link.textContent=item.label||item.id;
+          group.append(link);
+        }
+      }else{
+        const empty=document.createElement('span');
+        empty.className='ntaxer-ai-reference-empty';
+        empty.textContent=emptyText;
+        group.append(empty);
+      }
+      article.append(group);
+    };
+    appendReferenceGroup('Act sections',sectionItems,'No Act section cited for this answer.');
+    appendReferenceGroup('Schedules',scheduleItems,'No Schedule cited for this answer.');
   }
 
   if(Array.isArray(payload.cautions)&&payload.cautions.length){
@@ -219,7 +233,9 @@ function calculatorContext(){
   const result=escapeText(document.querySelector('#result')?.innerText||'');
   const breakdown=escapeText(document.querySelector('#breakdown')?.innerText||'');
   const details=escapeText(document.querySelector('#detail-content')?.innerText||'').slice(0,4000);
-  const sourceIds=calc?.refs?.map(number=>'section-'+number)||[];
+  const sectionIds=calc?.refs?.map(number=>'section-'+number)||[];
+  const scheduleIds=calc?.schedules?.map(number=>'schedule-'+number)||[];
+  const sourceIds=[...sectionIds,...scheduleIds];
   return {
     calculator:calc?calc.name+' — '+calc.description:'',
     inputs:inputContext.text,
@@ -227,7 +243,7 @@ function calculatorContext(){
     result,
     breakdown,
     details,
-    sources:calc?.refs?.map(number=>'Section '+number)||[],
+    sources:[...(calc?.refs?.map(number=>'Section '+number)||[]),...(calc?.schedules?.map(number=>'Schedule '+number)||[])],
     sourceIds
   };
 }
@@ -338,7 +354,9 @@ function registry(){
     id:item.id,
     name:item.name,
     group:item.group,
-    description:item.description
+    description:item.description,
+    refs:[...(item.refs||[])],
+    schedules:[...(item.schedules||[])]
   }));
 }
 
@@ -380,7 +398,7 @@ async function ask(question,{silentUser=false,displayText=''}={}){
     const data=await response.json().catch(()=>({}));
     loading.remove();
     if(!response.ok||!data.ok)throw new Error(data.error||'NTaxer AI could not complete this request.');
-    addAssistant(data);
+    addAssistant(data,{showReferences:true});
     aiState.history.push({role:'assistant',text:data.answer||''});
   }catch(error){
     loading.remove();
