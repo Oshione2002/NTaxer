@@ -1751,3 +1751,17 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
   top:1px;
  }
 }
+
+
+/* Excel export button: white label at rest, accent label on hover/focus. */
+#download-excel{
+ color:#fff;
+}
+@media (hover:hover) and (pointer:fine){
+ #download-excel:not(:disabled):hover{
+  color:var(--mint);
+ }
+}
+#download-excel:not(:disabled):focus-visible{
+ color:var(--mint);
+}
