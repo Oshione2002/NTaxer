@@ -1681,3 +1681,39 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
   font-size:13px;
  }
 }
+
+
+/* Hover overlay for result export buttons. */
+.export-button{
+ position:relative;
+ overflow:hidden;
+ isolation:isolate;
+}
+.export-button>span{
+ position:relative;
+ z-index:2;
+}
+.export-button::after{
+ content:"";
+ position:absolute;
+ inset:0;
+ z-index:1;
+ background:rgba(7,62,50,.10);
+ opacity:0;
+ transition:opacity .16s ease;
+ pointer-events:none;
+}
+.export-button.primary::after{
+ background:rgba(7,62,50,.16);
+}
+@media (hover:hover) and (pointer:fine){
+ .export-button:not(:disabled):hover::after{
+  opacity:1;
+ }
+}
+.export-button:not(:disabled):focus-visible::after{
+ opacity:1;
+}
+@media(prefers-reduced-motion:reduce){
+ .export-button::after{transition:none}
+}
