@@ -1,11 +1,13 @@
-const CACHE_VERSION='ntaxer-offline-v71';
+const CACHE_VERSION='ntaxer-offline-v72';
 const APP_SHELL=[
  './',
  './index.html',
  './app.js',
+ './app-v27.js',
  './ai.js',
  './theme.js',
  './styles.css',
+ './styles-v39.css',
  './ai.css',
  './manifest.webmanifest',
  './calculators.js',

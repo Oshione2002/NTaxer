@@ -1,0 +1,2042 @@
+:root{font-family:Inter,Aptos,"Segoe UI",system-ui,sans-serif;color:var(--tone-172e28);background:var(--tone-f3f6f5);font-synthesis:none;--green:var(--tone-073e32);--mint:#c9f57d;--muted:var(--tone-60716b);--line:var(--tone-dce5e0);--white:var(--tone-fff);--radius:16px}
+*{box-sizing:border-box}body{margin:0;font-size:18px;line-height:1.55}button,input,select{font:inherit}button,a,input,select,summary{-webkit-tap-highlight-color:transparent}a{color:inherit;text-underline-offset:4px}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}:focus-visible{outline:3px solid var(--tone-219d72);outline-offset:4px}.skip{position:absolute;top:-80px;padding:12px;background:var(--surface);z-index:10}.skip:focus{top:0}.topbar{height:88px;background:var(--white);display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 42px;border-bottom:1px solid var(--line)}.brand{text-decoration:none;font-size:28px;font-weight:750;letter-spacing:-1.3px;display:flex;gap:10px;align-items:center}.brand img{background:var(--strong-surface);border-radius:10px;object-fit:contain}.brand-period{color:#159965}.topbar nav{display:flex;height:100%;gap:34px;align-items:stretch}.topbar nav a{display:flex;align-items:center;text-decoration:none;font-size:16px;color:var(--muted);border-bottom:3px solid transparent;padding-top:3px}.topbar nav a.active{color:var(--green);font-weight:700;border-color:var(--green)}.edition{padding:6px 13px;border:1px solid var(--line);border-radius:24px;font-size:16px;font-weight:650}.edition span{font-weight:400;color:var(--muted)}.shell{display:grid;grid-template-columns:256px minmax(0,1fr);max-width:none;margin:0;min-height:calc(100vh - 155px)}.sidebar{padding:32px 22px;border-right:1px solid var(--line);background:var(--tone-fbfcfb)}.sidebar-heading{font-size:14px;font-weight:700;letter-spacing:1.1px;color:var(--muted);margin-bottom:18px}.search{display:flex;align-items:center;border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:7px 10px;gap:8px}.search span{font-size:23px}.search input{border:0;outline:0!important;min-width:0;width:100%;font-size:16px;background:transparent}.search:focus-within{outline:2px solid var(--tone-219d72)}.nav-group{font-size:14px;letter-spacing:.8px;color:var(--muted);font-weight:650;text-transform:uppercase;margin:26px 10px 8px}.calc-link{display:flex;align-items:center;gap:10px;padding:10px 11px;margin:3px 0;border-radius:8px;text-decoration:none;font-size:16px;color:var(--tone-53675d)}.calc-link .nav-symbol{width:23px;height:23px;display:grid;place-items:center;border:1px solid var(--tone-bfcec5);border-radius:6px;font-size:12px;flex-shrink:0}.calc-link:hover{background:var(--tone-ecf1ee)}.calc-link.active{background:var(--tone-e4eee7);color:var(--green);font-weight:700}.calc-link.active .nav-symbol{border-color:var(--tone-538466)}.side-note{border-top:1px solid var(--line);margin-top:30px;padding:22px 8px 8px;font-size:15px;color:var(--muted)}.side-note strong{display:block;font-size:16px;color:var(--green);margin-top:8px}.side-note p{margin-top:5px}.shield{background:var(--tone-e6eee9);border-radius:50%;display:inline-grid;width:25px;height:25px;place-items:center}.source-shortcut{font-size:15px;margin-left:8px}main{padding:34px 40px 50px;min-width:0}.eyebrow{font-size:14px;letter-spacing:1.3px;text-transform:uppercase;font-weight:700;color:var(--muted);margin:0 0 8px}.heading-row{display:flex;justify-content:space-between;align-items:center;gap:20px}.calculator-import-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:9px 13px;border:1px solid var(--tone-b9d2c1);border-radius:9px;background:var(--surface);color:var(--green);font-size:14px;font-weight:700;text-decoration:none;white-space:nowrap}.calculator-import-button:hover{background:var(--tone-eaf1eb)}.calculator-import-button svg{flex:0 0 auto}h1{font-size:34px;line-height:1.2;letter-spacing:-1.2px;margin:0 0 12px;font-weight:700}h2{font-size:20px;line-height:1.3;letter-spacing:-.4px;margin:0}h3{font-size:16px;margin:0 0 7px}p.lead{color:var(--muted);margin:0;max-width:760px}.badge{display:inline-flex;align-items:center;padding:5px 10px;font-size:14px;font-weight:650;background:var(--tone-e7eee9);border-radius:5px;color:var(--tone-285844);white-space:nowrap}.badge.assisted,.badge.scenario{color:var(--tone-866114);background:var(--tone-fff2d9)}.intro{margin-bottom:26px}.notice{border:1px solid var(--tone-e8d9b0);border-radius:10px;padding:13px 16px;font-size:16px;background:var(--tone-fff9ec);color:var(--tone-785b23);margin:18px 0}.notice.neutral{background:var(--tone-edf3ef);color:var(--tone-426152);border-color:var(--tone-d6e3d9)}.workspace{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(300px,1fr);gap:24px;align-items:start}.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}.panel-head{padding:24px 26px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--tone-edf0ee);gap:12px}.step{color:var(--tone-809087);font-size:14px}.fields{padding:24px 26px}.field{margin-bottom:20px;display:block}.field:last-child{margin-bottom:0}.field>span:first-child{display:block;font-size:16px;font-weight:600;margin-bottom:7px}.field .hint{font-size:14px;color:var(--muted);display:block;margin-top:6px;line-height:1.5}.input-wrap{display:flex;align-items:center;border:1px solid var(--tone-cfdbd3);border-radius:8px;background:var(--surface);overflow:hidden}.input-wrap:focus-within{outline:2px solid var(--tone-219d72);border-color:transparent}.input-wrap .prefix{padding-left:13px;color:var(--tone-819187)}.input-wrap input{border:0;width:100%;padding:11px 12px;background:transparent;min-width:0;color:var(--tone-233e31);outline:none}.input-wrap.invalid{border-color:var(--tone-c33838)}.field select{width:100%;padding:12px 10px;border:1px solid var(--tone-cfdbd3);border-radius:8px;background:var(--surface);color:var(--tone-233e31)}.checkfield{display:flex;gap:10px;font-size:16px;align-items:flex-start;margin:18px 0}.checkfield input{width:18px;height:18px;margin-top:3px;accent-color:var(--green);flex-shrink:0}.checkfield small{display:block;color:var(--muted);font-size:14px;margin-top:3px}.field-divider{padding-top:21px;border-top:1px solid var(--line);margin:24px 0 17px;font-size:14px;font-weight:700;letter-spacing:.9px;color:var(--muted);text-transform:uppercase}.error{font-size:15px;color:var(--tone-a82929);margin-top:8px}.form-actions{border-top:1px solid var(--tone-edf0ee);display:flex;justify-content:space-between;align-items:center;padding:16px 26px;font-size:14px;color:var(--muted)}.text-button{border:0;background:transparent;color:var(--green);font-size:15px;font-weight:600;padding:7px}.result-card{background:var(--strong-surface);color:white;border-radius:var(--radius);padding:26px;position:relative}.result-heading{font-size:15px;color:#bed7ca;letter-spacing:.2px;margin-bottom:7px}.result-total{font-size:clamp(28px,3.1vw,46px);letter-spacing:-1.6px;font-weight:650;line-height:1.2;overflow-wrap:anywhere}.result-sub{font-size:15px;color:#b5d0c1;margin-top:9px}.result-metrics{display:grid;grid-template-columns:1fr 1fr;gap:18px;border-top:1px solid #386758;margin-top:26px;padding-top:21px}.result-metrics small{font-size:14px;display:block;color:#c0d7ca;margin-bottom:5px}.result-metrics strong{font-size:18px;overflow-wrap:anywhere}.result-bar{display:flex;height:7px;background:#326452;border-radius:8px;overflow:hidden;margin-top:24px}.result-bar .bar-fill{background:var(--mint)}.bar-labels{display:flex;justify-content:space-between;font-size:14px;margin-top:8px;color:#bed7ca}.result-actions{display:flex;gap:10px;margin-top:23px}.button{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 13px;color:var(--green);font-size:15px;font-weight:650;display:inline-flex;justify-content:center;align-items:center;gap:7px;text-decoration:none}.button.primary{background:var(--mint);border-color:var(--mint)}.result-actions button{flex:1}.breakdown{margin-top:20px}.breakdown .panel-head{padding:21px}.breakdown h2{font-size:16px}.rows{padding:5px 21px 16px}.result-row{display:flex;justify-content:space-between;gap:18px;font-size:15px;padding:11px 0;border-bottom:1px solid var(--tone-edf0ee)}.result-row:last-child{border-bottom:0;font-weight:700}.result-row span{color:var(--muted)}.result-row strong{text-align:right;overflow-wrap:anywhere}.info-note{font-size:14px;color:var(--muted);margin:16px 6px}.detail-area{margin-top:24px}.tabbar{display:flex;gap:24px;border-bottom:1px solid var(--line);margin-bottom:22px;overflow:auto}.tabbar button{white-space:nowrap;padding:13px 0;border:0;border-bottom:2px solid transparent;background:transparent;color:var(--muted);font-size:16px}.tabbar button.active{color:var(--green);font-weight:700;border-color:var(--green)}.detail-card{padding:24px;background:var(--surface);border:1px solid var(--line);border-radius:12px;font-size:16px}.detail-card p{color:var(--muted)}.detail-card ul{padding-left:20px}.detail-card li{margin:10px 0}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:15px}th{text-align:left;font-weight:500;color:var(--muted);font-size:14px;padding:0 12px 12px}td{padding:13px 12px;border-top:1px solid var(--tone-e9eeea)}th:last-child,td:last-child{text-align:right}.table-total td{font-weight:700;background:var(--tone-f4f8f4)}.inline-ref{font-size:14px;display:inline-block;margin-top:10px;color:var(--tone-547264)}.grid-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.coverage-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:23px}.coverage-card p{font-size:16px;color:var(--muted)}.coverage-card .badge{margin-bottom:13px}.coverage-card h2{font-size:18px;margin-bottom:8px}.coverage-card a{font-size:16px}.coverage-card ul{font-size:15px;padding-left:17px;color:var(--muted)}.wide-search{margin:24px 0;max-width:680px}.wide-search input{padding:6px;font-size:18px}.filter-chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px}.filter-chips button{border:1px solid var(--line);border-radius:24px;padding:7px 14px;background:var(--surface);font-size:15px;color:var(--muted)}.filter-chips button.active{background:var(--strong-surface);color:white;border-color:var(--green)}.law-item{padding:17px 20px;background:var(--surface);border:1px solid var(--line);border-radius:10px;margin:10px 0}.law-item summary{cursor:pointer;display:flex;gap:18px;align-items:center;font-size:17px;font-weight:600}.section-no{color:var(--tone-477b5e);background:var(--tone-eaf1eb);min-width:45px;border-radius:7px;padding:6px;font-size:15px;text-align:center}.law-item pre{white-space:pre-wrap;font:16px/1.8 system-ui,sans-serif;color:var(--tone-53665b);max-height:480px;overflow:auto}.law-item a{font-size:15px;display:inline-block;margin:12px 0}.law-count{font-size:15px;color:var(--muted)}.source-entry{padding:22px 0;border-bottom:1px solid var(--line)}.source-entry h3{margin-bottom:8px}.source-entry p{font-size:16px;color:var(--muted)}.empty{padding:30px;color:var(--muted)}footer{display:flex;justify-content:space-between;gap:18px;padding:20px 40px;border-top:1px solid var(--line);font-size:14px;color:var(--muted);background:var(--surface)}.toast{font-size:15px;color:var(--tone-496d53);margin-top:12px}.print-only{display:none}.status-placeholder{font-size:25px;line-height:1.4;letter-spacing:-.3px}.mini-label{font-size:14px;color:var(--muted)}
+.full-breakdown-title{margin-top:24px}.tax-progress{width:100%;height:7px;border:0;appearance:none;background:#326452}.tax-progress::-webkit-progress-bar{background:#326452}.tax-progress::-webkit-progress-value{background:var(--mint)}.tax-progress::-moz-progress-bar{background:var(--mint)}
+@media(min-width:1450px){main{padding:40px 56px}.workspace{gap:28px}.fields{padding:28px 30px}}
+@media(max-width:1150px){.shell{grid-template-columns:220px minmax(0,1fr)}.sidebar{padding:28px 14px}main{padding:28px 24px}.workspace{gap:17px;grid-template-columns:minmax(0,1fr) minmax(270px,.9fr)}.fields,.panel-head{padding:21px}.result-card{padding:23px}.topbar{padding:0 26px}.heading-row{align-items:flex-start}h1{font-size:29px}}
+@media(max-width:940px){.shell{grid-template-columns:190px minmax(0,1fr)}.workspace{grid-template-columns:1fr}.sidebar{padding:24px 10px}.result-column{display:grid;grid-template-columns:1fr;gap:0}.grid-cards{grid-template-columns:1fr}.calc-link{font-size:15px;padding:9px 8px}.topbar nav{gap:23px}.edition span{display:none}.result-total{font-size:40px}}
+@media(max-width:650px){.topbar{height:auto;min-height:74px;padding:16px 18px;gap:14px;flex-wrap:wrap}.brand{font-size:25px}.brand img{width:34px;height:34px}.topbar nav{order:3;width:100%;justify-content:space-between;gap:12px}.topbar nav a{padding:7px 0;font-size:15px}.edition{margin-left:auto}.shell{display:block}.sidebar{padding:15px 18px;border-bottom:1px solid var(--line);border-right:0}.sidebar-heading,.side-note,.source-shortcut{display:none}.sidebar .search{margin-bottom:10px}#calculator-nav{display:flex;gap:7px;overflow:auto;max-height:155px;flex-wrap:nowrap;padding-bottom:5px}.nav-group{display:none}.calc-link{white-space:nowrap;margin:0;flex-shrink:0;padding:8px 11px;border:1px solid var(--line);background:var(--surface)}.nav-symbol{display:none!important}main{padding:26px 18px 35px}.heading-row{flex-wrap:nowrap;gap:12px}.heading-row .badge{margin-bottom:12px}.calculator-import-button{width:42px;height:42px;min-height:42px;padding:0;flex:0 0 42px;border-radius:10px}.calculator-import-button span{display:none}h1{font-size:29px}.lead{font-size:16px}.intro{margin-bottom:22px}.fields{padding:22px}.panel-head{padding:21px 22px}.result-total{font-size:38px}.detail-card{padding:18px}.tabbar{gap:20px}.tabbar button{font-size:15px}footer{padding:18px;display:block}footer span{display:block;margin-bottom:5px}.law-item{padding:13px}.law-item summary{font-size:16px}}
+@media(prefers-reduced-motion:no-preference){.panel,.result-card,.coverage-card{animation:arrive .25s ease-out}@keyframes arrive{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}}
+@media print{body{background:var(--surface)}.topbar nav,.sidebar,.edition,footer,.form-actions,.result-actions,.tabbar,.skip{display:none!important}.topbar{padding:15px 0;height:65px}.shell{display:block}main{padding:20px 0}.workspace{display:block}.panel,.result-card{break-inside:avoid;margin-bottom:20px}.result-card{background:var(--surface);color:black;border:1px solid #aaa}.result-heading,.result-sub,.result-metrics small,.bar-labels{color:#333}.result-column{display:block}.print-only{display:block}.detail-area{margin-top:20px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{margin:0}.field-divider{grid-column:1/-1}.field input,.field select{padding:4px}.checkfield{margin:0}.detail-card{border:0}.result-bar{display:none}a{color:black}.badge{border:1px solid #aaa}}
+/* Keep the estimate visible while completing long forms. */
+:root{--header-height:88px}
+.sticky-estimate{display:none}
+@media screen{
+ .topbar{position:sticky;top:0;z-index:20}
+ html{scroll-padding-top:calc(var(--header-height) + 20px)}
+}
+@media screen and (max-width:650px){
+ :root{--header-height:140px}
+}
+@media screen and (min-width:941px){
+ .result-column{position:sticky;top:calc(var(--header-height) + 20px);max-height:none;overflow:visible;min-width:0}
+}
+@media screen and (max-width:940px){
+ .sticky-estimate{display:flex;position:sticky;top:calc(var(--header-height) + 8px);z-index:5;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 16px;padding:12px 16px;margin-bottom:18px;border-radius:12px;background:var(--strong-surface);color:white;box-shadow:0 4px 14px var(--tone-073e3226)}
+ .sticky-estimate span{font-size:14px;color:#bed7ca}
+ .sticky-estimate strong{font-size:22px;overflow-wrap:anywhere;min-width:0;max-width:100%}
+ .field input,.field select,.checkfield input{scroll-margin-top:110px}
+}
+
+/* Primary navigation lives in the sidebar; the brand stays centred. */
+:root{--sidebar-width:256px}
+.topbar{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);height:88px;min-height:88px;padding:0 24px;gap:12px}
+.topbar .brand{grid-column:2;justify-self:center}
+.topbar .edition{grid-column:3;justify-self:end;margin:0}
+.sidebar-primary{display:flex;flex-direction:column;gap:6px;padding-bottom:20px;margin-bottom:24px;border-bottom:1px solid var(--line)}
+.sidebar-primary>a{padding:10px 12px;border-radius:8px;text-decoration:none;font-size:16px;color:var(--muted)}
+.sidebar-primary>a:hover{background:var(--tone-ecf1ee)}
+.sidebar-primary>a.active{background:var(--tone-e4eee7);color:var(--green);font-weight:700}
+.sidebar-toggle{position:fixed;top:calc(var(--header-height) + 16px);left:calc(var(--sidebar-width) - 16px);z-index:15;display:grid;place-items:center;width:48px;height:48px;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--green);box-shadow:0 2px 8px var(--tone-073e3214)}
+.sidebar-toggle:hover{background:var(--tone-e4eee7)}
+.sidebar-toggle[aria-expanded="false"]{left:0;border-radius:0 12px 12px 0}
+.sidebar-open-icon{display:none}
+.sidebar-toggle[aria-expanded="false"] .sidebar-close-icon{display:none}
+.sidebar-toggle[aria-expanded="false"] .sidebar-open-icon{display:block}
+.sidebar[hidden]{display:none!important}
+.shell.sidebar-collapsed{grid-template-columns:minmax(0,1fr)}
+@media(max-width:1150px){:root{--sidebar-width:220px}}
+@media(max-width:940px){:root{--sidebar-width:190px}}
+@media(max-width:650px){
+ :root{--sidebar-width:100%;--header-height:74px}
+ .topbar{height:74px;min-height:74px;padding:0 18px;gap:8px}
+ .topbar .edition{font-size:14px;padding:5px 8px}
+ .sidebar-primary{margin-bottom:14px;padding-right:28px;padding-bottom:14px}
+ .sidebar-primary>a{font-size:15px}
+ .sidebar-toggle{left:calc(100% - 48px);border-radius:12px 0 0 12px}
+}
+@media print{
+ .sidebar-toggle{display:none}
+ .topbar{height:65px;min-height:0;padding:15px 0}
+}
+
+/* All tax calculators are grouped beneath one keyboard-accessible disclosure. */
+.calculator-menu{min-width:0}
+.calculator-menu>.calculator-menu-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;list-style:none;cursor:pointer;padding:10px 12px;border-radius:8px;font-size:16px;color:var(--muted)}
+.calculator-menu>.calculator-menu-toggle::-webkit-details-marker{display:none}
+.calculator-menu>.calculator-menu-toggle:hover{background:var(--tone-ecf1ee)}
+.calculator-menu>.calculator-menu-toggle.active{background:var(--tone-e4eee7);color:var(--green);font-weight:700}
+.calculator-menu>.calculator-menu-toggle svg{flex-shrink:0}
+.calculator-menu.is-open>.calculator-menu-toggle svg{transform:rotate(180deg)}
+.calculator-menu-content{padding:12px 5px 6px;margin:4px 0 8px;max-height:none;overflow:visible}
+.calculator-menu #calculator-nav{display:block;max-height:none;overflow:visible;padding:0}
+.calculator-menu .nav-group{display:block;margin:20px 8px 8px}
+.calculator-menu .calc-link{white-space:normal;border:0}
+@media(max-width:650px){
+ .calculator-menu>.calculator-menu-toggle{font-size:15px}
+ .calculator-menu .calc-link{margin:3px 0}
+}
+
+/* The sidebar owns its scroll area; scrolling can continue to the page at its edge. */
+@media screen{
+ .sidebar{position:fixed;top:var(--header-height);left:0;bottom:0;width:var(--sidebar-width);height:calc(100dvh - var(--header-height));overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:auto;scrollbar-width:thin;z-index:10}
+ .shell{min-height:calc(100dvh - var(--header-height))}
+ .shell>main{grid-column:2}
+ .shell.sidebar-collapsed>main{grid-column:1}
+}
+@media screen and (max-width:650px){
+ :root{--sidebar-width:min(300px,calc(100vw - 40px))}
+ .sidebar{border-right:1px solid var(--line);border-bottom:0;box-shadow:6px 0 18px var(--tone-073e3214)}
+ .sidebar-primary{padding-right:0}
+ .sidebar-toggle{left:calc(var(--sidebar-width) - 16px);border-radius:12px}
+ .sidebar-toggle[aria-expanded="false"]{left:0;border-radius:0 12px 12px 0}
+}
+
+/* Keep law search beside its heading and available throughout the reference page. */
+.law-toolbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,360px);align-items:center;gap:20px;background:var(--tone-f3f6f5);padding:14px 0 18px;margin-bottom:18px;border-bottom:1px solid var(--line)}
+.law-toolbar h1{margin-bottom:0}
+.law-toolbar .wide-search{margin:0;width:100%;max-width:none}
+.law-toolbar .wide-search input{min-width:0}
+@media screen{
+ .law-toolbar{position:sticky;top:var(--header-height);z-index:6}
+ .law-item,.law-count{scroll-margin-top:calc(var(--law-toolbar-height,120px) + 12px)}
+}
+.scroll-to-top{position:fixed;right:24px;bottom:max(24px,env(safe-area-inset-bottom));z-index:8;display:grid;place-items:center;width:48px;height:48px;border:1px solid #386758;border-radius:50%;background:var(--strong-surface);color:white;box-shadow:0 4px 14px var(--tone-073e3226)}
+.scroll-to-top:hover{background:#125441}
+.scroll-to-top[hidden]{display:none}
+@media(max-width:1150px){.law-toolbar{grid-template-columns:minmax(0,1fr);gap:12px}}
+@media(max-width:650px){
+ .law-toolbar{padding:10px 0 14px}
+ .scroll-to-top{right:16px;bottom:max(16px,env(safe-area-inset-bottom))}
+}
+@media print{.scroll-to-top{display:none}.law-toolbar{display:block}.law-toolbar .search{display:none}}
+
+/* Sticky controls and bounded category headings share the sidebar scroll area. */
+.calculator-menu{--calculator-heading-height:45px;--calculator-search-height:70px}
+.calculator-menu-content{padding-top:0;margin-top:0}
+.calculator-search-bar{padding:12px 0;background:var(--tone-fbfcfb)}
+.calculator-search-bar .search{margin:0}
+.calculator-nav-group{padding-bottom:12px}
+.calculator-menu .nav-group{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0;padding:10px 8px;background:var(--tone-fbfcfb);line-height:1.5;text-transform:none;cursor:pointer;list-style:none}
+.calculator-menu .nav-group::-webkit-details-marker{display:none}
+.calculator-menu .nav-group::marker{content:""}
+.calculator-menu .nav-group:hover{background:var(--tone-ecf1ee)}
+.nav-group-chevron{flex-shrink:0}
+.calculator-nav-group[open] .nav-group-chevron{transform:rotate(180deg)}
+@media(prefers-reduced-motion:no-preference){.nav-group-chevron{transition:transform .18s ease}}
+@media screen{
+ .calculator-menu>.calculator-menu-toggle{position:sticky;top:0;z-index:4;background:var(--tone-fbfcfb)}
+ .calculator-menu>.calculator-menu-toggle.active{background:var(--tone-e4eee7)}
+ .calculator-search-bar{position:sticky;top:var(--calculator-heading-height);z-index:3}
+ .calculator-menu .nav-group{position:sticky;top:calc(var(--calculator-heading-height) + var(--calculator-search-height));z-index:2;border-bottom:1px solid var(--line)}
+ .calculator-menu .calc-link{scroll-margin-top:calc(var(--calculator-heading-height) + var(--calculator-search-height) + 64px)}
+}
+
+/* Let the page links flow directly after the calculator categories. */
+.calculator-menu-toggle{width:100%;border:0;background:transparent;font-family:inherit;text-align:left;font-weight:400;flex-shrink:0}
+.calculator-menu-content[hidden]{display:none!important}
+@media screen{
+ .sidebar-primary.calculators-expanded{height:auto;min-height:0;margin:0;padding:0;border:0}
+ .sidebar-primary>a{display:block;flex-shrink:0}
+ .calculator-menu.is-open{display:block;min-height:0}
+ .calculator-menu.is-open>.calculator-menu-toggle{position:relative;top:auto}
+ .calculator-menu.is-open .calculator-menu-content{min-height:0;margin:0;overflow:visible}
+ .calculator-menu.is-open .calculator-search-bar{top:0}
+ .calculator-menu.is-open .nav-group{top:var(--calculator-search-height)}
+ .calculator-menu.is-open .calc-link{scroll-margin-top:calc(var(--calculator-search-height) + 64px)}
+}
+
+/* Pin page headings below the site header and stack results beneath them. */
+main{--page-header-height:0px}
+@media screen{
+ .page-header{position:sticky;top:var(--header-height);z-index:6;background:var(--tone-f3f6f5);padding:14px 0 18px;border-bottom:1px solid var(--line)}
+ .field input,.field select,.checkfield input{scroll-margin-top:calc(var(--page-header-height) + 110px)}
+}
+@media screen and (min-width:941px){
+ .result-column{top:calc(var(--header-height) + var(--page-header-height) + 20px);max-height:none}
+}
+@media screen and (max-width:940px){
+ .sticky-estimate{top:calc(var(--header-height) + var(--page-header-height) + 8px)}
+}
+
+/* Read sections as flowing paragraphs, retaining separate clauses and headings. */
+.law-body{font-size:16px;line-height:1.8;color:var(--tone-53665b);overflow-wrap:anywhere}
+.law-body p{margin:0 0 14px}
+.law-body p:last-child{margin-bottom:0}
+.law-item:hover,.law-item:focus-within{background:var(--tone-eaf1eb);border-color:var(--tone-b9d2c1)}
+.law-item:hover .section-no,.law-item:focus-within .section-no{background:transparent}
+.law-item:hover>summary,.law-item:focus-within>summary{color:var(--green)}
+@media(prefers-reduced-motion:no-preference){
+ .law-item,.section-no{transition:background-color .16s ease,border-color .16s ease,color .16s ease}
+}
+
+/* The disclosure chevron follows each section's native open/closed state. */
+.law-item>summary{list-style:none}
+.law-item>summary::-webkit-details-marker{display:none}
+.law-section-title{flex:1;min-width:0;overflow-wrap:anywhere}
+.law-chevron{display:grid;place-items:center;flex:0 0 32px;width:32px;height:32px;border-radius:50%;color:var(--green)}
+.law-item>summary:hover .law-chevron{background:var(--tone-d6e6dc)}
+.law-item[open]>summary .law-chevron svg{transform:rotate(180deg)}
+@media(prefers-reduced-motion:no-preference){.law-chevron svg{transition:transform .18s ease}}
+
+/* Keep the footer aligned with the page beside an expanded desktop sidebar. */
+footer{flex-wrap:wrap}
+footer span{min-width:0;overflow-wrap:anywhere}
+@media screen and (min-width:651px) and (max-width:1150px){footer{padding-left:24px;padding-right:24px}}
+@media screen and (min-width:1450px){footer{padding-left:56px;padding-right:56px}}
+
+/* The home page gives direct access to every existing calculator. */
+.home-calculators{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
+.home-group{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.home-group h2{padding:22px 24px;background:var(--tone-eaf1eb);color:var(--green);border-bottom:1px solid var(--line)}
+.home-group-links{padding:0 24px}
+.home-calculator{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0;text-decoration:none;border-bottom:1px solid var(--line)}
+.home-calculator:last-child{border-bottom:0}
+.home-calculator strong{display:block;font-size:18px;color:var(--green);margin-bottom:5px}
+.home-calculator small{display:block;font-size:16px;color:var(--muted);line-height:1.55}
+.home-calculator:hover strong,.home-calculator:focus-visible strong{text-decoration:underline;text-underline-offset:4px}
+.home-link-arrow{flex-shrink:0;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--tone-eaf1eb);color:var(--green)}
+.home-calculator:hover .home-link-arrow{background:var(--mint)}
+.home-reference-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:24px}
+.home-reference-links a{display:block;padding:24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);text-decoration:none}
+.home-reference-links a:hover{background:var(--tone-eaf1eb)}
+.home-reference-links strong{display:block;color:var(--green);margin-bottom:6px}
+.home-reference-links span{font-size:16px;color:var(--muted)}
+@media(max-width:940px){.home-calculators,.home-reference-links{grid-template-columns:minmax(0,1fr)}}
+
+/* The footer scrolls with the document and uses the remaining page width. */
+footer{position:static;width:auto;}
+
+/* Theme colours are shared by every page and control. */
+:root{--tone-285844:#285844;--tone-426152:#426152;--tone-538466:#538466;--tone-547264:#547264;--tone-809087:#809087;--tone-819187:#819187;--tone-866114:#866114;--tone-073e32:#073e32;--tone-073e3214:#073e3214;--tone-073e3226:#073e3226;--tone-172e28:#172e28;--tone-233e31:#233e31;--tone-477b5e:#477b5e;--tone-496d53:#496d53;--tone-53665b:#53665b;--tone-53675d:#53675d;--tone-60716b:#60716b;--tone-785b23:#785b23;--tone-a82929:#a82929;--tone-c33838:#c33838;--tone-219d72:#219d72;--tone-b9d2c1:#b9d2c1;--tone-bfcec5:#bfcec5;--tone-cfdbd3:#cfdbd3;--tone-d6e3d9:#d6e3d9;--tone-d6e6dc:#d6e6dc;--tone-dce5e0:#dce5e0;--tone-e4eee7:#e4eee7;--tone-e6eee9:#e6eee9;--tone-e7eee9:#e7eee9;--tone-e8d9b0:#e8d9b0;--tone-e9eeea:#e9eeea;--tone-eaf1eb:#eaf1eb;--tone-ecf1ee:#ecf1ee;--tone-edf0ee:#edf0ee;--tone-edf3ef:#edf3ef;--tone-f3f6f5:#f3f6f5;--tone-f4f8f4:#f4f8f4;--tone-fbfcfb:#fbfcfb;--tone-fff:#fff;--tone-fff2d9:#fff2d9;--tone-fff9ec:#fff9ec;--surface:var(--tone-fff);--strong-surface:#073e32;--ink-on-accent:#073e32;color-scheme:light}
+:root[data-theme="dark"]{--tone-285844:#b4dec4;--tone-426152:#b1c8ba;--tone-538466:#82ba9c;--tone-547264:#b1c8ba;--tone-809087:#9cb3a5;--tone-819187:#9cb3a5;--tone-866114:#f0d18b;--tone-073e32:#a4e3c1;--tone-073e3214:#00000033;--tone-073e3226:#00000066;--tone-172e28:#e7f1eb;--tone-233e31:#edf4ef;--tone-477b5e:#a5d5b8;--tone-496d53:#b1c8ba;--tone-53665b:#b1c8ba;--tone-53675d:#b1c8ba;--tone-60716b:#a4baae;--tone-785b23:#f1d58f;--tone-a82929:#ff9696;--tone-c33838:#ff9696;--tone-219d72:#70d9a7;--tone-b9d2c1:#425e4e;--tone-bfcec5:#425e4e;--tone-cfdbd3:#425e4e;--tone-d6e3d9:#395849;--tone-d6e6dc:#304f3e;--tone-dce5e0:#31483d;--tone-e4eee7:#243f32;--tone-e6eee9:#213b2e;--tone-e7eee9:#213b2e;--tone-e8d9b0:#6e592b;--tone-e9eeea:#293e34;--tone-eaf1eb:#213b2e;--tone-ecf1ee:#263f32;--tone-edf0ee:#293e34;--tone-edf3ef:#1d3429;--tone-f3f6f5:#0d1714;--tone-f4f8f4:#1c3026;--tone-fbfcfb:#101d18;--tone-fff:#14221d;--tone-fff2d9:#3d3118;--tone-fff9ec:#342b17;color-scheme:dark}
+input,select,button{color:inherit}
+input::placeholder{color:var(--muted);opacity:1}
+.button.primary,.home-calculator:hover .home-link-arrow{color:var(--ink-on-accent)}
+h1{font-weight:800}
+h2,h3{font-weight:750}
+.brand{font-weight:900}
+.sidebar-primary>a,.calculator-menu>.calculator-menu-toggle{font-weight:700}
+.theme-toggle{display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid var(--line);border-radius:50%;background:var(--surface);color:var(--green)}
+.theme-toggle:hover{background:var(--tone-eaf1eb)}
+.theme-toggle .sun-icon{display:none}
+:root[data-theme="dark"] .theme-toggle .moon-icon{display:none}
+:root[data-theme="dark"] .theme-toggle .sun-icon{display:block}
+@media print{
+ :root,:root[data-theme="dark"]{--tone-285844:#285844;--tone-426152:#426152;--tone-538466:#538466;--tone-547264:#547264;--tone-809087:#809087;--tone-819187:#819187;--tone-866114:#866114;--tone-073e32:#073e32;--tone-073e3214:#073e3214;--tone-073e3226:#073e3226;--tone-172e28:#172e28;--tone-233e31:#233e31;--tone-477b5e:#477b5e;--tone-496d53:#496d53;--tone-53665b:#53665b;--tone-53675d:#53675d;--tone-60716b:#60716b;--tone-785b23:#785b23;--tone-a82929:#a82929;--tone-c33838:#c33838;--tone-219d72:#219d72;--tone-b9d2c1:#b9d2c1;--tone-bfcec5:#bfcec5;--tone-cfdbd3:#cfdbd3;--tone-d6e3d9:#d6e3d9;--tone-d6e6dc:#d6e6dc;--tone-dce5e0:#dce5e0;--tone-e4eee7:#e4eee7;--tone-e6eee9:#e6eee9;--tone-e7eee9:#e7eee9;--tone-e8d9b0:#e8d9b0;--tone-e9eeea:#e9eeea;--tone-eaf1eb:#eaf1eb;--tone-ecf1ee:#ecf1ee;--tone-edf0ee:#edf0ee;--tone-edf3ef:#edf3ef;--tone-f3f6f5:#f3f6f5;--tone-f4f8f4:#f4f8f4;--tone-fbfcfb:#fbfcfb;--tone-fff:#fff;--tone-fff2d9:#fff2d9;--tone-fff9ec:#fff9ec;color-scheme:light}
+ .theme-toggle{display:none}
+}
+
+.eyebrow,.nav-group,.result-heading{font-weight:750}
+
+/* Footer and main content share the same grid column and document flow. */
+@media screen{
+ .shell{grid-template-rows:1fr auto}
+ .shell>main{grid-row:1}
+ .shell>footer{position:static;grid-column:2;grid-row:2;min-width:0;width:auto;margin:0}
+ .shell.sidebar-collapsed>footer{grid-column:1}
+}
+
+/* Home categories can be collapsed independently. */
+.home-group>summary{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 24px;list-style:none;cursor:pointer;background:var(--tone-eaf1eb);color:var(--green)}
+.home-group>summary::-webkit-details-marker{display:none}
+.home-group>summary h2{padding:0;margin:0;border:0;background:transparent}
+.home-group>summary:hover{background:var(--tone-e4eee7)}
+.home-group[open]>summary{border-bottom:1px solid var(--line)}
+.home-category-chevron{flex-shrink:0}
+.home-group[open] .home-category-chevron{transform:rotate(180deg)}
+@media(prefers-reduced-motion:no-preference){.home-category-chevron{transition:transform .18s ease}}
+
+/* Keep appearance controls at the sidebar bottom, below the navigation. */
+@media screen{
+ .sidebar{display:flex;flex-direction:column}
+ .sidebar .sidebar-primary{flex:0 0 auto}
+ .sidebar .sidebar-primary.calculators-expanded{flex:0 0 auto;min-height:0;height:auto}
+}
+.sidebar-theme-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;margin-top:auto;padding-top:16px}
+.sidebar-theme-controls>span{font-size:14px;font-weight:600;color:var(--muted)}
+
+/* Chapter filtering stays beside the search input in the sticky law toolbar. */
+.law-toolbar{grid-template-columns:minmax(0,1fr) minmax(420px,1fr)}
+.law-search-controls{display:flex;align-items:stretch;gap:10px;min-width:0}
+.law-search-controls .wide-search{flex:1;min-width:0}
+.law-filter-control{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--green);flex-shrink:0}
+.law-filter-control svg{flex-shrink:0}
+.law-filter-control select{width:clamp(100px,14vw,180px);min-width:0;padding:6px 0;border:0;background:transparent;color:inherit;font:inherit;font-size:16px;cursor:pointer;text-overflow:ellipsis}
+.law-filter-control:focus-within{outline:2px solid var(--tone-219d72);outline-offset:2px}
+@media(max-width:1150px){.law-toolbar{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:650px){.law-filter-control{gap:5px;padding:8px}.law-filter-control select{width:90px;font-size:14px}}
+@media print{.law-search-controls{display:none}}
+
+
+
+/* Keep the outboard sidebar control clear of page headings at every width. */
+@media screen and (min-width:651px) and (max-width:1150px){
+ .shell:not(.sidebar-collapsed)>main{padding-left:48px}
+}
+@media screen and (max-width:650px){
+ .shell:not(.sidebar-collapsed)::after{content:"";position:fixed;inset:var(--header-height) 0 0 var(--sidebar-width);z-index:9;background:#0006}
+}
+
+
+/* Keep the collapsed hamburger clear button clear of all page content. */
+@media screen{
+ .shell.sidebar-collapsed>main{padding-left:64px}
+}
+
+
+/* Give the outboard sidebar control a permanent gutter beside navigation. */
+@media screen and (min-width:1151px){
+ :root{--sidebar-width:280px}
+ .shell{grid-template-columns:var(--sidebar-width) minmax(0,1fr)}
+ .sidebar-primary,.sidebar-primary.calculators-expanded{padding-right:28px}
+}
+@media screen and (min-width:941px) and (max-width:1150px){
+ :root{--sidebar-width:244px}
+ .shell{grid-template-columns:var(--sidebar-width) minmax(0,1fr)}
+ .sidebar-primary,.sidebar-primary.calculators-expanded{padding-right:28px}
+}
+@media screen and (min-width:651px) and (max-width:940px){
+ :root{--sidebar-width:214px}
+ .shell{grid-template-columns:var(--sidebar-width) minmax(0,1fr)}
+ .sidebar-primary,.sidebar-primary.calculators-expanded{padding-right:28px}
+}
+@media screen and (max-width:650px){
+ :root{--sidebar-width:min(320px,calc(100vw - 40px))}
+ .sidebar-primary,.sidebar-primary.calculators-expanded{padding-right:24px}
+}
+
+
+/* Centre the open close control on the sidebar boundary. */
+@media screen{
+ .sidebar-toggle[aria-expanded="true"]{left:calc(var(--sidebar-width) - 24px)}
+}
+
+
+/* Restore the original compact typography scale. */
+body{font-size:16px}
+.sidebar-heading,.nav-group,.eyebrow,.badge,.step,.field .hint,.checkfield small,.field-divider,.form-actions,.result-metrics small,.bar-labels,.info-note,th,.inline-ref,footer,.mini-label,.sidebar-theme-controls>span,.sticky-estimate span{font-size:12px}
+.side-note,.source-shortcut,.error,.text-button,.result-heading,.result-sub,.button,.result-row,table,.coverage-card ul,.filter-chips button,.law-item a,.law-count,.toast{font-size:13px}
+.topbar nav a,.edition,.search input,.calc-link,.side-note strong,.field>span:first-child,.checkfield,.notice,.tabbar button,.detail-card,.coverage-card p,.coverage-card a,.source-entry p,.sidebar-primary>a,.calculator-menu>.calculator-menu-toggle,.law-body,.law-filter-control select,.home-calculator small,.home-reference-links span{font-size:14px}
+.law-item summary{font-size:15px}
+.section-no{font-size:13px}
+.wide-search input{font-size:16px}
+@media(max-width:940px){.calc-link{font-size:13px}}
+@media(max-width:650px){
+ .topbar nav a,.tabbar button,.calculator-menu>.calculator-menu-toggle{font-size:13px}
+ .lead,.law-item summary{font-size:14px}
+ .law-filter-control select{font-size:12px}
+}
+
+/* Increase text contrast in both colour themes. */
+:root{
+ --tone-172e28:#0b1411;
+ --tone-233e31:#0b1411;
+ --tone-60716b:#405049;
+ --tone-53665b:#33463d;
+ --tone-53675d:#33463d;
+ --tone-547264:#345244;
+ --tone-426152:#334d42;
+ --tone-809087:#4b5e55;
+ --tone-819187:#4b5e55;
+}
+:root[data-theme="dark"]{
+ --tone-172e28:#f7fbf8;
+ --tone-233e31:#ffffff;
+ --tone-60716b:#cfddd5;
+ --tone-53665b:#dce7e1;
+ --tone-53675d:#dce7e1;
+ --tone-547264:#d6e5dd;
+ --tone-426152:#d4e2da;
+ --tone-809087:#c8d6ce;
+ --tone-819187:#c8d6ce;
+ --tone-496d53:#d6e5dd;
+}
+
+/* Additional homepage guidance. */
+.home-how{margin-top:24px;padding:28px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.home-section-heading{margin-bottom:22px}
+.home-section-heading .eyebrow{margin-bottom:7px}
+.home-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:0;padding:0;list-style:none}
+.home-steps li{display:flex;align-items:flex-start;gap:13px;min-width:0}
+.home-step-number{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border-radius:50%;background:var(--tone-eaf1eb);color:var(--green);font-weight:800}
+.home-steps strong{display:block;margin-bottom:5px;color:var(--tone-172e28)}
+.home-steps p{margin:0;color:var(--muted);font-size:14px}
+.home-planning-note{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,1.2fr);align-items:center;gap:32px;margin-top:24px;padding:26px 28px;border-radius:var(--radius);background:var(--strong-surface);color:#fff}
+.home-planning-note .eyebrow{color:#dcefe5}
+.home-planning-note h2{color:#fff}
+.home-planning-note p{margin:0;color:#e1eee7}
+@media(max-width:940px){.home-steps{grid-template-columns:1fr}.home-planning-note{grid-template-columns:1fr;gap:14px}}
+@media(max-width:650px){.home-how,.home-planning-note{padding:22px}}
+
+
+/* The sidebar control now belongs to the sticky header. */
+@media screen{
+ .topbar .sidebar-toggle,.topbar .sidebar-toggle[aria-expanded="false"],.topbar .sidebar-toggle[aria-expanded="true"]{
+  position:static;grid-column:1;grid-row:1;justify-self:start;align-self:center;left:auto;top:auto;z-index:auto;border-radius:12px
+ }
+ .shell:not(.sidebar-collapsed)>main,.shell.sidebar-collapsed>main{padding-left:40px}
+ .sidebar-primary,.sidebar-primary.calculators-expanded{padding-right:0}
+}
+@media screen and (max-width:1150px){
+ .shell:not(.sidebar-collapsed)>main,.shell.sidebar-collapsed>main{padding-left:24px}
+}
+@media screen and (max-width:650px){
+ .shell:not(.sidebar-collapsed)>main,.shell.sidebar-collapsed>main{padding-left:18px}
+}
+@media screen and (min-width:1450px){
+ .shell:not(.sidebar-collapsed)>main,.shell.sidebar-collapsed>main{padding-left:56px}
+}
+
+/* Homepage accordion columns expand independently without empty grid rows. */
+.home-calculator-column{display:flex;flex-direction:column;gap:24px;min-width:0}
+@media(max-width:940px){
+ .home-calculators{display:flex;flex-direction:column;gap:24px}
+ .home-calculator-column{display:contents}
+ .home-group{order:var(--home-order)}
+}
+
+
+/* Keep homepage categories full-width and use a drawer before content becomes cramped. */
+@media screen and (max-width:940px){
+ :root{--sidebar-width:min(320px,calc(100vw - 40px))}
+ .shell{display:block}
+ .shell>main,.shell.sidebar-collapsed>main{width:100%}
+ .sidebar{border-right:1px solid var(--line);border-bottom:0;box-shadow:6px 0 18px var(--tone-073e3214)}
+ .shell:not(.sidebar-collapsed)::after{content:"";position:fixed;inset:var(--header-height) 0 0 var(--sidebar-width);z-index:9;background:#0006}
+ .home-calculators{align-items:stretch}
+ .home-group{width:100%}
+}
+
+
+/* Tablets retain the two-column homepage; only smartphones use one column. */
+@media screen and (min-width:651px) and (max-width:940px){
+ .home-calculators{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
+ .home-calculator-column{display:flex}
+ .home-group{order:initial}
+ .home-reference-links{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+
+/* Small-screen breathing room. */
+@media screen and (max-width:650px){
+ .topbar{padding-left:20px;padding-right:20px}
+ main,.shell:not(.sidebar-collapsed)>main,.shell.sidebar-collapsed>main{padding-left:20px;padding-right:20px}
+ footer{padding-left:20px;padding-right:20px}
+}
+
+/* Keep native dropdown menus legible in both themes. */
+select option{background-color:var(--surface);color:var(--tone-172e28)}
+:root[data-theme="dark"] select{color-scheme:dark}
+:root[data-theme="dark"] select option{background-color:#14221d;color:#f7fbf8}
+
+/* Keep the footer at the viewport bottom on short responsive pages. */
+@media screen and (max-width:940px){
+ .shell{display:flex;flex-direction:column;min-height:calc(100dvh - var(--header-height))}
+ .shell>main{flex:1 0 auto}
+ .shell>footer{flex:0 0 auto;margin-top:auto}
+}
+
+/* Tax Coverage search and filter controls. */
+.coverage-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;gap:10px;margin:22px 0 12px}
+.coverage-toolbar .wide-search{width:100%;max-width:none;margin:0}
+.coverage-filter-control{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--green)}
+.coverage-filter-control svg{flex-shrink:0}
+.coverage-filter-control select{min-width:130px;padding:6px 0;border:0;background:transparent;color:inherit;font:inherit;font-size:14px;cursor:pointer}
+.coverage-filter-control:focus-within{outline:2px solid var(--tone-219d72);outline-offset:2px}
+.coverage-empty{grid-column:1/-1}
+@media(max-width:480px){
+ .coverage-toolbar{grid-template-columns:minmax(0,1fr)}
+ .coverage-filter-control{width:100%}
+ .coverage-filter-control select{width:100%}
+}
+
+/* Slide the sidebar and animate the matching header icon. */
+@media screen{
+ .sidebar{transform:translateX(0);visibility:visible}
+ .sidebar[hidden]{display:flex!important;transform:translateX(calc(-100% - 10px));visibility:hidden;pointer-events:none}
+ .topbar .sidebar-toggle{overflow:hidden}
+ .sidebar-toggle .sidebar-open-icon,.sidebar-toggle .sidebar-close-icon{display:block;grid-area:1/1}
+ body.sidebar-motion-ready .sidebar{transition:transform .26s ease,visibility 0s}
+ body.sidebar-motion-ready .sidebar[hidden]{transition:transform .26s ease,visibility 0s .26s}
+ body.sidebar-motion-ready .sidebar-toggle .sidebar-open-icon,body.sidebar-motion-ready .sidebar-toggle .sidebar-close-icon{transition:opacity .18s ease,transform .26s ease}
+ .sidebar-toggle[aria-expanded="true"] .sidebar-open-icon{opacity:0;transform:translateX(-12px) rotate(-90deg)}
+ .sidebar-toggle[aria-expanded="true"] .sidebar-close-icon{opacity:1;transform:translateX(0) rotate(0)}
+ .sidebar-toggle[aria-expanded="false"] .sidebar-open-icon{opacity:1;transform:translateX(0) rotate(0)}
+ .sidebar-toggle[aria-expanded="false"] .sidebar-close-icon{opacity:0;transform:translateX(12px) rotate(90deg)}
+ .sidebar-toggle:active{transform:scale(.94)}
+}
+@media(prefers-reduced-motion:reduce){
+ .sidebar,.sidebar[hidden],.sidebar-toggle .sidebar-open-icon,.sidebar-toggle .sidebar-close-icon{transition:none!important}
+}
+@media print{.sidebar,.sidebar[hidden]{display:none!important}}
+
+
+/* Page-level headings and descriptions scroll normally beneath the sticky site header. */
+@media screen{
+ .page-header{position:static;top:auto;z-index:auto}
+ main{--page-header-height:0px}
+}
+
+/* Tax Coverage controls sit beside the main page title. */
+.coverage-heading-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(420px,1fr);align-items:center;gap:24px}
+.coverage-heading-row h1{margin-bottom:0}
+.coverage-heading-row .coverage-toolbar{margin:0}
+@media(max-width:1150px){
+ .coverage-heading-row{grid-template-columns:minmax(0,1fr);gap:14px}
+}
+
+
+/* Tax Coverage mirrors the law page: sticky controls, scrolling description. */
+.coverage-intro{margin-bottom:18px}
+@media screen{
+ .coverage-heading-row{position:sticky;top:var(--header-height);z-index:6;margin-bottom:18px;padding:14px 0 18px;border-bottom:1px solid var(--line);background:var(--tone-f3f6f5)}
+}
+
+
+/* Calculator and methodology titles stay pinned; their descriptions scroll away. */
+.page-subtext{padding-top:16px}
+.sticky-page-heading h1{margin-bottom:0}
+@media screen{
+ .sticky-page-heading{position:sticky;top:var(--header-height);z-index:6;background:var(--tone-f3f6f5)}
+}
+
+
+/* Explanatory text beneath page headings uses the full content width. */
+.law-toolbar+.intro .lead,.coverage-intro .lead,.page-subtext .lead{max-width:none}
+
+/* Let reference links follow Calculators until the sidebar reaches its limit. */
+@media screen{
+ #tax-sidebar{overflow:hidden;overscroll-behavior-y:contain}
+ #tax-sidebar .sidebar-primary,
+ #tax-sidebar .sidebar-primary.calculators-expanded{
+  flex:0 1 auto;
+  min-height:0;
+  height:auto;
+  margin:0;
+  padding-bottom:0;
+  border-bottom:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior-y:contain;
+  scrollbar-width:thin
+ }
+ #tax-sidebar .sidebar-reference-nav{
+  display:flex;
+  flex-direction:column;
+  flex:0 0 auto;
+  gap:6px;
+  padding:6px 0 10px;
+  background:var(--tone-fbfcfb);
+  touch-action:none
+ }
+ #tax-sidebar .sidebar-reference-nav>a{
+  display:block;
+  padding:10px 12px;
+  border-radius:8px;
+  text-decoration:none;
+  color:var(--muted);
+  font-size:14px;
+  font-weight:700
+ }
+ #tax-sidebar .sidebar-reference-nav>a:hover{background:var(--tone-ecf1ee)}
+ #tax-sidebar .sidebar-reference-nav>a.active{
+  background:var(--tone-e4eee7);
+  color:var(--green)
+ }
+ #tax-sidebar .sidebar-theme-controls{
+  flex:0 0 auto;
+  margin-top:auto;
+  padding:14px 0 0;
+  border-top:1px solid var(--line);
+  background:var(--tone-fbfcfb);
+  touch-action:none
+ }
+}
+
+/* Keep the mobile page shade stationary while the sidebar slides over it. */
+@media screen and (max-width:940px){
+ .shell::after,
+ .shell:not(.sidebar-collapsed)::after{
+  content:"";
+  position:fixed;
+  inset:var(--header-height) 0 0 0;
+  z-index:9;
+  background:rgba(0,0,0,.46);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none
+ }
+ .shell:not(.sidebar-collapsed)::after{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto
+ }
+ body.sidebar-motion-ready .shell::after{
+  transition:opacity .2s ease,visibility 0s .2s
+ }
+ body.sidebar-motion-ready .shell:not(.sidebar-collapsed)::after{
+  transition:opacity .2s ease,visibility 0s
+ }
+}
+@media screen and (max-width:940px) and (prefers-reduced-motion:reduce){
+ .shell::after,.shell:not(.sidebar-collapsed)::after{transition:none!important}
+}
+
+/* Installation stays directly below Appearance at the bottom of the sidebar. */
+.sidebar-install-button{
+ display:flex;
+ align-items:center;
+ gap:11px;
+ width:100%;
+ margin-top:12px;
+ padding:11px 12px;
+ border:1px solid var(--line);
+ border-radius:10px;
+ background:var(--surface);
+ color:var(--green);
+ text-align:left;
+ touch-action:manipulation
+}
+.sidebar-install-button:hover{background:var(--tone-eaf1eb);border-color:var(--tone-bfcec5)}
+.sidebar-install-button svg{flex:0 0 auto}
+.sidebar-install-button span{display:block;min-width:0}
+.sidebar-install-button strong,.sidebar-install-button small{display:block}
+.sidebar-install-button strong{font-size:14px;line-height:1.25}
+.sidebar-install-button small{margin-top:2px;color:var(--muted);font-size:12px;line-height:1.35}
+.sidebar-install-button:disabled{cursor:default;opacity:1;background:var(--tone-eaf1eb)}
+.install-app-status{margin:8px 2px 0;color:var(--muted);font-size:12px;line-height:1.45}
+@media print{.sidebar-install-button,.install-app-status{display:none!important}}
+
+/* Keep both reference-page searches beside an icon-only filter on phones. */
+@media screen and (max-width:650px){
+ .coverage-toolbar{grid-template-columns:minmax(0,1fr) 48px;gap:10px}
+ .law-search-controls{display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:10px}
+ .coverage-toolbar .wide-search,.law-search-controls .wide-search{min-width:0}
+ .coverage-filter-control,.law-filter-control{
+  position:relative;
+  display:grid;
+  place-items:center;
+  flex:0 0 48px;
+  width:48px;
+  min-width:48px;
+  height:48px;
+  padding:0;
+  overflow:hidden
+ }
+ .coverage-filter-control select,.law-filter-control select{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  min-width:0;
+  opacity:0;
+  cursor:pointer
+ }
+}
+
+
+/* Two-level sidebar: main navigation switches to a dedicated calculator browser. */
+.sidebar-view[hidden]{display:none!important}
+.sidebar-main-view{display:flex;flex-direction:column;height:100%;min-height:0}
+.sidebar-calculator-entry{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
+ width:100%;
+ padding:10px 12px;
+ border:0;
+ border-radius:8px;
+ background:transparent;
+ color:var(--muted);
+ font-family:Inter,Aptos,"Segoe UI",system-ui,sans-serif;
+ font-size:14px;
+ font-weight:700;
+ text-align:left;
+ cursor:pointer
+}
+.sidebar-calculator-entry:hover{background:var(--tone-ecf1ee)}
+.sidebar-calculator-entry.active{background:var(--tone-e4eee7);color:var(--green);font-weight:700}
+.sidebar-calculator-entry svg{flex:0 0 auto}
+.sidebar-calculator-view{display:flex;flex-direction:column;height:100%;min-height:0}
+.calculator-sidebar-header{flex:0 0 auto;border-bottom:1px solid var(--line)}
+.calculator-sidebar-back{
+ display:flex;
+ align-items:center;
+ gap:8px;
+ width:100%;
+ min-height:46px;
+ padding:8px 6px;
+ border:0;
+ border-radius:8px;
+ background:transparent;
+ color:var(--tone-233e31);
+ font-family:Inter,Aptos,"Segoe UI",system-ui,sans-serif;
+ font-size:14px;
+ font-weight:700;
+ letter-spacing:.2px;
+ text-align:left;
+ cursor:pointer
+}
+.calculator-sidebar-back:hover{background:var(--tone-ecf1ee)}
+.calculator-sidebar-back svg{flex:0 0 auto}
+.sidebar-calculator-view .calculator-search-bar{position:relative!important;top:auto!important;flex:0 0 auto;padding:14px 0 10px;background:var(--tone-fbfcfb)}
+.sidebar-calculator-view #calculator-nav{
+ display:block!important;
+ flex:1 1 auto;
+ min-height:0;
+ max-height:none!important;
+ overflow-y:auto!important;
+ overflow-x:hidden!important;
+ padding:0!important;
+ scrollbar-width:thin
+}
+.sidebar-calculator-view .calculator-nav-group{
+ display:block;
+ margin:0;
+ padding:0;
+ border-bottom:1px solid var(--line)
+}
+.sidebar-calculator-view .nav-group{
+ position:relative!important;
+ top:auto!important;
+ display:flex!important;
+ align-items:center;
+ justify-content:space-between;
+ gap:8px;
+ margin:0!important;
+ padding:12px 8px!important;
+ border:0!important;
+ background:transparent!important;
+ color:var(--tone-53675d);
+ font-size:14px;
+ font-weight:700;
+ letter-spacing:.2px;
+ line-height:1.45;
+ text-transform:none;
+ cursor:pointer;
+ list-style:none
+}
+.sidebar-calculator-view .nav-group::-webkit-details-marker{display:none}
+.sidebar-calculator-view .nav-group::marker{content:""}
+.sidebar-calculator-view .nav-group:hover{background:var(--tone-ecf1ee)!important}
+.sidebar-calculator-view .calculator-nav-group[open]>.nav-group{background:var(--tone-e4eee7)!important;color:var(--green)}
+.sidebar-calculator-view .nav-group-chevron{flex:0 0 auto}
+.sidebar-calculator-view .calculator-nav-group[open] .nav-group-chevron{transform:rotate(180deg)}
+.sidebar-calculator-view .calculator-nav-links{padding:5px 0 9px}
+.sidebar-calculator-view .calc-link{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ margin:3px 0!important;
+ padding:9px 8px!important;
+ border:0!important;
+ white-space:normal!important;
+ scroll-margin-top:0!important
+}
+.sidebar-calculator-view .empty{padding:12px 8px;color:var(--muted);font-size:14px}
+@media(max-width:650px){
+ .sidebar-calculator-entry{font-size:15px}
+ .calculator-sidebar-back{font-size:15px}
+ .sidebar-calculator-view #calculator-nav{display:block!important;flex-wrap:nowrap!important}
+ .sidebar-calculator-view .nav-group{display:flex!important}
+ .sidebar-calculator-view .calc-link{white-space:normal!important}
+}
+@media print{
+ .sidebar-calculator-entry,.sidebar-calculator-view{display:none!important}
+}
+
+
+/* Consistent outline icon system for sidebar navigation. */
+.sidebar-link-main{
+ display:flex;
+ align-items:center;
+ gap:11px;
+ min-width:0
+}
+.sidebar-nav-icon{
+ width:19px;
+ height:19px;
+ flex:0 0 19px;
+ stroke:currentColor
+}
+.sidebar-primary>a,
+#tax-sidebar .sidebar-reference-nav>a{
+ display:flex;
+ align-items:center
+}
+.sidebar-calculator-entry .sidebar-link-main{flex:1 1 auto}
+.sidebar-entry-chevron{flex:0 0 auto}
+.sidebar-theme-controls>.sidebar-link-main{
+ font-size:14px;
+ font-weight:700;
+ color:var(--muted)
+}
+.calculator-group-label{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ min-width:0
+}
+.calculator-group-icon{
+ width:18px;
+ height:18px;
+ flex:0 0 18px;
+ stroke:currentColor
+}
+
+/* One branded sidebar toggle: only its arrow changes direction. */
+.sidebar-toggle{
+ grid-template-columns:26px 18px;
+ column-gap:6px;
+ width:62px;
+ height:48px;
+ padding:0 6px;
+ border-radius:12px;
+ overflow:hidden
+}
+.sidebar-toggle-mark{
+ display:block;
+ width:26px;
+ height:26px;
+ border-radius:7px;
+ object-fit:contain;
+ flex:0 0 auto
+}
+.sidebar-toggle-arrow{
+ display:block;
+ flex:0 0 auto;
+ transform:rotate(0deg)
+}
+.sidebar-toggle[aria-expanded="true"] .sidebar-toggle-arrow{transform:rotate(180deg)}
+.sidebar-toggle[aria-expanded="false"]{
+ left:0;
+ border-radius:0 12px 12px 0
+}
+@media screen{
+ .sidebar-toggle[aria-expanded="true"]{left:calc(var(--sidebar-width) - 31px)}
+}
+@media(prefers-reduced-motion:no-preference){
+ .sidebar-toggle-arrow{transition:transform .18s ease}
+}
+@media(max-width:650px){
+ .sidebar-theme-controls>.sidebar-link-main{font-size:14px}
+}
+
+
+/* Main sidebar toggle follows the supplied sidebar-panel glyph. */
+.sidebar-toggle{
+ display:grid;
+ place-items:center;
+ width:48px;
+ height:48px;
+ padding:0;
+ border-radius:12px
+}
+.sidebar-toggle-glyph{
+ display:block;
+ width:28px;
+ height:28px;
+ flex:0 0 auto
+}
+.sidebar-toggle-arrow{
+ transform-box:fill-box;
+ transform-origin:center;
+ transform:rotate(0deg)
+}
+.sidebar-toggle[aria-expanded="true"] .sidebar-toggle-arrow{transform:rotate(180deg)}
+.sidebar-toggle-mark{display:none!important}
+@media screen{
+ .sidebar-toggle[aria-expanded="true"]{left:calc(var(--sidebar-width) - 24px)}
+}
+
+
+/* Align Appearance with the main sidebar navigation rows. */
+.sidebar-theme-controls{
+ padding:16px 12px 0;
+}
+.sidebar-theme-controls>span{
+ font-size:14px;
+ font-weight:700;
+ line-height:1.4;
+}
+@media(max-width:650px){
+ .sidebar-theme-controls{padding-left:12px;padding-right:12px}
+ .sidebar-theme-controls>span{font-size:14px}
+}
+
+
+/* Make the main sidebar toggle glyph larger, centred and white at rest. */
+.sidebar-toggle{
+ display:grid;
+ place-items:center;
+ background:var(--strong-surface);
+ color:#fff;
+}
+.sidebar-toggle-glyph{
+ width:36px;
+ height:36px;
+ margin:0;
+}
+.sidebar-toggle:hover{
+ background:var(--tone-e4eee7);
+ color:var(--green);
+}
+
+
+/* Give the Appearance label a little more inset from the sidebar edge. */
+.sidebar-theme-controls{
+ padding-left:22px;
+ padding-right:12px;
+}
+@media(max-width:650px){
+ .sidebar-theme-controls{padding-left:22px;padding-right:12px}
+}
+
+
+/* Centre the single sidebar glyph within the toggle button. */
+.sidebar-toggle{
+ grid-template-columns:1fr;
+ column-gap:0;
+ justify-items:center;
+ align-items:center;
+}
+.sidebar-toggle-glyph{
+ justify-self:center;
+ align-self:center;
+}
+
+
+/* Ensure Appearance keeps the same left inset as the sidebar rows. */
+#tax-sidebar .sidebar-theme-controls{
+ padding-top:16px;
+ padding-right:12px;
+ padding-left:22px;
+}
+
+
+/* Statement import entry point. */
+.statement-upload-card{
+ padding:24px;
+ border:1px solid var(--line);
+ border-radius:12px;
+ background:var(--surface)
+}
+.statement-upload-heading{
+ display:flex;
+ align-items:flex-start;
+ justify-content:space-between;
+ gap:16px
+}
+.statement-upload-heading .eyebrow{margin-bottom:6px}
+.statement-source-calculator{
+ display:inline-flex;
+ align-items:center;
+ padding:6px 10px;
+ border-radius:999px;
+ background:var(--tone-e4eee7);
+ color:var(--green);
+ font-size:12px;
+ font-weight:700;
+ white-space:nowrap
+}
+.statement-upload-copy{
+ margin:10px 0 18px;
+ color:var(--muted);
+ font-size:14px
+}
+.statement-dropzone{
+ position:relative;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ gap:8px;
+ min-height:230px;
+ padding:28px;
+ border:1.5px dashed var(--tone-b9d2c1);
+ border-radius:12px;
+ background:var(--tone-fbfcfb);
+ color:var(--tone-53675d);
+ text-align:center
+}
+.statement-dropzone.dragging,
+.statement-dropzone:hover{
+ border-color:var(--tone-219d72);
+ background:var(--tone-eaf1eb)
+}
+.statement-dropzone.has-file{border-style:solid}
+.statement-file-input{
+ position:absolute;
+ width:1px;
+ height:1px;
+ opacity:0;
+ pointer-events:none
+}
+.statement-upload-icon{color:var(--green)}
+.statement-dropzone>strong{
+ color:var(--tone-233e31);
+ font-size:16px
+}
+.statement-dropzone>span,
+.statement-dropzone>small{
+ color:var(--muted);
+ font-size:13px
+}
+.statement-dropzone .button{
+ margin:2px 0;
+ min-width:150px
+}
+.statement-file-status{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:16px;
+ margin-top:12px;
+ padding:12px 14px;
+ border:1px solid var(--line);
+ border-radius:10px;
+ background:var(--tone-fbfcfb)
+}
+.statement-file-status.error{
+ align-items:flex-start;
+ flex-direction:column;
+ gap:2px;
+ color:var(--tone-c33838)
+}
+.statement-file-info{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ min-width:0
+}
+.statement-file-info svg{flex:0 0 auto;color:var(--green)}
+.statement-file-info span{display:block;min-width:0}
+.statement-file-info strong,
+.statement-file-info small{display:block}
+.statement-file-info strong{
+ max-width:100%;
+ overflow:hidden;
+ text-overflow:ellipsis;
+ white-space:nowrap;
+ color:var(--tone-233e31);
+ font-size:14px
+}
+.statement-file-info small{
+ margin-top:2px;
+ color:var(--muted);
+ font-size:12px
+}
+@media(max-width:650px){
+ .statement-upload-card{padding:18px}
+ .statement-upload-heading{flex-direction:column;gap:8px}
+ .statement-dropzone{min-height:210px;padding:22px 16px}
+ .statement-file-status{align-items:flex-start}
+}
+@media print{
+ .statement-upload-card{display:none}
+}
+
+
+/* Multiple statement upload list. */
+.statement-file-status.multiple{
+ display:block;
+ padding:0;
+ overflow:hidden
+}
+.statement-file-summary{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:14px;
+ padding:12px 14px;
+ border-bottom:1px solid var(--line)
+}
+.statement-file-summary>div{min-width:0}
+.statement-file-summary strong,
+.statement-file-summary small{display:block}
+.statement-file-summary strong{font-size:14px;color:var(--tone-233e31)}
+.statement-file-summary small{margin-top:2px;font-size:12px;color:var(--muted)}
+.statement-file-list{display:grid}
+.statement-file-row{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:14px;
+ padding:11px 14px
+}
+.statement-file-row+.statement-file-row{border-top:1px solid var(--line)}
+.statement-remove-file{flex:0 0 auto}
+.statement-file-warning{
+ padding:10px 14px;
+ border-bottom:1px solid var(--tone-e8d9b0);
+ background:var(--tone-fff9ec);
+ color:var(--tone-785b23);
+ font-size:12px
+}
+@media(max-width:650px){
+ .statement-file-summary,
+ .statement-file-row{align-items:flex-start}
+ .statement-file-row{gap:10px}
+ .statement-file-info{min-width:0}
+}
+
+
+/* Forward action and next stage for statement uploads. */
+.statement-file-actions{
+ display:flex;
+ justify-content:flex-end;
+ padding:12px 14px;
+ border-top:1px solid var(--line)
+}
+.statement-continue{
+ min-width:140px
+}
+.statement-next-step{
+ margin-top:24px;
+ padding:24px;
+ border:1px solid var(--line);
+ border-radius:12px;
+ background:var(--surface)
+}
+.statement-next-heading{
+ display:flex;
+ align-items:flex-start;
+ justify-content:space-between;
+ gap:16px
+}
+.statement-next-summary{
+ display:grid;
+ gap:5px;
+ margin-top:14px;
+ padding:14px;
+ border:1px solid var(--line);
+ border-radius:10px;
+ background:var(--tone-fbfcfb)
+}
+.statement-next-summary strong{font-size:14px;color:var(--tone-233e31)}
+.statement-next-summary span{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.statement-next-summary small{font-size:12px;color:var(--green)}
+@media(max-width:650px){
+ .statement-file-actions{justify-content:stretch}
+ .statement-continue{width:100%}
+ .statement-next-step{padding:18px}
+ .statement-next-heading{flex-direction:column}
+}
+
+
+/* Statement file preparation progress. */
+.statement-upload-progress{
+ padding:12px 14px;
+ border-bottom:1px solid var(--line)
+}
+.statement-progress-copy{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:12px;
+ margin-bottom:8px;
+ font-size:13px
+}
+.statement-progress-copy span{color:var(--muted)}
+.statement-progress-copy strong{color:var(--tone-233e31)}
+.statement-progress-track{
+ width:100%;
+ height:8px;
+ overflow:hidden;
+ border-radius:999px;
+ background:var(--tone-e4eee7)
+}
+.statement-progress-track>span{
+ display:block;
+ height:100%;
+ border-radius:inherit;
+ background:var(--tone-219d72);
+ transition:width .15s ease
+}
+.statement-continue:disabled{
+ opacity:.6;
+ cursor:wait
+}
+
+
+/* Compact X control for removing an uploaded statement. */
+.statement-remove-file{
+ display:grid;
+ place-items:center;
+ flex:0 0 34px;
+ width:34px;
+ height:34px;
+ padding:0;
+ border:1px solid var(--line);
+ border-radius:50%;
+ background:transparent;
+ color:var(--muted);
+ font-size:22px;
+ font-weight:400;
+ line-height:1
+}
+.statement-remove-file:hover{
+ background:var(--tone-eaf1eb);
+ color:var(--green);
+ border-color:var(--tone-bfcec5)
+}
+
+
+/* Statement analysis and row review. */
+.statement-analysis-actions{
+ display:flex;
+ justify-content:flex-end;
+ margin-top:16px
+}
+.statement-analysis-progress{
+ display:flex;
+ align-items:center;
+ gap:12px;
+ margin-top:14px;
+ padding:13px 14px;
+ border:1px solid var(--line);
+ border-radius:10px;
+ background:var(--tone-fbfcfb)
+}
+.statement-analysis-progress.error{
+ border-color:var(--tone-e8d9b0);
+ background:var(--tone-fff9ec);
+ color:var(--tone-785b23)
+}
+.statement-analysis-progress>div:last-child{display:grid;gap:2px}
+.statement-analysis-progress strong{font-size:14px}
+.statement-analysis-progress span{font-size:12px;color:var(--muted)}
+.statement-analysis-spinner{
+ width:22px;
+ height:22px;
+ flex:0 0 22px;
+ border:2px solid var(--line);
+ border-top-color:var(--tone-219d72);
+ border-radius:50%;
+ animation:statement-spin .8s linear infinite
+}
+@keyframes statement-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.statement-analysis-spinner{animation:none}}
+
+.statement-review{
+ margin-top:24px;
+ padding:24px;
+ border:1px solid var(--line);
+ border-radius:12px;
+ background:var(--surface)
+}
+.statement-review-heading{
+ display:flex;
+ align-items:flex-start;
+ justify-content:space-between;
+ gap:16px
+}
+.statement-review-copy{
+ margin:10px 0 18px;
+ color:var(--muted);
+ font-size:14px
+}
+.statement-document-summary{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+ gap:10px;
+ margin-bottom:16px
+}
+.statement-document-card{
+ display:grid;
+ gap:3px;
+ padding:11px 12px;
+ border:1px solid var(--line);
+ border-radius:9px;
+ background:var(--tone-fbfcfb)
+}
+.statement-document-card.error{
+ border-color:var(--tone-e8d9b0);
+ background:var(--tone-fff9ec)
+}
+.statement-document-card strong{font-size:13px;overflow-wrap:anywhere}
+.statement-document-card span,.statement-document-card small{font-size:12px;color:var(--muted)}
+.statement-review-table-wrap{
+ overflow-x:auto;
+ border:1px solid var(--line);
+ border-radius:10px
+}
+.statement-review-table{
+ width:100%;
+ min-width:920px;
+ border-collapse:collapse
+}
+.statement-review-table th{
+ padding:10px 12px;
+ border-bottom:1px solid var(--line);
+ background:var(--tone-fbfcfb);
+ text-align:left;
+ white-space:nowrap
+}
+.statement-review-table td{
+ padding:10px 12px;
+ border-bottom:1px solid var(--line);
+ vertical-align:middle
+}
+.statement-review-table tbody tr:last-child td{border-bottom:0}
+.statement-review-table td:nth-child(2){min-width:260px}
+.statement-review-table td:nth-child(5){min-width:280px}
+.statement-review-table td strong{display:block;font-size:13px}
+.statement-review-table td small,
+.statement-review-table td em{
+ display:block;
+ margin-top:2px;
+ font-size:11px;
+ color:var(--muted);
+ font-style:normal
+}
+.statement-review-table tr.excluded td{
+ opacity:.45;
+ background:var(--tone-f3f6f5)
+}
+.statement-amount{font-weight:700;white-space:nowrap}
+.statement-type-badge{
+ display:inline-flex;
+ padding:3px 7px;
+ border:1px solid var(--line);
+ border-radius:999px;
+ font-size:11px;
+ text-transform:capitalize
+}
+.statement-map-select{
+ width:100%;
+ min-width:250px;
+ padding:8px 9px;
+ border:1px solid var(--line);
+ border-radius:8px;
+ background:var(--surface);
+ color:var(--tone-172e28);
+ font-size:13px
+}
+.statement-confidence{text-transform:capitalize}
+.statement-row-toggle{
+ display:grid;
+ place-items:center;
+ width:34px;
+ height:34px;
+ padding:0;
+ border:1px solid var(--line);
+ border-radius:50%;
+ background:transparent;
+ color:var(--muted);
+ font-size:21px;
+ line-height:1
+}
+.statement-row-toggle:hover{
+ background:var(--tone-eaf1eb);
+ color:var(--green)
+}
+.statement-empty-review{
+ padding:20px!important;
+ color:var(--muted);
+ text-align:center
+}
+@media(max-width:650px){
+ .statement-analysis-actions{justify-content:stretch}
+ .statement-analysis-actions .button{width:100%}
+ .statement-review{padding:18px}
+ .statement-review-heading{flex-direction:column}
+}
+
+
+/* Keep statement-analysis title and status text clearly separated. */
+.statement-analysis-progress>div:last-child{
+ display:flex;
+ flex-direction:column;
+ align-items:flex-start;
+ gap:4px;
+ min-width:0
+}
+.statement-analysis-progress strong,
+.statement-analysis-progress span{
+ display:block;
+ line-height:1.35
+}
+
+
+/* Forward flow after statement row review. */
+.statement-review-actions{
+ display:flex;
+ justify-content:flex-end;
+ margin-top:16px
+}
+.statement-all-calculators{
+ margin-top:16px;
+ border:1px solid var(--line);
+ border-radius:10px;
+ overflow:hidden
+}
+.statement-all-calculators>summary{
+ padding:12px 14px;
+ cursor:pointer;
+ font-weight:700;
+ background:var(--tone-fbfcfb)
+}
+#statement-all-calculator-list{padding:14px}
+.statement-calculator-group+.statement-calculator-group{margin-top:16px}
+.statement-calculator-group h4{
+ margin:0 0 8px;
+ font-size:12px;
+ color:var(--muted);
+ text-transform:uppercase;
+ letter-spacing:.8px
+}
+.statement-calculator-grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+ gap:9px;
+ margin-top:10px
+}
+.statement-calculator-choice{
+ display:flex;
+ align-items:flex-start;
+ gap:9px;
+ padding:10px 11px;
+ border:1px solid var(--line);
+ border-radius:9px;
+ background:var(--tone-fbfcfb);
+ cursor:pointer
+}
+.statement-calculator-choice:hover{background:var(--tone-eaf1eb)}
+.statement-calculator-choice input{margin-top:2px}
+.statement-calculator-choice span{display:grid;gap:2px}
+.statement-calculator-choice strong{font-size:13px}
+.statement-calculator-choice small{font-size:11px;color:var(--muted)}
+.statement-empty-choice{
+ margin:0;
+ color:var(--muted);
+ font-size:13px
+}
+.statement-mapped-totals{
+ display:grid;
+ gap:12px
+}
+.statement-total-card{
+ border:1px solid var(--line);
+ border-radius:10px;
+ overflow:hidden;
+ background:var(--tone-fbfcfb)
+}
+.statement-total-card h3{
+ padding:11px 13px;
+ border-bottom:1px solid var(--line);
+ background:var(--surface)
+}
+.statement-total-rows{display:grid}
+.statement-total-row{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:18px;
+ padding:11px 13px
+}
+.statement-total-row+.statement-total-row{border-top:1px solid var(--line)}
+.statement-total-row span{display:grid;gap:2px}
+.statement-total-row strong{font-size:13px}
+.statement-total-row small{font-size:11px;color:var(--muted)}
+.statement-total-row b{font-size:14px;white-space:nowrap}
+.statement-total-meta{
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap
+}
+.statement-total-meta span{
+ display:inline-flex;
+ padding:4px 8px;
+ border:1px solid var(--line);
+ border-radius:999px;
+ font-size:11px;
+ color:var(--muted)
+}
+@media(max-width:650px){
+ .statement-review-actions{justify-content:stretch}
+ .statement-review-actions .button{width:100%}
+ .statement-calculator-grid{grid-template-columns:1fr}
+ .statement-total-row{align-items:flex-start;flex-direction:column;gap:6px}
+}
+
+
+/* Statement workflow: never reserve space for hidden or empty placeholders. */
+#statement-file-status[hidden],
+#statement-analysis-progress[hidden],
+#statement-next-step[hidden],
+#statement-review[hidden],
+#statement-calculator-step[hidden],
+#statement-totals-step[hidden]{
+ display:none!important;
+ margin:0!important;
+ padding:0!important;
+ border:0!important;
+ min-height:0!important
+}
+#statement-file-status:empty,
+#statement-analysis-progress:empty,
+#statement-next-summary:empty,
+#statement-document-summary:empty,
+#statement-mapped-totals:empty{
+ display:none!important;
+ margin:0!important;
+ padding:0!important;
+ border:0!important;
+ min-height:0!important
+}
+
+
+/* Calculator-aware statement classification labels. */
+.statement-row-classification{
+ color:var(--green)!important;
+ font-weight:700;
+ text-transform:capitalize
+}
+
+
+/* Final sidebar toggle treatment: icon only, no coloured button tile. */
+.sidebar-toggle,
+.sidebar-toggle[aria-expanded="false"],
+.sidebar-toggle[aria-expanded="true"]{
+ width:44px;
+ height:44px;
+ padding:0;
+ display:grid;
+ place-items:center;
+ background:transparent!important;
+ border:none!important;
+ box-shadow:none!important;
+ color:#fff;
+}
+.sidebar-toggle:hover,
+.sidebar-toggle:focus-visible,
+.sidebar-toggle:active{
+ background:transparent!important;
+ box-shadow:none!important;
+}
+.sidebar-toggle:hover{color:var(--mint)}
+.sidebar-toggle-glyph{
+ width:22px!important;
+ height:22px!important;
+ margin:0!important;
+}
+@media screen{
+ .sidebar-toggle[aria-expanded="true"]{
+  left:calc(var(--sidebar-width) - 22px);
+ }
+}
+
+
+/* Plain-English help tooltips for every calculator field. */
+.field-label-row{
+ display:flex;
+ align-items:center;
+ gap:7px;
+ margin-bottom:7px;
+ min-width:0
+}
+.field-label-row>label{
+ min-width:0;
+ font-size:16px;
+ font-weight:600;
+ line-height:1.35
+}
+.field-help-wrap{
+ display:inline-flex;
+ flex:0 0 auto
+}
+.field-help-trigger{
+ display:grid;
+ place-items:center;
+ width:25px;
+ height:25px;
+ padding:0;
+ border:0;
+ border-radius:50%;
+ background:transparent;
+ color:var(--green);
+ line-height:1
+}
+.field-help-trigger svg{
+ width:16px;
+ height:16px;
+ display:block
+}
+.field-help-trigger:hover,
+.field-help-trigger[aria-expanded="true"]{
+ background:var(--tone-e4eee7)
+}
+.field-help-trigger:focus-visible{
+ outline:2px solid var(--tone-219d72);
+ outline-offset:2px
+}
+.field-help-popover{
+ position:fixed;
+ z-index:1000;
+ width:max-content;
+ max-width:min(330px,calc(100vw - 24px));
+ padding:10px 12px;
+ border:1px solid #386758;
+ border-radius:9px;
+ background:var(--strong-surface);
+ color:#fff;
+ box-shadow:0 8px 24px rgba(0,0,0,.18);
+ font-size:13px;
+ line-height:1.45;
+ opacity:0;
+ visibility:hidden;
+ pointer-events:none;
+ transform:translateY(-2px);
+ transition:opacity .12s ease,transform .12s ease,visibility 0s linear .12s
+}
+.field-help-popover.is-visible{
+ opacity:1;
+ visibility:visible;
+ transform:translateY(0);
+ transition:opacity .12s ease,transform .12s ease
+}
+.checkfield-copy{
+ min-width:0;
+ flex:1
+}
+.checkfield-copy .field-label-row{
+ margin-bottom:0
+}
+.checkfield-copy small{
+ display:block;
+ color:var(--muted);
+ font-size:14px;
+ margin-top:3px
+}
+@media(max-width:650px){
+ .field-help-trigger{
+  width:32px;
+  height:32px
+ }
+ .field-help-trigger svg{
+  width:17px;
+  height:17px
+ }
+ .field-help-popover{
+  max-width:calc(100vw - 24px);
+  font-size:13px
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .field-help-popover{transition:none}
+}
+
+
+/* Richer field-help content: explanation, entry guidance and common mistakes. */
+.field-help-popover{
+ max-width:min(390px,calc(100vw - 24px));
+ padding:13px 14px;
+}
+.field-help-title{
+ margin-bottom:10px;
+ padding-bottom:8px;
+ border-bottom:1px solid #386758;
+ font-size:14px;
+ font-weight:800;
+ line-height:1.35;
+ color:#fff;
+}
+.field-help-section{
+ display:grid;
+ gap:2px;
+}
+.field-help-section+.field-help-section{
+ margin-top:9px;
+}
+.field-help-section strong{
+ font-size:11px;
+ letter-spacing:.4px;
+ text-transform:uppercase;
+ color:#b9d8c8;
+}
+.field-help-section span{
+ font-size:13px;
+ line-height:1.5;
+ color:#fff;
+}
+.field-help-watch{
+ margin-top:10px!important;
+ padding-top:9px;
+ border-top:1px solid #386758;
+}
+.field-help-watch strong{
+ color:var(--mint);
+}
+@media(max-width:650px){
+ .field-help-popover{
+  max-width:calc(100vw - 24px);
+  padding:12px 13px;
+ }
+ .field-help-title{
+  font-size:14px;
+ }
+ .field-help-section span{
+  font-size:13px;
+ }
+}
+
+
+/* Hover overlay for result export buttons. */
+.export-button{
+ position:relative;
+ overflow:hidden;
+ isolation:isolate;
+}
+.export-button>span{
+ position:relative;
+ z-index:2;
+}
+.export-button::after{
+ content:"";
+ position:absolute;
+ inset:0;
+ z-index:1;
+ background:rgba(7,62,50,.10);
+ opacity:0;
+ transition:opacity .16s ease;
+ pointer-events:none;
+}
+.export-button.primary::after{
+ background:rgba(7,62,50,.16);
+}
+@media (hover:hover) and (pointer:fine){
+ .export-button:not(:disabled):hover::after{
+  opacity:1;
+ }
+}
+.export-button:not(:disabled):focus-visible::after{
+ opacity:1;
+}
+@media(prefers-reduced-motion:reduce){
+ .export-button::after{transition:none}
+}
+
+
+/* Keep the mobile NTaxer brand truly centred in the viewport. */
+@media screen and (max-width:650px){
+ .topbar{
+  position:sticky;
+  top:0;
+ }
+ .topbar .brand{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  margin:0;
+  justify-self:auto;
+  white-space:nowrap;
+ }
+}
+
+
+/* Optically centre the NTaxer wordmark beside the mobile icon. */
+@media screen and (max-width:650px){
+ .topbar .brand{
+  align-items:center;
+ }
+ .topbar .brand>span{
+  display:flex;
+  align-items:center;
+  height:34px;
+  line-height:1;
+  position:relative;
+  top:1px;
+ }
+}
+
+
+/* Excel export button: white label at rest, accent label on hover/focus. */
+#download-excel{
+ color:#fff;
+}
+@media (hover:hover) and (pointer:fine){
+ #download-excel:not(:disabled):hover{
+  color:var(--mint);
+ }
+}
+#download-excel:not(:disabled):focus-visible{
+ color:var(--mint);
+}
+
+
+/* Strong, full-button hover states for result exports. */
+#download-pdf,
+#download-excel{
+ transition:background-color .16s ease,border-color .16s ease,color .16s ease,filter .16s ease;
+}
+#download-excel{
+ color:#fff;
+}
+#download-pdf::after,
+#download-excel::after{
+ display:none;
+}
+@media (hover:hover) and (pointer:fine){
+ #download-pdf:not(:disabled):hover{
+  filter:brightness(.88);
+ }
+ #download-excel:not(:disabled):hover{
+  background:var(--green);
+  border-color:var(--green);
+  color:#fff;
+ }
+}
+#download-pdf:not(:disabled):focus-visible{
+ filter:brightness(.88);
+}
+#download-excel:not(:disabled):focus-visible{
+ background:var(--green);
+ border-color:var(--green);
+ color:#fff;
+}
+@media(prefers-reduced-motion:reduce){
+ #download-pdf,#download-excel{transition:none}
+}
+
+
+/* Keep the icon-only sidebar control visible in both themes. */
+.sidebar-toggle,
+.sidebar-toggle[aria-expanded="false"],
+.sidebar-toggle[aria-expanded="true"]{
+ color:var(--green);
+}
+:root[data-theme="dark"] .sidebar-toggle,
+:root[data-theme="dark"] .sidebar-toggle[aria-expanded="false"],
+:root[data-theme="dark"] .sidebar-toggle[aria-expanded="true"]{
+ color:#fff;
+}
+.sidebar-toggle:hover,
+.sidebar-toggle:focus-visible{
+ color:var(--tone-219d72);
+}
+:root[data-theme="dark"] .sidebar-toggle:hover,
+:root[data-theme="dark"] .sidebar-toggle:focus-visible{
+ color:var(--mint);
+}
+
+
+/* Final Excel hover contrast: light accent surface with dark-green text. */
+@media (hover:hover) and (pointer:fine){
+ #download-excel:not(:disabled):hover{
+  background:var(--mint)!important;
+  border-color:var(--mint)!important;
+  color:#073e32!important;
+ }
+ #download-excel:not(:disabled):hover>span{
+  color:#073e32!important;
+ }
+}
+#download-excel:not(:disabled):focus-visible{
+ background:var(--mint)!important;
+ border-color:var(--mint)!important;
+ color:#073e32!important;
+}
+#download-excel:not(:disabled):focus-visible>span{
+ color:#073e32!important;
+}
+
+
+/* Final compact header, larger sidebar glyph, and matched export hover behaviour. */
+:root{
+ --header-height:76px;
+}
+.topbar{
+ height:76px;
+ min-height:76px;
+}
+
+/* Keep Excel's own resting style, but give it the same hover treatment as PDF. */
+#download-pdf,
+#download-excel{
+ transition:filter .16s ease,background-color .16s ease,border-color .16s ease,color .16s ease;
+}
+@media (hover:hover) and (pointer:fine){
+ #download-pdf:not(:disabled):hover,
+ #download-excel:not(:disabled):hover{
+  filter:brightness(.88);
+ }
+ #download-excel:not(:disabled):hover{
+  background:inherit!important;
+  border-color:inherit!important;
+  color:#fff!important;
+ }
+ #download-excel:not(:disabled):hover>span{
+  color:#fff!important;
+ }
+}
+#download-pdf:not(:disabled):focus-visible,
+#download-excel:not(:disabled):focus-visible{
+ filter:brightness(.88);
+}
+#download-excel:not(:disabled):focus-visible{
+ background:inherit!important;
+ border-color:inherit!important;
+ color:#fff!important;
+}
+#download-excel:not(:disabled):focus-visible>span{
+ color:#fff!important;
+}
+
+/* Make the icon-only sidebar control easier to see without restoring its tile. */
+.sidebar-toggle-glyph{
+ width:28px!important;
+ height:28px!important;
+}
+
+@media screen and (max-width:650px){
+ :root{
+  --header-height:64px;
+ }
+ .topbar{
+  height:64px;
+  min-height:64px;
+  padding-left:18px;
+  padding-right:18px;
+ }
+ .sidebar-toggle-glyph{
+  width:30px!important;
+  height:30px!important;
+ }
+}
+
+
+/* Show installation controls only in browser mode and update controls only in the installed app. */
+.sidebar-install-button[hidden],
+.install-app-status[hidden]{
+ display:none!important;
+}
+@media (display-mode:standalone){
+ #install-app,
+ #install-app-status{
+  display:none!important;
+ }
+ #update-app:not([hidden]){
+  display:flex;
+ }
+}
+
+
+/* Cross-device install fallback: native prompt when available, in-app guide otherwise. */
+.install-guide[hidden]{display:none!important}
+.install-guide{
+ position:fixed;
+ inset:0;
+ z-index:1200;
+ display:grid;
+ place-items:center;
+ padding:20px
+}
+.install-guide-backdrop{
+ position:absolute;
+ inset:0;
+ background:rgba(0,0,0,.48);
+ backdrop-filter:blur(2px)
+}
+.install-guide-card{
+ position:relative;
+ z-index:1;
+ width:min(430px,100%);
+ max-height:calc(100dvh - 40px);
+ overflow:auto;
+ padding:28px;
+ border:1px solid var(--line);
+ border-radius:18px;
+ background:var(--surface);
+ color:var(--tone-172e28);
+ box-shadow:0 24px 70px rgba(0,0,0,.24)
+}
+.install-guide-close{
+ position:absolute;
+ top:12px;
+ right:12px;
+ display:grid;
+ place-items:center;
+ width:36px;
+ height:36px;
+ padding:0;
+ border:0;
+ border-radius:50%;
+ background:transparent;
+ color:var(--muted);
+ font-size:28px;
+ line-height:1
+}
+.install-guide-close:hover{background:var(--tone-eaf1eb);color:var(--green)}
+.install-guide-icon{
+ display:grid;
+ place-items:center;
+ width:48px;
+ height:48px;
+ margin-bottom:14px;
+ border-radius:14px;
+ background:var(--tone-eaf1eb);
+ color:var(--green);
+ font-size:28px;
+ font-weight:800
+}
+.install-guide-card h2{margin:0 42px 8px 0;font-size:22px}
+.install-guide-card p{margin:0 0 16px;color:var(--muted);font-size:14px}
+.install-guide-card ol{margin:0 0 22px;padding-left:22px}
+.install-guide-card li{margin:8px 0;font-size:14px}
+.install-guide-card .button{width:100%;min-width:0}
+body.install-guide-open{overflow:hidden}
+@media(max-width:480px){
+ .install-guide{padding:14px}
+ .install-guide-card{padding:24px 20px;border-radius:16px}
+}
+
+
+/* Keep Appearance and app-management controls together at the bottom of the sidebar. */
+.sidebar-main-view>.sidebar-reference-nav{
+ margin-bottom:auto;
+}
+.sidebar-main-view>.sidebar-theme-controls{
+ margin-top:0!important;
+}
+.sidebar-main-view>#install-app:not([hidden]),
+.sidebar-main-view>#update-app:not([hidden]){
+ display:flex!important;
+ flex:0 0 auto;
+}
+.sidebar-main-view>#install-app,
+.sidebar-main-view>#update-app{
+ margin-top:10px;
+}
+.sidebar-main-view>#install-app-status:not([hidden]),
+.sidebar-main-view>#update-app-status:not([hidden]){
+ flex:0 0 auto;
+}
+
+
+/* Installed-app state is authoritative: never show the install control there. */
+html.ntaxer-installed-app #install-app,
+html.ntaxer-installed-app #install-app-status{
+ display:none!important;
+}
+html.ntaxer-installed-app #update-app:not([hidden]){
+ display:flex!important;
+}
+@media (display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui),(display-mode:window-controls-overlay){
+ #install-app,#install-app-status{display:none!important}
+ #update-app:not([hidden]){display:flex!important}
+}
+
+
+/* Cache-proof installed-app controls. */
+@media (display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui),(display-mode:window-controls-overlay){
+ #install-app,
+ #install-app-status{
+  display:none!important;
+ }
+ #update-app{
+  display:flex!important;
+ }
+}
