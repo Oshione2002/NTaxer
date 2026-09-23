@@ -1587,9 +1587,15 @@ const updateStatus=$('#update-app-status');
 let swRegistration=null;
 let updateCheckBusy=false;
 let updateReloadPending=false;
-const installedMode=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const installedMode=()=>{
+ const modes=['standalone','fullscreen','minimal-ui','window-controls-overlay'];
+ return modes.some(mode=>window.matchMedia('(display-mode: '+mode+')').matches)
+  ||navigator.standalone===true
+  ||document.referrer.startsWith('android-app://');
+};
 function syncAppManagementVisibility(){
  const installed=installedMode();
+ document.documentElement.classList.toggle('ntaxer-installed-app',installed);
  if(installButton)installButton.hidden=installed;
  if(installStatus&&installed)installStatus.hidden=true;
  if(updateButton)updateButton.hidden=!installed;
@@ -1598,6 +1604,14 @@ function syncAppManagementVisibility(){
 }
 function setInstallCopy(label,detail,{disabled=false,status=''}={}){
  if(!installButton)return;
+ if(label==='NTaxer installed'){
+  installButton.hidden=true;
+  if(installStatus)installStatus.hidden=true;
+  if(updateButton)updateButton.hidden=false;
+  refreshUpdateButton();
+  return;
+ }
+ installButton.hidden=false;
  installLabel.textContent=label;
  installDetail.textContent=detail;
  installButton.disabled=disabled;
@@ -1766,6 +1780,23 @@ window.addEventListener('online',()=>{
  if(swRegistration&&installedMode())setTimeout(()=>checkForAppUpdate(),500);
 });
 window.addEventListener('offline',refreshUpdateButton);
+window.addEventListener('pageshow',()=>{
+ syncAppManagementVisibility();
+ refreshUpdateButton();
+});
+document.addEventListener('visibilitychange',()=>{
+ if(document.visibilityState==='visible'){
+  syncAppManagementVisibility();
+  refreshUpdateButton();
+ }
+});
+for(const mode of ['standalone','fullscreen','minimal-ui','window-controls-overlay']){
+ const query=window.matchMedia('(display-mode: '+mode+')');
+ query.addEventListener?.('change',()=>{
+  syncAppManagementVisibility();
+  refreshUpdateButton();
+ });
+}
 
 if('serviceWorker' in navigator){
  navigator.serviceWorker.addEventListener('controllerchange',()=>{

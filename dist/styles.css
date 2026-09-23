@@ -2014,3 +2014,17 @@ body.install-guide-open{overflow:hidden}
 .sidebar-main-view>#update-app-status:not([hidden]){
  flex:0 0 auto;
 }
+
+
+/* Installed-app state is authoritative: never show the install control there. */
+html.ntaxer-installed-app #install-app,
+html.ntaxer-installed-app #install-app-status{
+ display:none!important;
+}
+html.ntaxer-installed-app #update-app:not([hidden]){
+ display:flex!important;
+}
+@media (display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui),(display-mode:window-controls-overlay){
+ #install-app,#install-app-status{display:none!important}
+ #update-app:not([hidden]){display:flex!important}
+}
