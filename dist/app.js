@@ -1689,6 +1689,63 @@ window.addEventListener('appinstalled',()=>{
  syncAppManagementVisibility();
  setInstallCopy('NTaxer installed','Ready to use offline',{disabled:true,status:'Installation complete. Launch NTaxer from your device to manage updates.'});
 });
+const installGuide=document.createElement('div');
+installGuide.id='install-guide';
+installGuide.className='install-guide';
+installGuide.hidden=true;
+installGuide.innerHTML='<div class="install-guide-backdrop" data-install-guide-close></div><section class="install-guide-card" role="dialog" aria-modal="true" aria-labelledby="install-guide-title"><button class="install-guide-close" type="button" aria-label="Close install instructions" data-install-guide-close>×</button><div class="install-guide-icon" aria-hidden="true">↓</div><h2 id="install-guide-title">Install NTaxer</h2><p id="install-guide-copy"></p><ol id="install-guide-steps"></ol><button id="install-guide-done" class="button primary" type="button" data-install-guide-close>Got it</button></section>';
+document.body.append(installGuide);
+const installGuideCopy=installGuide.querySelector('#install-guide-copy');
+const installGuideSteps=installGuide.querySelector('#install-guide-steps');
+
+function installInstructions(){
+ const ua=navigator.userAgent;
+ const isiOS=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ const isAndroid=/Android/i.test(ua);
+ const isMac=/Macintosh|Mac OS X/i.test(ua);
+ if(isiOS)return {
+  copy:'Your browser does not allow a website to open the iPhone or iPad install sheet directly. Use the browser share menu to install NTaxer.',
+  steps:['Tap the Share button in your browser.','Choose Add to Home Screen.','Tap Add to install NTaxer.']
+ };
+ if(isAndroid)return {
+  copy:'Your browser has not exposed its native install prompt yet. You can still install NTaxer from the browser menu.',
+  steps:['Open the browser menu (usually ⋮).','Choose Install app or Add to Home screen.','Confirm the installation.']
+ };
+ if(isMac)return {
+  copy:'Your browser has not exposed a native install prompt. Use its app-install option if available.',
+  steps:['Open the browser menu or File menu.','Choose Install NTaxer, Install app, or Add to Dock.','Confirm the installation.']
+ };
+ return {
+  copy:'Your browser has not exposed a native install prompt. Use its browser menu to install NTaxer if PWA installation is supported.',
+  steps:['Open the browser menu.','Choose Install app, Install page as app, or Add to Home screen.','Confirm the installation.']
+ };
+}
+
+function showInstallGuide(){
+ const info=installInstructions();
+ installGuideCopy.textContent=info.copy;
+ installGuideSteps.innerHTML='';
+ for(const step of info.steps){
+  const li=document.createElement('li');
+  li.textContent=step;
+  installGuideSteps.append(li);
+ }
+ installGuide.hidden=false;
+ document.body.classList.add('install-guide-open');
+ installGuide.querySelector('.install-guide-close')?.focus();
+}
+function hideInstallGuide(){
+ installGuide.hidden=true;
+ document.body.classList.remove('install-guide-open');
+ installButton?.focus({preventScroll:true});
+}
+installGuide.addEventListener('click',event=>{
+ if(event.target.closest('[data-install-guide-close]'))hideInstallGuide();
+});
+document.addEventListener('keydown',event=>{
+ if(event.key==='Escape'&&!installGuide.hidden)hideInstallGuide();
+});
+
 installButton?.addEventListener('click',async()=>{
  if(deferredInstallPrompt){
   const prompt=deferredInstallPrompt;
@@ -1698,9 +1755,7 @@ installButton?.addEventListener('click',async()=>{
   if(choice.outcome==='dismissed')setInstallCopy('Install NTaxer',offlineReady?'Available offline after installation':'Preparing offline access…',{status:'Installation was cancelled. You can try again.'});
   return;
  }
- const isiOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
- const message=isiOS?'Tap the browser Share button, choose Add to Home Screen, then tap Add.':'Open your browser menu and choose Install app, Install page as app, or Add to Home screen.';
- setInstallCopy('Install NTaxer',offlineReady?'Available offline after installation':'Preparing offline access…',{status:message});
+ showInstallGuide();
 });
 updateInstallButton();
 syncAppManagementVisibility();

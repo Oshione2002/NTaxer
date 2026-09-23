@@ -1922,3 +1922,73 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
   display:flex;
  }
 }
+
+
+/* Cross-device install fallback: native prompt when available, in-app guide otherwise. */
+.install-guide[hidden]{display:none!important}
+.install-guide{
+ position:fixed;
+ inset:0;
+ z-index:1200;
+ display:grid;
+ place-items:center;
+ padding:20px
+}
+.install-guide-backdrop{
+ position:absolute;
+ inset:0;
+ background:rgba(0,0,0,.48);
+ backdrop-filter:blur(2px)
+}
+.install-guide-card{
+ position:relative;
+ z-index:1;
+ width:min(430px,100%);
+ max-height:calc(100dvh - 40px);
+ overflow:auto;
+ padding:28px;
+ border:1px solid var(--line);
+ border-radius:18px;
+ background:var(--surface);
+ color:var(--tone-172e28);
+ box-shadow:0 24px 70px rgba(0,0,0,.24)
+}
+.install-guide-close{
+ position:absolute;
+ top:12px;
+ right:12px;
+ display:grid;
+ place-items:center;
+ width:36px;
+ height:36px;
+ padding:0;
+ border:0;
+ border-radius:50%;
+ background:transparent;
+ color:var(--muted);
+ font-size:28px;
+ line-height:1
+}
+.install-guide-close:hover{background:var(--tone-eaf1eb);color:var(--green)}
+.install-guide-icon{
+ display:grid;
+ place-items:center;
+ width:48px;
+ height:48px;
+ margin-bottom:14px;
+ border-radius:14px;
+ background:var(--tone-eaf1eb);
+ color:var(--green);
+ font-size:28px;
+ font-weight:800
+}
+.install-guide-card h2{margin:0 42px 8px 0;font-size:22px}
+.install-guide-card p{margin:0 0 16px;color:var(--muted);font-size:14px}
+.install-guide-card ol{margin:0 0 22px;padding-left:22px}
+.install-guide-card li{margin:8px 0;font-size:14px}
+.install-guide-card .button{width:100%;min-width:0}
+body.install-guide-open{overflow:hidden}
+@media(max-width:480px){
+ .install-guide{padding:14px}
+ .install-guide-card{padding:24px 20px;border-radius:16px}
+}
