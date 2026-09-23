@@ -1,4 +1,4 @@
-const CACHE_VERSION='ntaxer-offline-v69';
+const CACHE_VERSION='ntaxer-offline-v70';
 const APP_SHELL=[
  './',
  './index.html',
@@ -23,7 +23,24 @@ self.addEventListener('install',event=>{
 });
 
 self.addEventListener('activate',event=>{
- event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('ntaxer-offline-')&&key!==CACHE_VERSION).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));
+ event.waitUntil((async()=>{
+  const keys=await caches.keys();
+  const oldCaches=keys.filter(key=>key.startsWith('ntaxer-offline-')&&key!==CACHE_VERSION);
+  const upgrading=oldCaches.length>0;
+  await Promise.all(oldCaches.map(key=>caches.delete(key)));
+  await self.clients.claim();
+
+  // Existing installed apps may still be running an older cached app.js.
+  // After a real version upgrade, reload open app windows once so the
+  // newly activated service worker and latest UI take effect immediately.
+  if(upgrading){
+   const clients=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+   await Promise.all(clients.map(client=>{
+    if(!client.url.startsWith(self.location.origin))return Promise.resolve();
+    return client.navigate(client.url).catch(()=>null);
+   }));
+  }
+ })());
 });
 
 async function offlineResponse(request){
