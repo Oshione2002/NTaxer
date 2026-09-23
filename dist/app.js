@@ -1580,6 +1580,13 @@ const installDetail=installButton?.querySelector('small');
 const installStatus=$('#install-app-status');
 let deferredInstallPrompt=null;
 let offlineReady=false;
+const updateButton=$('#update-app');
+const updateLabel=updateButton?.querySelector('strong');
+const updateDetail=updateButton?.querySelector('small');
+const updateStatus=$('#update-app-status');
+let swRegistration=null;
+let updateCheckBusy=false;
+let updateReloadPending=false;
 const installedMode=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 function setInstallCopy(label,detail,{disabled=false,status=''}={}){
  if(!installButton)return;
@@ -1592,6 +1599,75 @@ function setInstallCopy(label,detail,{disabled=false,status=''}={}){
 function updateInstallButton(){
  if(installedMode()){setInstallCopy('NTaxer installed',offlineReady?'Ready to use offline':'Preparing offline access…',{disabled:true});return;}
  setInstallCopy('Install NTaxer',offlineReady?'Available offline after installation':'Preparing offline access…');
+}
+function setUpdateCopy(label,detail,{disabled=false,status=''}={}){
+ if(!updateButton)return;
+ updateLabel.textContent=label;
+ updateDetail.textContent=detail;
+ updateButton.disabled=disabled;
+ if(status){updateStatus.textContent=status;updateStatus.hidden=false;}
+ else{updateStatus.textContent='';updateStatus.hidden=true;}
+}
+function refreshUpdateButton(){
+ if(!('serviceWorker' in navigator)){
+  setUpdateCopy('Updates unavailable','This browser does not support app updates',{disabled:true});
+  return;
+ }
+ if(!navigator.onLine){
+  setUpdateCopy('Check for updates','Connect to the internet to update');
+  return;
+ }
+ setUpdateCopy('Check for updates',swRegistration?'You are ready to check for a newer version':'Preparing update service…',{disabled:!swRegistration});
+}
+function watchInstallingWorker(worker){
+ if(!worker)return;
+ setUpdateCopy('Updating NTaxer','Downloading the latest version…',{disabled:true});
+ worker.addEventListener('statechange',()=>{
+  if(worker.state==='installed'&&navigator.serviceWorker.controller){
+   updateReloadPending=true;
+   setUpdateCopy('Update ready','Applying the latest version…',{disabled:true});
+   if(swRegistration?.waiting)swRegistration.waiting.postMessage({type:'SKIP_WAITING'});
+  }else if(worker.state==='redundant'){
+   setUpdateCopy('Check for updates','Update could not be installed',{status:'Please try again while connected to the internet.'});
+  }
+ });
+}
+async function checkForAppUpdate({manual=false}={}){
+ if(!('serviceWorker' in navigator))return;
+ if(!navigator.onLine){
+  setUpdateCopy('Check for updates','Connect to the internet to update',{status:manual?'NTaxer cannot download an update while you are offline.':''});
+  return;
+ }
+ if(updateCheckBusy)return;
+ try{
+  updateCheckBusy=true;
+  if(!swRegistration)swRegistration=await navigator.serviceWorker.ready;
+  let updateFound=false;
+  const onUpdateFound=()=>{
+   updateFound=true;
+   watchInstallingWorker(swRegistration.installing);
+  };
+  swRegistration.addEventListener('updatefound',onUpdateFound,{once:true});
+  setUpdateCopy('Checking for updates','Looking for a newer version…',{disabled:true});
+  await swRegistration.update();
+  if(swRegistration.waiting){
+   updateFound=true;
+   updateReloadPending=true;
+   setUpdateCopy('Update ready','Applying the latest version…',{disabled:true});
+   swRegistration.waiting.postMessage({type:'SKIP_WAITING'});
+  }
+  await new Promise(resolve=>setTimeout(resolve,700));
+  if(!updateFound&&!swRegistration.installing&&!swRegistration.waiting){
+   swRegistration.removeEventListener('updatefound',onUpdateFound);
+   setUpdateCopy('Check for updates','NTaxer is up to date',{status:manual?'You already have the latest available version.':''});
+  }
+ }catch(error){
+  console.error('NTaxer update check failed',error);
+  setUpdateCopy('Check for updates','Could not check for updates',{status:'Check your internet connection and try again.'});
+ }finally{
+  updateCheckBusy=false;
+  if(updateButton&&updateButton.disabled&&!updateReloadPending)updateButton.disabled=false;
+ }
 }
 window.addEventListener('beforeinstallprompt',event=>{
  event.preventDefault();
@@ -1617,16 +1693,36 @@ installButton?.addEventListener('click',async()=>{
 });
 updateInstallButton();
 
+updateButton?.addEventListener('click',()=>checkForAppUpdate({manual:true}));
+window.addEventListener('online',()=>{
+ refreshUpdateButton();
+ if(swRegistration)setTimeout(()=>checkForAppUpdate(),500);
+});
+window.addEventListener('offline',refreshUpdateButton);
+
 if('serviceWorker' in navigator){
+ navigator.serviceWorker.addEventListener('controllerchange',()=>{
+  if(!updateReloadPending)return;
+  updateReloadPending=false;
+  setUpdateCopy('Updated','Reloading NTaxer…',{disabled:true});
+  setTimeout(()=>location.reload(),350);
+ });
  window.addEventListener('load',async()=>{
   try{
-   await navigator.serviceWorker.register('./service-worker.js',{scope:'./'});
+   swRegistration=await navigator.serviceWorker.register('./service-worker.js',{scope:'./',updateViaCache:'none'});
+   swRegistration.addEventListener('updatefound',()=>watchInstallingWorker(swRegistration.installing));
    await navigator.serviceWorker.ready;
    offlineReady=true;
    updateInstallButton();
+   refreshUpdateButton();
+   if(navigator.onLine)setTimeout(()=>checkForAppUpdate(),1200);
   }catch(error){
    console.error('Offline setup failed',error);
    setInstallCopy('Install NTaxer','Offline setup needs an online reload',{status:'Reconnect to the internet and reload once to finish offline setup.'});
+   setUpdateCopy('Check for updates','Update service needs an online reload',{status:'Reconnect to the internet and reload once to enable app updates.'});
   }
  },{once:true});
-}else setInstallCopy('Install NTaxer','Use your browser installation menu',{status:'This browser does not provide offline web-app installation.'});
+}else{
+ setInstallCopy('Install NTaxer','Use your browser installation menu',{status:'This browser does not provide offline web-app installation.'});
+ refreshUpdateButton();
+}

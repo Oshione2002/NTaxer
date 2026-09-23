@@ -1,4 +1,4 @@
-const CACHE_VERSION='ntaxer-offline-v65';
+const CACHE_VERSION='ntaxer-offline-v66';
 const APP_SHELL=[
  './',
  './index.html',
@@ -53,4 +53,9 @@ async function offlineResponse(request){
 
 self.addEventListener('fetch',event=>{
  if(event.request.method==='GET')event.respondWith(offlineResponse(event.request));
+});
+
+
+self.addEventListener('message',event=>{
+ if(event.data?.type==='SKIP_WAITING')self.skipWaiting();
 });
