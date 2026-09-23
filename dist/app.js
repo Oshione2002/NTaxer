@@ -1588,6 +1588,14 @@ let swRegistration=null;
 let updateCheckBusy=false;
 let updateReloadPending=false;
 const installedMode=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+function syncAppManagementVisibility(){
+ const installed=installedMode();
+ if(installButton)installButton.hidden=installed;
+ if(installStatus&&installed)installStatus.hidden=true;
+ if(updateButton)updateButton.hidden=!installed;
+ if(updateStatus&&!installed)updateStatus.hidden=true;
+ return installed;
+}
 function setInstallCopy(label,detail,{disabled=false,status=''}={}){
  if(!installButton)return;
  installLabel.textContent=label;
@@ -1597,7 +1605,7 @@ function setInstallCopy(label,detail,{disabled=false,status=''}={}){
  else{installStatus.textContent='';installStatus.hidden=true;}
 }
 function updateInstallButton(){
- if(installedMode()){setInstallCopy('NTaxer installed',offlineReady?'Ready to use offline':'Preparing offline access…',{disabled:true});return;}
+ if(syncAppManagementVisibility())return;
  setInstallCopy('Install NTaxer',offlineReady?'Available offline after installation':'Preparing offline access…');
 }
 function setUpdateCopy(label,detail,{disabled=false,status=''}={}){
@@ -1609,6 +1617,7 @@ function setUpdateCopy(label,detail,{disabled=false,status=''}={}){
  else{updateStatus.textContent='';updateStatus.hidden=true;}
 }
 function refreshUpdateButton(){
+ if(!syncAppManagementVisibility())return;
  if(!('serviceWorker' in navigator)){
   setUpdateCopy('Updates unavailable','This browser does not support app updates',{disabled:true});
   return;
@@ -1633,6 +1642,7 @@ function watchInstallingWorker(worker){
  });
 }
 async function checkForAppUpdate({manual=false}={}){
+ if(!installedMode())return;
  if(!('serviceWorker' in navigator))return;
  if(!navigator.onLine){
   setUpdateCopy('Check for updates','Connect to the internet to update',{status:manual?'NTaxer cannot download an update while you are offline.':''});
@@ -1676,7 +1686,8 @@ window.addEventListener('beforeinstallprompt',event=>{
 });
 window.addEventListener('appinstalled',()=>{
  deferredInstallPrompt=null;
- setInstallCopy('NTaxer installed','Ready to use offline',{disabled:true,status:'Installation complete. NTaxer can now launch from your device.'});
+ syncAppManagementVisibility();
+ setInstallCopy('NTaxer installed','Ready to use offline',{disabled:true,status:'Installation complete. Launch NTaxer from your device to manage updates.'});
 });
 installButton?.addEventListener('click',async()=>{
  if(deferredInstallPrompt){
@@ -1692,11 +1703,12 @@ installButton?.addEventListener('click',async()=>{
  setInstallCopy('Install NTaxer',offlineReady?'Available offline after installation':'Preparing offline access…',{status:message});
 });
 updateInstallButton();
+syncAppManagementVisibility();
 
 updateButton?.addEventListener('click',()=>checkForAppUpdate({manual:true}));
 window.addEventListener('online',()=>{
  refreshUpdateButton();
- if(swRegistration)setTimeout(()=>checkForAppUpdate(),500);
+ if(swRegistration&&installedMode())setTimeout(()=>checkForAppUpdate(),500);
 });
 window.addEventListener('offline',refreshUpdateButton);
 
@@ -1715,7 +1727,7 @@ if('serviceWorker' in navigator){
    offlineReady=true;
    updateInstallButton();
    refreshUpdateButton();
-   if(navigator.onLine)setTimeout(()=>checkForAppUpdate(),1200);
+   if(navigator.onLine&&installedMode())setTimeout(()=>checkForAppUpdate(),1200);
   }catch(error){
    console.error('Offline setup failed',error);
    setInstallCopy('Install NTaxer','Offline setup needs an online reload',{status:'Reconnect to the internet and reload once to finish offline setup.'});

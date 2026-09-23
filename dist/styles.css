@@ -1906,3 +1906,19 @@ select option{background-color:var(--surface);color:var(--tone-172e28)}
   height:30px!important;
  }
 }
+
+
+/* Show installation controls only in browser mode and update controls only in the installed app. */
+.sidebar-install-button[hidden],
+.install-app-status[hidden]{
+ display:none!important;
+}
+@media (display-mode:standalone){
+ #install-app,
+ #install-app-status{
+  display:none!important;
+ }
+ #update-app:not([hidden]){
+  display:flex;
+ }
+}
