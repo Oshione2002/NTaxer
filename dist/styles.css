@@ -1992,3 +1992,25 @@ body.install-guide-open{overflow:hidden}
  .install-guide{padding:14px}
  .install-guide-card{padding:24px 20px;border-radius:16px}
 }
+
+
+/* Keep Appearance and app-management controls together at the bottom of the sidebar. */
+.sidebar-main-view>.sidebar-reference-nav{
+ margin-bottom:auto;
+}
+.sidebar-main-view>.sidebar-theme-controls{
+ margin-top:0!important;
+}
+.sidebar-main-view>#install-app:not([hidden]),
+.sidebar-main-view>#update-app:not([hidden]){
+ display:flex!important;
+ flex:0 0 auto;
+}
+.sidebar-main-view>#install-app,
+.sidebar-main-view>#update-app{
+ margin-top:10px;
+}
+.sidebar-main-view>#install-app-status:not([hidden]),
+.sidebar-main-view>#update-app-status:not([hidden]){
+ flex:0 0 auto;
+}
