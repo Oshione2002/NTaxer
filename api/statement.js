@@ -1,4 +1,4 @@
-const MODELS=['gemini-3.5-flash-lite','gemini-3.1-flash-lite'];
+const MODELS=['gemini-3.8-flash','gemini-3.5-flash-lite','gemini-3.1-flash-lite'];
 const RETRYABLE=new Set([429,500,502,503,504]);
 const MAX_FILES=5;
 const MAX_FILE_BYTES=5*1024*1024;
@@ -337,7 +337,9 @@ async function callGenerateContent(model,file,prompt){
     },
     body:JSON.stringify({
       contents:[{role:'user',parts}],
-      generationConfig:{temperature:0.05,maxOutputTokens:8192},
+      generationConfig:model==='gemini-3.8-flash'
+        ?{thinkingConfig:{thinkingLevel:'low'},maxOutputTokens:8192}
+        :{temperature:0.05,maxOutputTokens:8192},
       store:false
     })
   });

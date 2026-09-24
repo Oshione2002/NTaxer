@@ -1,4 +1,4 @@
-const MODELS=['gemini-3.5-flash-lite','gemini-3.1-flash-lite'];
+const MODELS=['gemini-3.8-flash','gemini-3.5-flash-lite','gemini-3.1-flash-lite'];
 const RETRYABLE=new Set([429,500,502,503,504]);
 const WINDOW_MS=10*60*1000;
 const MAX_PER_WINDOW=24;
@@ -229,8 +229,10 @@ async function callGemini(mode,prompt){
           systemInstruction:{parts:[{text:systemInstruction(mode)}]},
           contents:[{role:'user',parts:[{text:prompt}]}],
           generationConfig:{
-            temperature:0.15,
-            maxOutputTokens:700,
+            ...(model==='gemini-3.8-flash'
+              ?{thinkingConfig:{thinkingLevel:'low'}}
+              :{temperature:0.15}),
+            maxOutputTokens:model==='gemini-3.8-flash'?2048:700,
             responseMimeType:'application/json',
             responseSchema:schemas[mode]
           },
