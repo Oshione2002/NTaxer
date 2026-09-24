@@ -1,5 +1,4 @@
 const MODELS=[
-  'gemini-3.8-flash',
   'gemini-3.7-flash',
   'gemini-3.6-flash',
   'gemini-3.5-flash',
@@ -25,9 +24,7 @@ async function testModel(model){
             role:'user',
             parts:[{text:'Reply with exactly NTAXER_AI_OK'}]
           }],
-          generationConfig:model==='gemini-3.8-flash'
-            ?{thinkingConfig:{thinkingLevel:'low'},maxOutputTokens:64}
-            :{temperature:0,maxOutputTokens:24}
+          generationConfig:{temperature:0,maxOutputTokens:24}
         })
       }
     );
